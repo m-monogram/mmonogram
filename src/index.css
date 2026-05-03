@@ -1,0 +1,764 @@
+/* Fonts loaded via index.html for better performance */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: 'Riviera Nights';
+    src: url('/riviera-font-family/RivieraNightsTrial-Ultralight.otf') format('opentype');
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Riviera Nights';
+    src: url('/riviera-font-family/RivieraNightsTrial-Light.otf') format('opentype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Riviera Nights';
+    src: url('/riviera-font-family/RivieraNightsTrial-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Riviera Nights';
+    src: url('/riviera-font-family/RivieraNightsTrial-Medium.otf') format('opentype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Riviera Nights';
+    src: url('/riviera-font-family/RivieraNightsTrial-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Riviera Nights';
+    src: url('/riviera-font-family/RivieraNightsTrial-Black.otf') format('opentype');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    /* =========================================
+       1. ШРИФТ И ВЕС (Typography & Weight)
+    ========================================= */
+    --font-family-primary: 'Riviera Nights', sans-serif;
+    
+    --weight-light: 300; /* Основной вес для роскошного вида */
+    --weight-regular: 400; /* Для длинных читаемых текстов */
+
+    /* =========================================
+       2. ЦВЕТ И КОНТРАСТ (Colors)
+       Решаем проблему "плохо читается на черном"
+    ========================================= */
+    --color-bg-main: #0a0a0a; /* Глубокий, богатый черный цвет */
+    --color-text-primary: #f5f5f5; /* Мягкий белый (не 100% белый, чтобы не резало глаза) */
+    --color-text-secondary: #a0a0a0; /* Светло-серый, но с достаточным контрастом */
+    --color-border: #333333; /* Тонкие, еле заметные линии разделителей */
+
+    /* =========================================
+       3. РАЗМЕРЫ ТЕКСТА (Typography Scale)
+    ========================================= */
+    --text-hero: clamp(2.5rem, 6vw, 4rem);       /* Главный заголовок первого экрана (with clamp) */
+    --text-section: clamp(1.5rem, 4vw, 2.25rem); /* Заголовки разделов (with clamp) */
+    --text-body: 1.125rem;   /* ~18px: Основной текст */
+    --text-caption: 0.875rem;/* ~14px: Подписи, карточки, меню */
+
+    /* =========================================
+       4. МЕЖБУКВЕННЫЕ ИНТЕРВАЛЫ (Letter Spacing)
+       Секрет "дорогой" типографики
+    ========================================= */
+    --ls-hero: -0.01em;    /* Огромные заголовки чуть сдвигаем для монолитности */
+    --ls-section: 0.05em;  /* Заголовки секций слегка разряжаем */
+    --ls-body: 0;          /* Обычный текст оставляем как есть для читаемости */
+    --ls-caps: 0.15em;     /* НАВИГАЦИЯ И ПОДПИСИ КАПСОМ сильно разряжаем */
+
+    /* =========================================
+       5. МЕЖСТРОЧНЫЙ ИНТЕРВАЛ (Line Height)
+    ========================================= */
+    --lh-heading: 1.1; /* Плотный интервал для заголовков */
+    --lh-body: 1.6;    /* Просторный интервал для основного текста */
+
+    /* =========================================
+       6. СИСТЕМА ОТСТУПОВ (Spacing System)
+       Математический шаг, убираем хаос
+    ========================================= */
+    --space-xs: 0.5rem;  /* 8px:  Расстояние между иконкой и подписью */
+    --space-sm: 1rem;    /* 16px: Расстояние между названием авто и его характеристиками */
+    --space-md: 2rem;    /* 32px: Расстояние между заголовком и основным текстом */
+    --space-lg: 4rem;    /* 64px: Внутренние отступы блоков карточек */
+    --space-xl: 8rem;    /* 128px: Огромные отступы между большими разделами сайта */
+
+    /* M-MONOGRAM Ultra Premium Black Design System - UNIFIED Base Compatibility */
+    --background: 0 0% 4%; /* Matches #0a0a0a */
+    --foreground: 0 0% 96%; /* Matches #f5f5f5 */
+
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 0 0% 3%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 3%;
+
+    --secondary: 0 0% 3%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 75%;
+
+    --accent: 0 0% 3%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 15%;
+    --input: 0 0% 8%;
+    --ring: 0 0% 100%;
+
+    --radius: 0rem;
+
+    /* Single unified black */
+    --premium-black: 0 0% 0%;
+    --accent-white: 0 0% 100%;
+    --accent-white-dim: 0 0% 80%;
+    --muted-foreground: 0 0% 75%;
+
+    /* Purple accent for subtitles */
+    --accent-gold: 270 60% 70%;
+    --accent-gold-dim: 270 50% 60%;
+
+    /* Glass effect */
+    --glass-bg: 0 0% 3% / 0.9;
+    --glass-border: 0 0% 100% / 0.06;
+    --glass-inner-glow: inset 0 1px 0 0 rgba(255,255,255,0.05);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply antialiased;
+    color: var(--color-text-primary);
+    font-family: var(--font-family-primary);
+    font-weight: var(--weight-light);
+    font-size: var(--text-body);
+    line-height: var(--lh-body);
+    background-color: var(--color-bg-main);
+    min-height: 100vh;
+    min-height: 100dvh; /* Use dynamic viewport height for mobile */
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Arabic language font override */
+  [dir="rtl"] body {
+    font-family: 'Noto Sans Arabic', 'Riviera Nights', sans-serif;
+  }
+
+  /* Luxury Wave Background */
+  .luxury-bg {
+    background-color: hsl(0 0% 0%);
+    background-image: url('/images/luxury-bg.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+
+  .luxury-bg-contain {
+    background-color: hsl(0 0% 0%);
+    background-image: url('/images/luxury-bg.png');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .luxury-bg-overlay {
+    position: relative;
+  }
+
+  .luxury-bg-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('/images/luxury-bg.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  /* ===== Premium Typography System ===== */
+  /* Luxury Automotive Brand - Refined Type Scale */
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-primary);
+    text-transform: uppercase;
+    font-weight: var(--weight-light);
+    line-height: var(--lh-heading);
+    color: var(--color-text-primary);
+  }
+
+  /* H1 - Hero/Primary Headlines */
+  h1 {
+    font-size: var(--text-hero);
+    letter-spacing: var(--ls-hero);
+  }
+
+  /* H2 & H3 - Section Headers (Unified) */
+  h2, h3 {
+    font-size: var(--text-section);
+    letter-spacing: var(--ls-section);
+    margin-top: var(--space-md);
+    margin-bottom: var(--space-sm);
+  }
+
+  /* H4 - Card/Component Headers */
+  h4 {
+    font-size: var(--text-caption);
+    letter-spacing: var(--ls-caps);
+    font-weight: var(--weight-light);
+  }
+
+  /* Body/Paragraph - Highly Readable */
+  p {
+    font-family: var(--font-family-primary);
+    font-weight: var(--weight-regular);
+    font-style: normal;
+    font-size: var(--text-body);
+    line-height: var(--lh-body);
+    letter-spacing: var(--ls-body);
+    color: var(--color-text-secondary);
+  }
+}
+
+@layer components {
+  /* Display Typography - Premium Headers */
+  .font-display {
+    font-family: var(--font-family-primary);
+    text-transform: uppercase;
+    font-weight: var(--weight-light);
+    line-height: var(--lh-heading);
+  }
+
+  /* Body Typography - Readable Text */
+  .font-body {
+    font-family: var(--font-family-primary);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--ls-body);
+    line-height: var(--lh-body);
+    font-style: normal;
+  }
+
+  /* Tagline - Hero Subtitle Style */
+  .text-tagline {
+    font-family: var(--font-family-primary);
+    font-weight: var(--weight-light);
+    font-size: var(--text-caption);
+    line-height: var(--lh-body);
+    letter-spacing: var(--ls-caps);
+    color: var(--color-text-secondary);
+  }
+
+  /* ===== Typography Scale Tokens ===== */
+  
+  /* Caption - smallest text for labels, metadata */
+  .text-caption {
+    font-size: 0.75rem;    /* 12px */
+    line-height: 1.5;
+  }
+
+  /* Caption Large - for slightly larger labels */
+  .text-caption-lg {
+    font-size: 0.8125rem;  /* 13px */
+    line-height: 1.5;
+  }
+
+  /* Subtitle - secondary text, descriptions */
+  .text-subtitle {
+    font-size: 0.875rem;   /* 14px */
+    line-height: 1.6;
+  }
+
+  /* Subtitle Large */
+  .text-subtitle-lg {
+    font-size: 0.9375rem;  /* 15px */
+    line-height: 1.6;
+  }
+
+  /* Body - main readable text */
+  .text-body {
+    font-size: 1rem;       /* 16px */
+    line-height: 1.7;
+  }
+
+  /* Body Large */
+  .text-body-lg {
+    font-size: 1.125rem;   /* 18px */
+    line-height: 1.7;
+  }
+
+  /* Lead - emphasized body text */
+  .text-lead {
+    font-size: 1.25rem;    /* 20px */
+    line-height: 1.6;
+  }
+
+  /* Responsive variants */
+  @media (min-width: 640px) {
+    .text-caption {
+      font-size: 0.8125rem;  /* 13px on sm+ */
+    }
+    .text-caption-lg {
+      font-size: 0.875rem;   /* 14px on sm+ */
+    }
+    .text-subtitle {
+      font-size: 0.9375rem;  /* 15px on sm+ */
+    }
+    .text-subtitle-lg {
+      font-size: 1rem;       /* 16px on sm+ */
+    }
+    .text-body {
+      font-size: 1.0625rem;  /* 17px on sm+ */
+    }
+    .text-body-lg {
+      font-size: 1.1875rem;  /* 19px on sm+ */
+    }
+    .text-lead {
+      font-size: 1.375rem;   /* 22px on sm+ */
+    }
+  }
+
+  /* Premium Glass Panel */
+  .glass-panel {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow: var(--glass-inner-glow), 0 8px 32px rgba(0,0,0,0.5);
+  }
+
+  /* Ultra Premium Glass (for important UI elements) */
+  .glass-premium {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+      inset 0 1px 0 0 rgba(255,255,255,0.08),
+      0 12px 40px rgba(0,0,0,0.6);
+  }
+
+  .text-accent-white {
+    color: hsl(var(--accent-white));
+  }
+
+  .bg-accent-white {
+    background-color: hsl(var(--accent-white));
+  }
+
+  .border-accent-white {
+    border-color: hsl(var(--accent-white));
+  }
+
+  /* Gold accent text */
+  .text-accent-gold {
+    color: hsl(var(--accent-gold));
+  }
+
+  .text-accent-gold-dim {
+    color: hsl(var(--accent-gold-dim));
+  }
+
+  /* Text contrast overlays */
+  .overlay-gradient-strong {
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.2) 100%);
+  }
+
+  .overlay-gradient-medium {
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+  }
+
+  /* Glow effects - white tones */
+  .glow-primary {
+    box-shadow: 0 0 50px rgba(255, 255, 255, 0.12);
+  }
+
+  .glow-primary-sm {
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.08);
+  }
+
+  /* Unified black sections */
+  .section-black {
+    background: hsl(var(--premium-black));
+  }
+
+  /* Brand strip - same black */
+  .brand-strip {
+    background: hsl(var(--premium-black));
+  }
+
+  /* Premium black background */
+  .bg-premium-black {
+    background: hsl(var(--premium-black));
+  }
+
+  /* Luxury Button with Sheen Animation - White accent */
+  .btn-primary {
+    @apply relative px-8 py-4 font-body font-normal uppercase tracking-widest text-sm overflow-hidden transition-all duration-300;
+    background: hsl(var(--accent-white));
+    color: hsl(0 0% 0%);
+    min-height: 48px;
+  }
+
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      120deg,
+      transparent,
+      rgba(0,0,0,0.15),
+      transparent
+    );
+    transition: left 0.5s ease;
+  }
+
+  .btn-primary:hover::before {
+    left: 100%;
+  }
+
+  .btn-primary:hover {
+    background: hsl(0 0% 90%);
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.2);
+  }
+
+  .btn-outline {
+    @apply px-8 py-4 border border-foreground/30 text-foreground font-body font-normal uppercase tracking-widest text-sm hover:bg-foreground/10 hover:border-foreground transition-all duration-300;
+    min-height: 48px;
+  }
+
+  .btn-ghost {
+    @apply px-8 py-4 border border-border text-muted-foreground font-body font-normal uppercase tracking-widest text-sm hover:border-primary hover:text-primary transition-all duration-300;
+    min-height: 48px;
+  }
+
+  /* Premium Input Fields - Monochrome */
+  .input-luxury {
+    @apply w-full font-body text-foreground placeholder:text-muted-foreground focus:outline-none transition-all duration-300;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.03);
+    min-height: 48px;
+  }
+
+  .input-luxury:focus {
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 
+      inset 0 1px 0 0 rgba(255,255,255,0.08),
+      0 0 25px rgba(255, 255, 255, 0.08);
+  }
+
+  /* Hide scrollbar */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Touch target minimum */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* ===== Vehicle Image Classes ===== */
+  
+  /* Hero Vehicle - Full viewport, cinematic coverage */
+  .img-hero-vehicle {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Default: center on vehicle body */
+    object-position: center 60%;
+  }
+  
+  /* Mobile: adjust to show more of the vehicle */
+  @media (max-width: 639px) {
+    .img-hero-vehicle {
+      object-position: center 55%;
+    }
+  }
+  
+  /* Desktop: cinematic wide shot */
+  @media (min-width: 1024px) {
+    .img-hero-vehicle {
+      object-position: center 65%;
+    }
+  }
+
+  /* Cover Vehicle - Card/thumbnail style, 4:3 or 16:9 containers */
+  .img-cover-vehicle {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 40%;
+  }
+  
+  @media (max-width: 639px) {
+    .img-cover-vehicle {
+      object-position: center 35%;
+    }
+  }
+
+  /* Detail Vehicle - Full visibility required */
+  .img-detail-vehicle {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 45%;
+  }
+  
+  @media (max-width: 639px) {
+    .img-detail-vehicle {
+      object-fit: contain;
+      object-position: center center;
+      background: hsl(var(--background));
+    }
+  }
+
+  /* Kit/Exploded View - Always contain for full visibility */
+  .img-kit-view {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center center;
+  }
+
+  /* Gallery Thumbnail - Square crop, centered */
+  .img-gallery-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+  }
+
+  /* Hero Card - Full Width Mobile-First */
+  .hero-card-fullwidth {
+    width: 100%;
+    min-height: 70vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  @media (min-width: 768px) {
+    .hero-card-fullwidth {
+      min-height: 75vh;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero-card-fullwidth {
+      min-height: 80vh;
+    }
+  }
+
+  /* Unified modification card styling */
+  .mod-card {
+    @apply relative overflow-hidden transition-all duration-300;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+  }
+
+  .mod-card:hover {
+    border-color: hsl(var(--foreground) / 0.3);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+}
+
+@layer utilities {
+  .tracking-luxury {
+    letter-spacing: 0.2em;
+  }
+
+  .tracking-wide-luxury {
+    letter-spacing: 0.15em;
+  }
+
+  /* Cinematic text shadow for readability over images */
+  .text-shadow-luxury {
+    text-shadow: 0 2px 30px rgba(0,0,0,0.8), 0 4px 60px rgba(0,0,0,0.5);
+  }
+
+  .text-shadow-strong {
+    text-shadow: 0 2px 10px rgba(0,0,0,0.9), 0 4px 20px rgba(0,0,0,0.7), 0 8px 40px rgba(0,0,0,0.5);
+  }
+}
+
+/* Keyframe for button sheen */
+@keyframes sheen {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Particle animation */
+@keyframes float-up {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-10vh) scale(1);
+    opacity: 0;
+  }
+}
+
+.particle {
+  animation: float-up linear infinite;
+}
+
+/* Logo glow animation */
+@keyframes logo-glow {
+  0%, 100% {
+    filter: drop-shadow(0 4px 20px rgba(255, 255, 255, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 4px 40px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 60px rgba(255, 255, 255, 0.4));
+  }
+}
+
+.animate-logo-glow {
+  animation: logo-glow 3s ease-in-out infinite;
+}
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* GPU acceleration for smooth animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Mobile safe area handling for notches and status bars */
+@supports (padding: max(0px)) {
+  body {
+    padding-top: max(0px, env(safe-area-inset-top));
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+
+  /* Override for full-screen overlays */
+  .fixed {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* RTL (Right-to-Left) Language Support */
+[dir="rtl"] {
+  /* Text alignment */
+  text-align: right;
+
+  /* Form elements */
+  input, textarea, select {
+    text-align: right;
+  }
+
+  /* Icons and buttons */
+  .btn-primary {
+    flex-direction: row-reverse;
+  }
+
+  /* Language switcher */
+  .language-switcher {
+    flex-direction: row-reverse;
+  }
+
+  /* Contact cards */
+  .contact-card {
+    text-align: right;
+  }
+
+  /* Menu navigation */
+  .nav-menu {
+    direction: rtl;
+  }
+
+  /* Form labels */
+  label {
+    text-align: right;
+  }
+
+  /* Social links */
+  .social-links {
+    flex-direction: row-reverse;
+  }
+}
+
+/* Specific RTL adjustments for Arabic */
+[dir="rtl"] .arabic-text {
+  font-family: 'Noto Sans Arabic', 'Arial Unicode MS', sans-serif;
+  text-align: right;
+  direction: rtl;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
