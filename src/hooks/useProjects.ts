@@ -73,7 +73,7 @@ export function useProjects(includeUnpublished = false) {
     const { data: projectsData } = await query;
     
     if (!projectsData?.length) {
-      setProjects([]);
+      setProjects(fallbackProjects);
       setLoading(false);
       return;
     }
