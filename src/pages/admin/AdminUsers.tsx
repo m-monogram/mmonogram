@@ -47,36 +47,36 @@ export default function AdminUsers() {
   };
 
   if (!isAdmin) {
-    return <div className="text-center py-20 text-white/50">Только администраторы могут управлять пользователями.</div>;
+    return <div className="text-center py-20 text-foreground/50">Только администраторы могут управлять пользователями.</div>;
   }
 
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="text-white font-display text-2xl tracking-widest uppercase">Пользователи</h1>
-        <p className="text-white/40 text-sm font-body mt-1">Управление ролями пользователей</p>
+        <h1 className="text-foreground font-display text-2xl tracking-widest uppercase">Пользователи</h1>
+        <p className="text-foreground/40 text-sm font-body mt-1">Управление ролями пользователей</p>
       </div>
-      <div className="bg-white/5 border border-white/10 p-4 text-white/40 text-xs font-body space-y-1">
+      <div className="bg-foreground/5 border border-foreground/10 p-4 text-foreground/40 text-xs font-body space-y-1">
         <p>Чтобы добавить пользователя, он должен сначала зарегистрироваться на странице /admin.</p>
         <p>Затем добавьте его роль через Supabase SQL Editor:</p>
-        <code className="block mt-2 bg-black/50 p-3 text-white/60 font-mono text-xs">
+        <code className="block mt-2 bg-black/50 p-3 text-foreground/60 font-body text-xs">
           {`INSERT INTO user_roles (user_id, role) VALUES ('user-uuid-here', 'editor');`}
         </code>
       </div>
       {loading ? (
-        <div className="text-white/30 text-sm">Загрузка...</div>
+        <div className="text-foreground/30 text-sm">Загрузка...</div>
       ) : users.length === 0 ? (
-        <div className="text-white/30 text-sm text-center py-8">Нет пользователей с ролями</div>
+        <div className="text-foreground/30 text-sm text-center py-8">Нет пользователей с ролями</div>
       ) : (
         <div className="space-y-2">
           {users.map((u) => (
-            <div key={u.user_id} className="flex items-center justify-between bg-white/[0.03] border border-white/10 p-4">
+            <div key={u.user_id} className="flex items-center justify-between bg-white/[0.03] border border-foreground/10 p-4">
               <div>
-                <p className="text-white text-sm font-mono truncate max-w-[300px]">{u.user_id}</p>
-                <p className="text-white/30 text-xs mt-0.5">Добавлен: {u.created_at ? new Date(u.created_at).toLocaleDateString('ru') : '—'}</p>
+                <p className="text-foreground text-sm font-body truncate max-w-[300px]">{u.user_id}</p>
+                <p className="text-foreground/30 text-xs mt-0.5">Добавлен: {u.created_at ? new Date(u.created_at).toLocaleDateString('ru') : '—'}</p>
               </div>
               <div className="flex items-center gap-3">
-                <select value={u.role} onChange={(e) => handleUpdateRole(u.user_id, e.target.value as AppRole)} className="bg-white/5 border border-white/10 text-white text-xs px-2 py-1 focus:outline-none">
+                <select value={u.role} onChange={(e) => handleUpdateRole(u.user_id, e.target.value as AppRole)} className="bg-foreground/5 border border-foreground/10 text-foreground text-xs px-2 py-1 focus:outline-none">
                   <option value="admin">admin</option>
                   <option value="editor">editor</option>
                   <option value="viewer">viewer</option>

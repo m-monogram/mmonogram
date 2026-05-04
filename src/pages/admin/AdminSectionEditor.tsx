@@ -63,13 +63,13 @@ export default function AdminSectionEditor() {
     toast({ title: 'Сброшено к значениям по умолчанию' });
   };
 
-  if (loading) return <div className="text-white/30">Загрузка...</div>;
+  if (loading) return <div className="text-foreground/30">Загрузка...</div>;
 
   if (!section) {
     return (
       <div className="text-center py-20">
-        <p className="text-white/50 mb-4">Секция &ldquo;{id}&rdquo; не найдена</p>
-        <button onClick={() => navigate('/admin/sections')} className="text-white/40 hover:text-white text-sm underline">← К списку секций</button>
+        <p className="text-foreground/50 mb-4">Секция &ldquo;{id}&rdquo; не найдена</p>
+        <button onClick={() => navigate('/admin/sections')} className="text-foreground/40 hover:text-foreground text-sm underline">← К списку секций</button>
       </div>
     );
   }
@@ -79,12 +79,12 @@ export default function AdminSectionEditor() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate('/admin/sections')} className="text-white/40 hover:text-white transition-colors">
+          <button onClick={() => navigate('/admin/sections')} className="text-foreground/40 hover:text-foreground transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-white font-display text-xl tracking-wider">{meta?.name || section.section_name}</h1>
-            <p className="text-white/30 text-xs mt-0.5">{meta?.description || `ID: ${id}`}</p>
+            <h1 className="text-foreground font-display text-xl tracking-wider">{meta?.name || section.section_name}</h1>
+            <p className="text-foreground/30 text-xs mt-0.5">{meta?.description || `ID: ${id}`}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -101,7 +101,7 @@ export default function AdminSectionEditor() {
           {defaultContent[id!] && (
             <button
               onClick={handleReset}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs border border-white/10 text-white/30 hover:text-white hover:border-white/30 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs border border-foreground/10 text-foreground/30 hover:text-foreground hover:border-foreground/30 transition-colors"
               title="Сбросить к умолчаниям"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -132,26 +132,26 @@ export default function AdminSectionEditor() {
         ))}
         {!meta && (
           <div>
-            <label className="block text-white/40 text-xs uppercase tracking-wider mb-2">JSON контент</label>
+            <label className="block text-foreground/40 text-xs uppercase tracking-wider mb-2">JSON контент</label>
             <textarea
               value={JSON.stringify(content, null, 2)}
               onChange={(e) => { try { setContent(JSON.parse(e.target.value)); setHasChanges(true); } catch { } }}
               rows={15}
-              className="w-full bg-white/[0.03] border border-white/10 px-4 py-3 text-white text-sm font-mono focus:border-white/30 focus:outline-none resize-none"
+              className="w-full bg-white/[0.03] border border-foreground/10 px-4 py-3 text-foreground text-sm font-body focus:border-foreground/30 focus:outline-none resize-none"
             />
           </div>
         )}
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between pt-4 border-t border-white/10">
-        <p className="text-white/20 text-xs">
+      <div className="flex items-center justify-between pt-4 border-t border-foreground/10">
+        <p className="text-foreground/20 text-xs">
           Обновлено: {section.updated_at ? new Date(section.updated_at).toLocaleString('ru') : '—'}
         </p>
         <button
           onClick={handleSave}
           disabled={saving || !hasChanges}
-          className="flex items-center gap-2 px-6 py-2.5 bg-white text-black text-sm font-body uppercase tracking-wider hover:bg-white/90 disabled:opacity-30 transition-all"
+          className="flex items-center gap-2 px-6 py-2.5 bg-white text-black text-sm font-body uppercase tracking-wider hover:bg-foreground/90 disabled:opacity-30 transition-all"
         >
           {saving ? <><Save className="w-4 h-4 animate-spin" /> Сохранение...</> : <><Save className="w-4 h-4" /> Сохранить</>}
         </button>
@@ -174,12 +174,12 @@ function FieldEditor({ fieldKey, label, type, value, onChange }: FieldEditorProp
   if (type === 'text') {
     return (
       <div>
-        <label className="block text-white/40 text-xs uppercase tracking-wider mb-2">{label}</label>
+        <label className="block text-foreground/40 text-xs uppercase tracking-wider mb-2">{label}</label>
         <input
           type="text"
           value={(value as string) || ''}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full bg-white/[0.03] border border-white/10 px-4 py-3 text-white text-sm font-body focus:border-white/30 focus:outline-none transition-colors"
+          className="w-full bg-white/[0.03] border border-foreground/10 px-4 py-3 text-foreground text-sm font-body focus:border-foreground/30 focus:outline-none transition-colors"
         />
       </div>
     );
@@ -187,12 +187,12 @@ function FieldEditor({ fieldKey, label, type, value, onChange }: FieldEditorProp
   if (type === 'textarea') {
     return (
       <div>
-        <label className="block text-white/40 text-xs uppercase tracking-wider mb-2">{label}</label>
+        <label className="block text-foreground/40 text-xs uppercase tracking-wider mb-2">{label}</label>
         <textarea
           value={(value as string) || ''}
           onChange={(e) => onChange(e.target.value)}
           rows={4}
-          className="w-full bg-white/[0.03] border border-white/10 px-4 py-3 text-white text-sm font-body focus:border-white/30 focus:outline-none resize-none transition-colors"
+          className="w-full bg-white/[0.03] border border-foreground/10 px-4 py-3 text-foreground text-sm font-body focus:border-foreground/30 focus:outline-none resize-none transition-colors"
         />
       </div>
     );
@@ -204,7 +204,7 @@ function FieldEditor({ fieldKey, label, type, value, onChange }: FieldEditorProp
     const items = Array.isArray(value) ? value : [];
     return (
       <div>
-        <label className="block text-white/40 text-xs uppercase tracking-wider mb-2">{label}</label>
+        <label className="block text-foreground/40 text-xs uppercase tracking-wider mb-2">{label}</label>
         <div className="space-y-2">
           {items.map((item: unknown, idx: number) => (
             <div key={idx} className="flex gap-2">
@@ -212,7 +212,7 @@ function FieldEditor({ fieldKey, label, type, value, onChange }: FieldEditorProp
                 type="text"
                 value={typeof item === 'string' ? item : JSON.stringify(item)}
                 onChange={(e) => { const u = [...items]; u[idx] = e.target.value; onChange(u); }}
-                className="flex-1 bg-white/[0.03] border border-white/10 px-3 py-2 text-white text-sm font-body focus:border-white/30 focus:outline-none transition-colors"
+                className="flex-1 bg-white/[0.03] border border-foreground/10 px-3 py-2 text-foreground text-sm font-body focus:border-foreground/30 focus:outline-none transition-colors"
               />
               <button
                 onClick={() => onChange(items.filter((_: unknown, i: number) => i !== idx))}
@@ -224,7 +224,7 @@ function FieldEditor({ fieldKey, label, type, value, onChange }: FieldEditorProp
           ))}
           <button
             onClick={() => onChange([...items, ''])}
-            className="text-white/30 hover:text-white text-xs transition-colors"
+            className="text-foreground/30 hover:text-foreground text-xs transition-colors"
           >
             + Добавить
           </button>
@@ -234,11 +234,11 @@ function FieldEditor({ fieldKey, label, type, value, onChange }: FieldEditorProp
   }
   if (type === 'boolean') {
     return (
-      <div className="flex items-center justify-between bg-white/[0.03] border border-white/10 px-4 py-3">
-        <label className="text-white/50 text-sm">{label}</label>
+      <div className="flex items-center justify-between bg-white/[0.03] border border-foreground/10 px-4 py-3">
+        <label className="text-foreground/50 text-sm">{label}</label>
         <button
           onClick={() => onChange(!value)}
-          className={`relative w-10 h-5 rounded-full transition-colors ${value ? 'bg-green-500' : 'bg-white/20'}`}
+          className={`relative w-10 h-5 rounded-full transition-colors ${value ? 'bg-green-500' : 'bg-foreground/20'}`}
         >
           <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${value ? 'left-5' : 'left-0.5'}`} />
         </button>
@@ -248,12 +248,12 @@ function FieldEditor({ fieldKey, label, type, value, onChange }: FieldEditorProp
   // JSON fallback
   return (
     <div>
-      <label className="block text-white/40 text-xs uppercase tracking-wider mb-2">{label}</label>
+      <label className="block text-foreground/40 text-xs uppercase tracking-wider mb-2">{label}</label>
       <textarea
         value={typeof value === 'string' ? value : JSON.stringify(value, null, 2)}
         onChange={(e) => { try { onChange(JSON.parse(e.target.value)); } catch { onChange(e.target.value); } }}
         rows={6}
-        className="w-full bg-white/[0.03] border border-white/10 px-4 py-3 text-white text-sm font-mono focus:border-white/30 focus:outline-none resize-none transition-colors"
+        className="w-full bg-white/[0.03] border border-foreground/10 px-4 py-3 text-foreground text-sm font-body focus:border-foreground/30 focus:outline-none resize-none transition-colors"
       />
     </div>
   );
@@ -299,23 +299,23 @@ function ImageFieldEditor({ label, value, onChange }: { label: string; value: st
 
   return (
     <div>
-      <label className="block text-white/40 text-xs uppercase tracking-wider mb-2">{label}</label>
+      <label className="block text-foreground/40 text-xs uppercase tracking-wider mb-2">{label}</label>
       <div className="flex gap-2">
         <input
           type="text"
           value={value || ''}
           onChange={(e) => onChange(e.target.value)}
           placeholder="URL изображения"
-          className="flex-1 bg-white/[0.03] border border-white/10 px-4 py-3 text-white text-sm font-body focus:border-white/30 focus:outline-none transition-colors"
+          className="flex-1 bg-white/[0.03] border border-foreground/10 px-4 py-3 text-foreground text-sm font-body focus:border-foreground/30 focus:outline-none transition-colors"
         />
         <button
           onClick={openPicker}
-          className="flex items-center gap-1.5 px-4 py-2 border border-white/10 text-white/50 hover:text-white hover:border-white/30 text-xs transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 border border-foreground/10 text-foreground/50 hover:text-foreground hover:border-foreground/30 text-xs transition-colors"
         >
           <ImageIcon className="w-4 h-4" />
           Выбрать
         </button>
-        <label className="flex items-center gap-1.5 px-4 py-2 border border-white/10 text-white/50 hover:text-white hover:border-white/30 text-xs transition-colors cursor-pointer">
+        <label className="flex items-center gap-1.5 px-4 py-2 border border-foreground/10 text-foreground/50 hover:text-foreground hover:border-foreground/30 text-xs transition-colors cursor-pointer">
           {uploading ? 'Загрузка...' : '↑ Загрузить'}
           <input type="file" accept="image/*" onChange={handleUpload} className="hidden" disabled={uploading} />
         </label>
@@ -323,10 +323,10 @@ function ImageFieldEditor({ label, value, onChange }: { label: string; value: st
 
       {value && (
         <div className="mt-2 relative inline-block">
-          <img src={value} alt="" className="h-20 object-cover border border-white/10" />
+          <img src={value} alt="" className="h-20 object-cover border border-foreground/10" />
           <button
             onClick={() => onChange('')}
-            className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-400 transition-colors"
+            className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-foreground rounded-full flex items-center justify-center hover:bg-red-400 transition-colors"
           >
             <X className="w-3 h-3" />
           </button>
@@ -336,30 +336,30 @@ function ImageFieldEditor({ label, value, onChange }: { label: string; value: st
       {/* Media picker modal */}
       {showPicker && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={() => setShowPicker(false)}>
-          <div className="bg-[#111] border border-white/10 w-full max-w-2xl max-h-[80vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
-              <h3 className="text-white font-display text-sm tracking-wider uppercase">Медиа-библиотека</h3>
-              <button onClick={() => setShowPicker(false)} className="text-white/40 hover:text-white">
+          <div className="bg-popover border border-foreground/10 w-full max-w-2xl max-h-[80vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-5 py-4 border-b border-foreground/10">
+              <h3 className="text-foreground font-display text-sm tracking-wider uppercase">Медиа-библиотека</h3>
+              <button onClick={() => setShowPicker(false)} className="text-foreground/40 hover:text-foreground">
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-4">
               {loadingMedia ? (
-                <div className="text-center py-12 text-white/30 text-sm">Загрузка...</div>
+                <div className="text-center py-12 text-foreground/30 text-sm">Загрузка...</div>
               ) : mediaFiles.length === 0 ? (
-                <div className="text-center py-12 text-white/30 text-sm">Нет загруженных изображений</div>
+                <div className="text-center py-12 text-foreground/30 text-sm">Нет загруженных изображений</div>
               ) : (
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                   {mediaFiles.map((file) => (
                     <button
                       key={file.name}
                       onClick={() => { onChange(file.url); setShowPicker(false); }}
-                      className={`relative aspect-square bg-black/50 overflow-hidden border-2 transition-all hover:border-white/50 ${value === file.url ? 'border-white' : 'border-transparent'}`}
+                      className={`relative aspect-square bg-black/50 overflow-hidden border-2 transition-all hover:border-foreground/50 ${value === file.url ? 'border-white' : 'border-transparent'}`}
                     >
                       <img src={file.url} alt={file.name} className="w-full h-full object-cover" />
                       {value === file.url && (
-                        <div className="absolute inset-0 bg-white/20 flex items-center justify-center">
-                          <Check className="w-6 h-6 text-white" />
+                        <div className="absolute inset-0 bg-foreground/20 flex items-center justify-center">
+                          <Check className="w-6 h-6 text-foreground" />
                         </div>
                       )}
                     </button>
