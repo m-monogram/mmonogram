@@ -31,7 +31,7 @@ export default function AdminLayout() {
   const filteredNav = navItems.filter(item => !item.adminOnly || isAdmin);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex">
+    <div className="min-h-screen bg-background flex">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -42,7 +42,7 @@ export default function AdminLayout() {
 
       {/* Sidebar */}
       <aside className={`
-        fixed lg:sticky top-0 left-0 z-50 h-screen w-64 bg-[#0c0c0c] border-r border-white/[0.07]
+        fixed lg:sticky top-0 left-0 z-50 h-screen w-64 bg-background border-r border-white/[0.07]
         flex flex-col transition-transform duration-300
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
@@ -50,9 +50,9 @@ export default function AdminLayout() {
         <div className="p-5 border-b border-white/[0.07] flex items-center justify-between">
           <a href="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 group">
             <img src={logoWhite} alt="M-Monogram" className="h-7 w-auto" />
-            <span className="text-white/60 font-display text-xs tracking-widest uppercase group-hover:text-white transition-colors">CMS</span>
+            <span className="text-foreground/60 font-display text-xs tracking-widest uppercase group-hover:text-foreground transition-colors">CMS</span>
           </a>
-          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-white/50 hover:text-white">
+          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-foreground/50 hover:text-foreground">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -66,8 +66,8 @@ export default function AdminLayout() {
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 text-sm font-body tracking-wide transition-all duration-200 rounded-sm ${isActive
-                  ? 'bg-white/10 text-white'
-                  : 'text-white/40 hover:text-white hover:bg-white/[0.05]'
+                  ? 'bg-foreground/10 text-foreground'
+                  : 'text-foreground/40 hover:text-foreground hover:bg-white/[0.05]'
                 }`
               }
             >
@@ -83,7 +83,7 @@ export default function AdminLayout() {
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2.5 px-3 py-2.5 text-white/30 hover:text-white/70 text-xs font-body tracking-wide transition-colors rounded-sm hover:bg-white/[0.05]"
+            className="flex items-center gap-2.5 px-3 py-2.5 text-foreground/30 hover:text-foreground/70 text-xs font-body tracking-wide transition-colors rounded-sm hover:bg-white/[0.05]"
           >
             <ExternalLink className="w-3.5 h-3.5" />
             Открыть сайт
@@ -93,17 +93,17 @@ export default function AdminLayout() {
         {/* User info */}
         <div className="p-4 border-t border-white/[0.07]">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-7 h-7 bg-white/10 flex items-center justify-center text-white text-xs font-display rounded-sm">
+            <div className="w-7 h-7 bg-foreground/10 flex items-center justify-center text-foreground text-xs font-display rounded-sm">
               {user?.email?.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white/70 text-xs truncate">{user?.email}</p>
-              <p className="text-white/30 text-[10px] uppercase tracking-wider">{role}</p>
+              <p className="text-foreground/70 text-xs truncate">{user?.email}</p>
+              <p className="text-foreground/30 text-[10px] uppercase tracking-wider">{role}</p>
             </div>
           </div>
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-2 text-white/30 hover:text-red-400 text-xs transition-colors w-full group"
+            className="flex items-center gap-2 text-foreground/30 hover:text-red-400 text-xs transition-colors w-full group"
           >
             <LogOut className="w-3.5 h-3.5" />
             Выйти
@@ -114,10 +114,10 @@ export default function AdminLayout() {
       {/* Main */}
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 bg-[#0a0a0a]/90 backdrop-blur-md border-b border-white/[0.07] px-4 lg:px-8 py-3 flex items-center gap-4">
+        <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-md border-b border-white/[0.07] px-4 lg:px-8 py-3 flex items-center gap-4">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden text-white/60 hover:text-white"
+            className="lg:hidden text-foreground/60 hover:text-foreground"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -126,7 +126,7 @@ export default function AdminLayout() {
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white/30 hover:text-white text-xs font-body tracking-wide flex items-center gap-1.5 transition-colors"
+            className="text-foreground/30 hover:text-foreground text-xs font-body tracking-wide flex items-center gap-1.5 transition-colors"
           >
             <ExternalLink className="w-3.5 h-3.5" />
             Сайт

@@ -96,30 +96,30 @@ export default function AdminNavigation() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-white font-display text-2xl tracking-widest uppercase">Навигация</h1>
-          <p className="text-white/40 text-sm font-body mt-1">Управление меню сайта</p>
+          <h1 className="text-foreground font-display text-2xl tracking-widest uppercase">Навигация</h1>
+          <p className="text-foreground/40 text-sm font-body mt-1">Управление меню сайта</p>
         </div>
         <div className="flex items-center gap-2">
           {changed.size > 0 && (
             <button
               onClick={handleSaveAll}
               disabled={savingAll}
-              className="flex items-center gap-2 px-4 py-2 bg-white text-black text-xs font-body uppercase tracking-wider hover:bg-white/90 disabled:opacity-50 transition-all"
+              className="flex items-center gap-2 px-4 py-2 bg-white text-black text-xs font-body uppercase tracking-wider hover:bg-foreground/90 disabled:opacity-50 transition-all"
             >
               <Save className="w-3.5 h-3.5" />
               {savingAll ? 'Сохранение...' : `Сохранить (${changed.size})`}
             </button>
           )}
-          <button onClick={handleAdd} className="flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/10 text-white text-xs font-body uppercase tracking-wider hover:bg-white/20 transition-all">
+          <button onClick={handleAdd} className="flex items-center gap-2 px-4 py-2 bg-foreground/10 border border-foreground/10 text-foreground text-xs font-body uppercase tracking-wider hover:bg-foreground/20 transition-all">
             <Plus className="w-3.5 h-3.5" /> Добавить
           </button>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-white/10">
+      <div className="flex border-b border-foreground/10">
         {(['header', 'footer'] as Location[]).map(tab => (
-          <button key={tab} onClick={() => setActiveTab(tab)} className={`px-6 py-2.5 text-sm font-body uppercase tracking-wider transition-colors border-b-2 -mb-px ${activeTab === tab ? 'text-white border-white' : 'text-white/40 border-transparent hover:text-white/70'}`}>
+          <button key={tab} onClick={() => setActiveTab(tab)} className={`px-6 py-2.5 text-sm font-body uppercase tracking-wider transition-colors border-b-2 -mb-px ${activeTab === tab ? 'text-foreground border-white' : 'text-foreground/40 border-transparent hover:text-foreground/70'}`}>
             {tab === 'header' ? '🔝 Заголовок' : '🔽 Подвал'}
           </button>
         ))}
@@ -127,17 +127,17 @@ export default function AdminNavigation() {
 
       {/* Hint */}
       {filteredItems.length > 1 && (
-        <p className="text-white/20 text-xs flex items-center gap-1.5">
+        <p className="text-foreground/20 text-xs flex items-center gap-1.5">
           <GripVertical className="w-3 h-3" /> Перетащите для изменения порядка
         </p>
       )}
 
       {loading ? (
-        <div className="text-white/30 text-sm">Загрузка...</div>
+        <div className="text-foreground/30 text-sm">Загрузка...</div>
       ) : filteredItems.length === 0 ? (
-        <div className="text-center py-10 text-white/30 text-sm border border-dashed border-white/10">
+        <div className="text-center py-10 text-foreground/30 text-sm border border-dashed border-foreground/10">
           <p>Нет пунктов меню</p>
-          <button onClick={handleAdd} className="mt-2 text-white/40 hover:text-white text-xs underline transition-colors">
+          <button onClick={handleAdd} className="mt-2 text-foreground/40 hover:text-foreground text-xs underline transition-colors">
             Добавить первый пункт
           </button>
         </div>
@@ -152,9 +152,9 @@ export default function AdminNavigation() {
                 draggable
                 onDragStart={() => { handleDragStart(absoluteIdx); dragIdx.current = absoluteIdx; }}
                 onDragOver={e => handleDragOver(e, absoluteIdx)}
-                className={`flex items-center gap-2.5 border p-3 transition-all group ${isDirty ? 'border-yellow-500/30 bg-yellow-500/[0.03]' : 'border-white/[0.07] bg-white/[0.02] hover:border-white/15'} cursor-grab active:cursor-grabbing`}
+                className={`flex items-center gap-2.5 border p-3 transition-all group ${isDirty ? 'border-yellow-500/30 bg-yellow-500/[0.03]' : 'border-white/[0.07] bg-white/[0.02] hover:border-foreground/15'} cursor-grab active:cursor-grabbing`}
               >
-                <GripVertical className="w-4 h-4 text-white/20 group-hover:text-white/40 transition-colors flex-shrink-0" />
+                <GripVertical className="w-4 h-4 text-foreground/20 group-hover:text-foreground/40 transition-colors flex-shrink-0" />
 
                 {/* Visibility */}
                 <button
@@ -170,7 +170,7 @@ export default function AdminNavigation() {
                   type="text"
                   value={item.label}
                   onChange={e => handleUpdate(item.id, 'label', e.target.value)}
-                  className="flex-1 bg-transparent border-b border-transparent hover:border-white/20 focus:border-white/40 px-1 py-0.5 text-white text-sm focus:outline-none transition-colors"
+                  className="flex-1 bg-transparent border-b border-transparent hover:border-foreground/20 focus:border-foreground/40 px-1 py-0.5 text-foreground text-sm focus:outline-none transition-colors"
                   placeholder="Название ссылки"
                 />
 
@@ -180,14 +180,14 @@ export default function AdminNavigation() {
                     type="text"
                     value={item.href}
                     onChange={e => handleUpdate(item.id, 'href', e.target.value)}
-                    className="w-36 bg-transparent border-b border-transparent hover:border-white/20 focus:border-white/40 px-1 py-0.5 text-white/50 text-xs font-mono focus:outline-none transition-colors"
+                    className="w-36 bg-transparent border-b border-transparent hover:border-foreground/20 focus:border-foreground/40 px-1 py-0.5 text-foreground/50 text-xs font-body focus:outline-none transition-colors"
                     placeholder="/путь или https://..."
                   />
                   <a
                     href={item.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-white/20 hover:text-white/60 transition-colors"
+                    className="text-foreground/20 hover:text-foreground/60 transition-colors"
                     onClick={e => e.stopPropagation()}
                   >
                     <ExternalLink className="w-3 h-3" />
@@ -195,7 +195,7 @@ export default function AdminNavigation() {
                 </div>
 
                 {/* Delete */}
-                <button onClick={() => handleDelete(item.id)} className="text-white/20 hover:text-red-400 transition-colors flex-shrink-0">
+                <button onClick={() => handleDelete(item.id)} className="text-foreground/20 hover:text-red-400 transition-colors flex-shrink-0">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -211,7 +211,7 @@ export default function AdminNavigation() {
           <button
             onClick={handleSaveAll}
             disabled={savingAll}
-            className="flex items-center gap-1.5 px-4 py-1.5 bg-white text-black text-xs font-body uppercase tracking-wider hover:bg-white/90 disabled:opacity-50 transition-all"
+            className="flex items-center gap-1.5 px-4 py-1.5 bg-white text-black text-xs font-body uppercase tracking-wider hover:bg-foreground/90 disabled:opacity-50 transition-all"
           >
             <Save className="w-3.5 h-3.5" />
             {savingAll ? 'Сохранение...' : 'Сохранить всё'}

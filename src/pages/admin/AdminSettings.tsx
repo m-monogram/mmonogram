@@ -42,26 +42,26 @@ export default function AdminSettings() {
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="text-white font-display text-2xl tracking-widest uppercase">Настройки</h1>
-        <p className="text-white/40 text-sm font-body mt-1">Общие настройки сайта</p>
+        <h1 className="text-foreground font-display text-2xl tracking-widest uppercase">Настройки</h1>
+        <p className="text-foreground/40 text-sm font-body mt-1">Общие настройки сайта</p>
       </div>
       {loading ? (
-        <div className="text-white/30 text-sm">Загрузка...</div>
+        <div className="text-foreground/30 text-sm">Загрузка...</div>
       ) : settings.length === 0 ? (
-        <div className="bg-white/5 border border-white/10 p-8 text-center text-white/30 text-sm">Настройки не найдены. Запустите SQL-миграцию.</div>
+        <div className="bg-foreground/5 border border-foreground/10 p-8 text-center text-foreground/30 text-sm">Настройки не найдены. Запустите SQL-миграцию.</div>
       ) : (
         <div className="space-y-4">
           {settings.map((setting) => (
-            <div key={setting.key} className="bg-white/[0.03] border border-white/10 p-5">
-              <label className="block text-white/50 text-xs uppercase tracking-wider mb-1">{setting.key}</label>
-              {setting.description && <p className="text-white/20 text-xs mb-2">{setting.description}</p>}
-              <input type="text" value={getValue(setting)} onChange={(e) => updateSetting(setting.key, e.target.value)} className="w-full bg-white/5 border border-white/10 px-4 py-2.5 text-white text-sm font-body focus:border-white/30 focus:outline-none transition-colors" />
+            <div key={setting.key} className="bg-white/[0.03] border border-foreground/10 p-5">
+              <label className="block text-foreground/50 text-xs uppercase tracking-wider mb-1">{setting.key}</label>
+              {setting.description && <p className="text-foreground/20 text-xs mb-2">{setting.description}</p>}
+              <input type="text" value={getValue(setting)} onChange={(e) => updateSetting(setting.key, e.target.value)} className="w-full bg-foreground/5 border border-foreground/10 px-4 py-2.5 text-foreground text-sm font-body focus:border-foreground/30 focus:outline-none transition-colors" />
             </div>
           ))}
         </div>
       )}
       {Object.keys(changes).length > 0 && (
-        <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-6 py-2.5 bg-white text-black text-sm font-body uppercase tracking-wider hover:bg-white/90 disabled:opacity-30 transition-all">
+        <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-6 py-2.5 bg-white text-black text-sm font-body uppercase tracking-wider hover:bg-foreground/90 disabled:opacity-30 transition-all">
           <Save className="w-4 h-4" />
           {saving ? 'Сохранение...' : 'Сохранить'}
         </button>

@@ -49,12 +49,12 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-white font-display text-2xl tracking-widest uppercase">Dashboard</h1>
-          <p className="text-white/40 text-sm font-body mt-1 flex items-center gap-2">
+          <h1 className="text-foreground font-display text-2xl tracking-widest uppercase">Dashboard</h1>
+          <p className="text-foreground/40 text-sm font-body mt-1 flex items-center gap-2">
             <Activity className="w-3.5 h-3.5" />
             {user?.email}
-            <span className="text-white/20">·</span>
-            <span className="uppercase text-white/30 text-xs">{role}</span>
+            <span className="text-foreground/20">·</span>
+            <span className="uppercase text-foreground/30 text-xs">{role}</span>
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -67,23 +67,23 @@ export default function AdminDashboard() {
 
       {/* Quick actions */}
       <div>
-        <p className="text-white/30 text-xs uppercase tracking-wider mb-3">Быстрые действия</p>
+        <p className="text-foreground/30 text-xs uppercase tracking-wider mb-3">Быстрые действия</p>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => navigate('/admin/projects')}
-            className="flex items-center gap-2 px-4 py-2 bg-white text-black text-xs font-body uppercase tracking-wider hover:bg-white/90 transition-all"
+            className="flex items-center gap-2 px-4 py-2 bg-white text-black text-xs font-body uppercase tracking-wider hover:bg-foreground/90 transition-all"
           >
             <Plus className="w-3.5 h-3.5" /> Новый проект
           </button>
           <button
             onClick={() => navigate('/admin/media')}
-            className="flex items-center gap-2 px-4 py-2 bg-white/10 text-white text-xs font-body uppercase tracking-wider hover:bg-white/20 transition-all border border-white/10"
+            className="flex items-center gap-2 px-4 py-2 bg-foreground/10 text-foreground text-xs font-body uppercase tracking-wider hover:bg-foreground/20 transition-all border border-foreground/10"
           >
             <Upload className="w-3.5 h-3.5" /> Загрузить медиа
           </button>
           <button
             onClick={() => navigate('/admin/sections')}
-            className="flex items-center gap-2 px-4 py-2 bg-white/10 text-white text-xs font-body uppercase tracking-wider hover:bg-white/20 transition-all border border-white/10"
+            className="flex items-center gap-2 px-4 py-2 bg-foreground/10 text-foreground text-xs font-body uppercase tracking-wider hover:bg-foreground/20 transition-all border border-foreground/10"
           >
             <FileText className="w-3.5 h-3.5" /> Редактировать секции
           </button>
@@ -96,47 +96,47 @@ export default function AdminDashboard() {
           <button
             key={stat.label}
             onClick={() => navigate(stat.to)}
-            className="bg-white/[0.03] border border-white/[0.07] p-5 text-left hover:border-white/20 hover:bg-white/[0.05] transition-all group"
+            className="bg-white/[0.03] border border-white/[0.07] p-5 text-left hover:border-foreground/20 hover:bg-white/[0.05] transition-all group"
           >
             <stat.icon className={`w-5 h-5 ${stat.color} mb-3 opacity-70 group-hover:opacity-100 transition-opacity`} />
-            <p className="text-white text-2xl font-display">{stat.value}</p>
-            <p className="text-white/40 text-xs font-body mt-1">{stat.label}</p>
+            <p className="text-foreground text-2xl font-display">{stat.value}</p>
+            <p className="text-foreground/40 text-xs font-body mt-1">{stat.label}</p>
           </button>
         ))}
       </div>
 
       {/* Last updated */}
       <div>
-        <p className="text-white/30 text-xs uppercase tracking-wider mb-3 flex items-center gap-2">
+        <p className="text-foreground/30 text-xs uppercase tracking-wider mb-3 flex items-center gap-2">
           <Clock className="w-3 h-3" />
           Последние изменения
         </p>
         {loading ? (
-          <div className="text-white/30 text-sm">Загрузка...</div>
+          <div className="text-foreground/30 text-sm">Загрузка...</div>
         ) : recentUpdates.length === 0 ? (
-          <div className="text-white/30 text-sm">Нет данных.</div>
+          <div className="text-foreground/30 text-sm">Нет данных.</div>
         ) : (
           <div className="space-y-1.5">
             {recentUpdates.map((s) => (
               <button
                 key={s.id}
                 onClick={() => navigate(`/admin/sections/${s.id}`)}
-                className="w-full flex items-center justify-between bg-white/[0.02] border border-white/[0.07] hover:border-white/15 hover:bg-white/[0.04] px-4 py-3 transition-all group"
+                className="w-full flex items-center justify-between bg-white/[0.02] border border-white/[0.07] hover:border-foreground/15 hover:bg-white/[0.04] px-4 py-3 transition-all group"
               >
                 <div className="text-left">
-                  <p className="text-white/80 text-sm">{s.section_name}</p>
-                  <p className="text-white/25 text-[11px] font-mono mt-0.5">{s.id}</p>
+                  <p className="text-foreground/80 text-sm">{s.section_name}</p>
+                  <p className="text-foreground/25 text-[11px] font-body mt-0.5">{s.id}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
                     <span className={`text-[10px] px-2 py-0.5 ${s.is_visible ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
                       {s.is_visible ? 'Visible' : 'Hidden'}
                     </span>
-                    <p className="text-white/25 text-[10px] mt-1">
+                    <p className="text-foreground/25 text-[10px] mt-1">
                       {s.updated_at ? new Date(s.updated_at).toLocaleString('ru') : ''}
                     </p>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/50 transition-colors" />
+                  <ChevronRight className="w-4 h-4 text-foreground/20 group-hover:text-foreground/50 transition-colors" />
                 </div>
               </button>
             ))}

@@ -379,7 +379,7 @@ const ModificationDetail = ({
               </CardContainer>
             </div>
 
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/40 font-mono text-sm tracking-widest">
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-foreground/40 text-sm tracking-widest font-body">
               {selectedImageIndex + 1} / {category.images.length}
             </div>
           </motion.div>

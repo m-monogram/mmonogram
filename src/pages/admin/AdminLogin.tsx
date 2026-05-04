@@ -74,12 +74,12 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-10">
           <img src={logoWhite} alt="M-Monogram" className="h-16 mx-auto mb-4" />
-          <h1 className="font-display text-lg tracking-widest text-white uppercase">
+          <h1 className="font-display text-lg tracking-widest text-foreground uppercase">
             {isForgot ? 'Сброс пароля' : isSignUp ? 'Регистрация' : 'Админ-панель'}
           </h1>
         </div>
@@ -87,33 +87,33 @@ export default function AdminLogin() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email */}
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/30" />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
               required
-              className="w-full bg-white/5 border border-white/10 pl-10 pr-4 py-3 text-white text-sm font-body placeholder:text-white/30 focus:border-white/30 focus:outline-none transition-colors"
+              className="w-full bg-foreground/5 border border-foreground/10 pl-10 pr-4 py-3 text-foreground text-sm font-body placeholder:text-foreground/30 focus:border-foreground/30 focus:outline-none transition-colors"
             />
           </div>
 
           {/* Password */}
           {!isForgot && (
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/30" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Пароль"
                 required
-                className="w-full bg-white/5 border border-white/10 pl-10 pr-10 py-3 text-white text-sm font-body placeholder:text-white/30 focus:border-white/30 focus:outline-none transition-colors"
+                className="w-full bg-foreground/5 border border-foreground/10 pl-10 pr-10 py-3 text-foreground text-sm font-body placeholder:text-foreground/30 focus:border-foreground/30 focus:outline-none transition-colors"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground/60"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -128,7 +128,7 @@ export default function AdminLogin() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-3 bg-white text-black text-sm font-body uppercase tracking-widest hover:bg-white/90 disabled:opacity-50 transition-all"
+            className="w-full py-3 bg-white text-black text-sm font-body uppercase tracking-widest hover:bg-foreground/90 disabled:opacity-50 transition-all"
           >
             {submitting ? '...' : isForgot ? 'Отправить ссылку' : isSignUp ? 'Зарегистрироваться' : 'Войти'}
           </button>
@@ -138,14 +138,14 @@ export default function AdminLogin() {
         <div className="mt-6 text-center space-y-2">
           <button
             onClick={() => { setIsForgot(!isForgot); setError(''); setSuccess(''); }}
-            className="text-white/30 hover:text-white/60 text-xs font-body block mx-auto transition-colors"
+            className="text-foreground/30 hover:text-foreground/60 text-xs font-body block mx-auto transition-colors"
           >
             {isForgot ? '← Назад к входу' : 'Забыли пароль?'}
           </button>
         </div>
 
         <div className="mt-10 text-center">
-          <a href="/" className="text-white/20 hover:text-white/50 text-xs transition-colors">← На сайт</a>
+          <a href="/" className="text-foreground/20 hover:text-foreground/50 text-xs transition-colors">← На сайт</a>
         </div>
       </div>
     </div>

@@ -156,7 +156,7 @@ function ProjectGallery({
             </div>
 
             {/* Counter */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/40 font-mono text-sm tracking-widest">
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-foreground/40 text-sm tracking-widest font-body">
               {selectedIdx + 1} / {images.length}
             </div>
           </motion.div>
@@ -340,7 +340,7 @@ const ProjectTemplate = memo(function ProjectTemplate({
               <ChevronLeft className="w-4 h-4" aria-hidden />
               <span>Previous</span>
             </button> : <span aria-hidden />}
-          <span className="font-mono text-white/30 text-xs tracking-widest uppercase text-center max-w-[50%] truncate">
+          <span className="text-foreground/30 text-xs tracking-widest font-body uppercase text-center max-w-[50%] truncate">
             {title} — {subtitle}
           </span>
           {next ? <button type="button" onClick={() => navigate(`/projects/${next.slug}`)} className="flex items-center gap-2 text-white/50 hover:text-white transition-colors font-body text-xs sm:text-sm uppercase tracking-widest cursor-pointer">
