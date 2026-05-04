@@ -1,5 +1,33 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { projects as staticProjects } from '@/data/projects';
+
+const fallbackProjects: DBProject[] = staticProjects.map((p, idx) => ({
+  id: p.id,
+  slug: p.id,
+  title: p.title,
+  subtitle: p.subtitle,
+  year: p.year,
+  duration: p.duration,
+  package: p.package,
+  category: p.category,
+  cover_image: p.coverImage,
+  description: p.description,
+  modifications: p.modifications,
+  specs: p.specs as unknown as Record<string, string>,
+  video_url: p.videoUrl ?? null,
+  sort_order: idx,
+  is_published: true,
+  created_at: '',
+  updated_at: '',
+  images: p.images.map((img, i) => ({
+    id: `${p.id}-${i}`,
+    project_id: p.id,
+    src: img.src,
+    title: img.title,
+    sort_order: i,
+  })),
+}));
 
 export interface DBProject {
   id: string;
@@ -45,7 +73,7 @@ export function useProjects(includeUnpublished = false) {
     const { data: projectsData } = await query;
     
     if (!projectsData?.length) {
-      setProjects([]);
+      setProjects(fallbackProjects);
       setLoading(false);
       return;
     }
