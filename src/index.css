@@ -272,6 +272,44 @@
     font-style: normal;
   }
 
+  /* ===== Unified Heading Utilities ===== */
+  .h-display-1 {
+    font-family: var(--font-family-primary);
+    text-transform: uppercase;
+    font-weight: var(--weight-light);
+    line-height: var(--lh-heading);
+    font-size: var(--text-hero);
+    letter-spacing: var(--ls-hero);
+    color: var(--color-text-primary);
+  }
+  .h-display-2 {
+    font-family: var(--font-family-primary);
+    text-transform: uppercase;
+    font-weight: var(--weight-light);
+    line-height: var(--lh-heading);
+    font-size: var(--text-section);
+    letter-spacing: var(--ls-section);
+    color: var(--color-text-primary);
+  }
+  .h-display-3 {
+    font-family: var(--font-family-primary);
+    text-transform: uppercase;
+    font-weight: var(--weight-light);
+    line-height: 1.2;
+    font-size: 1.25rem;
+    letter-spacing: 0.1em;
+    color: var(--color-text-primary);
+  }
+  .text-eyebrow {
+    font-family: var(--font-family-primary);
+    text-transform: uppercase;
+    font-weight: var(--weight-light);
+    font-size: var(--text-caption);
+    letter-spacing: var(--ls-caps);
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+  }
+
   /* Tagline - Hero Subtitle Style */
   .text-tagline {
     font-family: var(--font-family-primary);
