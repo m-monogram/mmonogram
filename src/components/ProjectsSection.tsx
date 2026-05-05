@@ -4,7 +4,6 @@ import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import LatestAdditionsCarousel from "@/components/sections/latest-additions-carousel";
 import { useNavigation } from "@/hooks/useNavigation";
 import { AuroraBackground } from "@/components/ui/aurora-background";
-import { Spotlight } from "@/components/ui/spotlight";
 import { BlurText } from "@/components/ui/blur-text";
 
 interface ProjectsSectionProps {
@@ -55,12 +54,6 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
               `
             }}
             aria-hidden
-          />
-
-          {/* Spotlight Effect */}
-          <Spotlight
-            className="-top-40 left-0 md:-top-20 md:left-60 z-[1]"
-            fill="white"
           />
 
           {/* Subtle background pattern */}
