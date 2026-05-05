@@ -139,88 +139,72 @@ const ModificationDetail = ({
           {/* Stats Row */}
           
 
-          {/* Description - Enhanced for Exterior */}
-          <motion.div initial={{
-          opacity: 0,
-          y: 20
-        }} animate={{
-          opacity: 1,
-          y: 0
-        }} transition={{
-          duration: 0.5,
-          delay: 0.3
-        }} className={`mb-16 ${category.id ==="exterior" ?"sm:mb-20 md:mb-24" :""}`}>
-            <div className={`flex items-center gap-4 mb-6 ${category.id ==="exterior" ?"sm:mb-8" :""}`}>
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
-              <h2 className={`font-display ${category.id ==="exterior" ?"text-2xl sm:text-3xl md:text-4xl" :"text-xl"} tracking-widest text-foreground uppercase whitespace-nowrap`}>
-                {t("modifications.overview")}
-              </h2>
-              <div className="h-px flex-1 bg-gradient-to-l from-transparent via-foreground/20 to-transparent" />
-            </div>
-            <p className={`font-body ${category.id ==="exterior" ?"text-lg sm:text-xl md:text-2xl" :"text-base"} text-muted-foreground leading-relaxed ${category.id ==="exterior" ?"max-w-4xl" :"max-w-3xl"}`}>
-              {category.description}
-            </p>
-          </motion.div>
+          {/* Editorial Overview - minimal eyebrow + lead paragraph + pull quotes */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="mb-20 sm:mb-24 md:mb-28"
+          >
+            <div className="max-w-3xl mx-auto">
+              <div className="text-center mb-10 sm:mb-14">
+                <span className="font-body text-[10px] sm:text-xs tracking-[0.4em] text-foreground/40 uppercase">
+                  {t("modifications.overview")}
+                </span>
+                <div className="mx-auto mt-4 h-px w-10 bg-foreground/30" />
+              </div>
 
-          {/* Content Blocks - Clean Sequential Layout */}
-          {category.contentBlocks && category.contentBlocks.length > 0 && <motion.div initial={{
-          opacity: 0
-        }} animate={{
-          opacity: 1
-        }} transition={{
-          duration: 0.6,
-          delay: 0.35
-        }} className="mb-20 space-y-6">
-              {category.contentBlocks.map((block, index) => {
-            if (block.type ==="highlight") {
-              return <motion.div key={index} initial={{
-                opacity: 0,
-                y: 15
-              }} animate={{
-                opacity: 1,
-                y: 0
-              }} transition={{
-                duration: 0.5,
-                delay: 0.4 + index * 0.06
-              }} className="py-6 border-b border-foreground/20">
-                      <h3 className="font-display text-lg md:text-xl tracking-widest text-foreground">
-                        {block.content}
-                      </h3>
-                    </motion.div>;
-            }
-            if (block.type ==="quote") {
-              return <motion.div key={index} initial={{
-                opacity: 0,
-                y: 15
-              }} animate={{
-                opacity: 1,
-                y: 0
-              }} transition={{
-                duration: 0.5,
-                delay: 0.4 + index * 0.06
-              }} className="py-8 pl-6 border-l-2 border-foreground/40 my-4">
-                      <p className="font-body text-base md:text-lg text-foreground/80  leading-relaxed">
-                        {block.content}
-                      </p>
-                    </motion.div>;
-            }
-            if (block.type ==="text") {
-              return <motion.p key={index} initial={{
-                opacity: 0,
-                y: 15
-              }} animate={{
-                opacity: 1,
-                y: 0
-              }} transition={{
-                duration: 0.5,
-                delay: 0.4 + index * 0.06
-              }} className="font-body text-base text-muted-foreground leading-relaxed max-w-3xl">
-                      {block.content}
-                    </motion.p>;
-            }
-            return null;
-          })}
-            </motion.div>}
+              {/* Lead paragraph - drop-cap, larger type */}
+              <p className="font-body text-lg sm:text-xl md:text-2xl leading-relaxed text-foreground/85 text-center mb-12 sm:mb-16 first-letter:font-display first-letter:text-5xl sm:first-letter:text-6xl first-letter:mr-2 first-letter:float-left first-letter:leading-none first-letter:text-foreground">
+                {category.description}
+              </p>
+
+              {/* Supporting blocks */}
+              {category.contentBlocks && category.contentBlocks.length > 0 && (
+                <div className="space-y-10 sm:space-y-12">
+                  {category.contentBlocks.map((block, index) => {
+                    const common = {
+                      initial: { opacity: 0, y: 12 },
+                      whileInView: { opacity: 1, y: 0 },
+                      viewport: { once: true, margin: "-80px" },
+                      transition: { duration: 0.5, delay: 0.05 + index * 0.05 },
+                    } as const;
+
+                    if (block.type === "highlight") {
+                      return (
+                        <motion.div key={index} {...common} className="text-center">
+                          <h3 className="font-display text-xl md:text-2xl tracking-[0.25em] text-foreground uppercase">
+                            {block.content}
+                          </h3>
+                        </motion.div>
+                      );
+                    }
+                    if (block.type === "quote") {
+                      return (
+                        <motion.blockquote key={index} {...common} className="text-center px-2">
+                          <p className="font-display italic text-2xl sm:text-3xl md:text-4xl leading-snug tracking-wide text-foreground">
+                            “{block.content}”
+                          </p>
+                        </motion.blockquote>
+                      );
+                    }
+                    if (block.type === "text") {
+                      return (
+                        <motion.p
+                          key={index}
+                          {...common}
+                          className="font-body text-base sm:text-lg leading-relaxed text-foreground/70 text-center"
+                        >
+                          {block.content}
+                        </motion.p>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+              )}
+            </div>
+          </motion.section>
 
           {/* Gallery - Special designs for wheels and exterior, standard grid for others */}
           {category.id ==="wheels" ? <ForgedWheelsGrid images={category.images} onImageClick={openLightbox} /> : category.id ==="exterior" ? <motion.div initial={{
