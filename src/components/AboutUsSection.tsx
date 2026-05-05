@@ -9,9 +9,6 @@ const AboutUsSection = () => {
 
   return (
     <section className="relative py-20 sm:py-24 bg-premium-black overflow-hidden">
-      {/* Decorative gradient orb */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial from-white/[0.02] to-transparent rounded-full blur-3xl pointer-events-none" />
-
       {/* Subtle grid pattern */}
       <div className="absolute inset-0 opacity-[0.015]" style={{
         backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
