@@ -47,9 +47,6 @@ const NextSectionCTA = memo(({
       )}
 
       <div className="relative z-10 max-w-4xl mx-auto text-center">
-        {/* Decorative line */}
-        <div className="w-12 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent mx-auto mb-5" />
-
         {/* Label */}
         <p className="font-body text-xs tracking-widest text-white/60 uppercase mb-2">
           {label}
@@ -72,8 +69,6 @@ const NextSectionCTA = memo(({
           <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
         </motion.button>
 
-        {/* Decorative line */}
-        <div className="w-12 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent mx-auto mt-8" />
       </div>
     </motion.section>
   );
