@@ -87,9 +87,11 @@ const modificationCategoriesBase = [
       { src: interior2, title: "Cockpit View", description: "Full interior transformation with premium materials" },
     ],
     contentBlocks: [
-      { type: "text", contentKey: "modifications.interiorBlock3", position: "full" },
+      { type: "quote", contentKey: "modifications.interiorBlock1", position: "full" },
+      { type: "text", contentKey: "modifications.interiorBlock2", position: "left" },
+      { type: "text", contentKey: "modifications.interiorBlock3", position: "right" },
       { type: "quote", contentKey: "modifications.interiorBlock4", position: "full" },
-      { type: "text", contentKey: "modifications.interiorBlock5", position: "full" },
+      { type: "text", contentKey: "modifications.interiorBlock5", position: "center" },
     ],
     services: [
       { name: "Full Leather Retrim", description: "Complete interior in Nappa, Alcantara, or exotic leather", price: "from €12,000" },
@@ -110,9 +112,11 @@ const modificationCategoriesBase = [
       { src: wheels6, title: "DC.8", description: "22-inch diamond cut two-tone finish" },
     ],
     contentBlocks: [
-      { type: "text", contentKey: "modifications.wheelsBlock1", position: "full" },
+      { type: "text", contentKey: "modifications.wheelsBlock1", position: "left" },
+      { type: "text", contentKey: "modifications.wheelsBlock2", position: "right" },
       { type: "quote", contentKey: "modifications.wheelsBlock3", position: "full" },
-      { type: "text", contentKey: "modifications.wheelsBlock5", position: "full" },
+      { type: "text", contentKey: "modifications.wheelsBlock4", position: "left" },
+      { type: "text", contentKey: "modifications.wheelsBlock5", position: "right" },
       { type: "quote", contentKey: "modifications.wheelsBlock6", position: "full" },
     ],
     services: [
