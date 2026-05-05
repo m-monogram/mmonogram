@@ -87,11 +87,9 @@ const modificationCategoriesBase = [
       { src: interior2, title: "Cockpit View", description: "Full interior transformation with premium materials" },
     ],
     contentBlocks: [
-      { type: "quote", contentKey: "modifications.interiorBlock1", position: "full" },
-      { type: "text", contentKey: "modifications.interiorBlock2", position: "left" },
-      { type: "text", contentKey: "modifications.interiorBlock3", position: "right" },
+      { type: "text", contentKey: "modifications.interiorBlock3", position: "full" },
       { type: "quote", contentKey: "modifications.interiorBlock4", position: "full" },
-      { type: "text", contentKey: "modifications.interiorBlock5", position: "center" },
+      { type: "text", contentKey: "modifications.interiorBlock5", position: "full" },
     ],
     services: [
       { name: "Full Leather Retrim", description: "Complete interior in Nappa, Alcantara, or exotic leather", price: "from €12,000" },
