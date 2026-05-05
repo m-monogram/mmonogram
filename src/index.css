@@ -179,19 +179,12 @@
   /* Luxury Wave Background */
   .luxury-bg {
     background-color: hsl(0 0% 0%);
-    background-image: url('/images/luxury-bg.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    background-image: none;
   }
 
   .luxury-bg-contain {
     background-color: hsl(0 0% 0%);
-    background-image: url('/images/luxury-bg.png');
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
+    background-image: none;
   }
 
   .luxury-bg-overlay {
@@ -202,11 +195,8 @@
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url('/images/luxury-bg.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    opacity: 0.4;
+    background-image: none;
+    opacity: 0;
     pointer-events: none;
   }
 

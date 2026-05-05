@@ -10,7 +10,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useNavigate } from "react-router-dom";
 import { PillarsCarousel } from "@/components/PillarsCarousel";
-import { Spotlight } from "@/components/ui/spotlight";
 // Lazy load ProjectModal for better initial performance
 const ProjectModal = lazy(() => import("@/components/ProjectModal"));
 import NextSectionCTA from "@/components/NextSectionCTA";
