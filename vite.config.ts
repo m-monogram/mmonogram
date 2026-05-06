@@ -59,7 +59,12 @@ export default defineConfig(({ mode }) => ({
       },
     },
     chunkSizeWarningLimit: 600,
-    minify: 'esbuild',
+    minify: 'terser',
+    terserOptions: {
+      compress: { passes: 2, drop_console: true, drop_debugger: true },
+      mangle: true,
+      format: { comments: false },
+    },
     cssCodeSplit: true,
     sourcemap: false,
     reportCompressedSize: false,
