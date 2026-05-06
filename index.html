@@ -19,10 +19,12 @@
     <!-- Preload critical resources -->
     <link rel="preload" as="image" href="/src/assets/hero-main.jpg" type="image/jpeg" fetchpriority="high" />
     <link rel="preload" as="image" href="/src/assets/logo-white.png" type="image/png" fetchpriority="high" />
+    <!-- Preload critical fonts to break CSS->font request chain -->
+    <link rel="preload" as="font" type="font/otf" href="/riviera-font-family/RivieraNightsTrial-Ultralight.otf" crossorigin />
+    <link rel="preload" as="font" type="font/otf" href="/riviera-font-family/RivieraNightsTrial-Light.otf" crossorigin />
+    <link rel="preload" as="font" type="font/otf" href="/riviera-font-family/RivieraNightsTrial-Regular.otf" crossorigin />
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
     <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-    <link rel="dns-prefetch" href="https://mgyufoyornzbwvgdfojb.supabase.co" />
-    <link rel="preconnect" href="https://mgyufoyornzbwvgdfojb.supabase.co" crossorigin />
 
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
