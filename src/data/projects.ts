@@ -150,6 +150,12 @@ export const projects: Project[] = [
       { src: rrFusionBlueAerial, title: "Blue aerial" },
       { src: rrFusionBlueSide, title: "Blue side profile" },
       { src: rrFusionBlueInterior, title: "Blue interior" },
+      // Red
+      { src: rrFusionRedFront, title: "Red front" },
+      { src: rrFusionRedAerial, title: "Red aerial" },
+      { src: rrFusionRedSide, title: "Red side profile" },
+      // Purple
+      { src: rrFusionPurpleSide, title: "Purple side profile" },
     ],
     description: "The Fusion is a modern luxury statement, blending timeless elegance with bold contemporary design. Featuring bespoke exterior elements, a sculpted grille, and a handcrafted open-top interior. A seamless fusion of power, refinement, and future vision.",
     modifications: [
