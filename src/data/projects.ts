@@ -20,6 +20,10 @@ import rrFusionBronzeTop from "@/assets/rr-fusion-bronze-top.jpg";
 import rrFusionWhiteAerial from "@/assets/rr-fusion-white-aerial.jpg";
 import rrFusionWhiteTop from "@/assets/rr-fusion-white-top.jpg";
 import rrFusionWhiteInterior from "@/assets/rr-fusion-white-interior.jpg";
+import rrFusionBlueFront from "@/assets/rr-fusion-blue-front.jpg";
+import rrFusionBlueAerial from "@/assets/rr-fusion-blue-aerial.jpg";
+import rrFusionBlueSide from "@/assets/rr-fusion-blue-side.jpg";
+import rrFusionBlueInterior from "@/assets/rr-fusion-blue-interior.jpg";
 
 export interface ProjectSpecs {
   exterior: string;
@@ -123,17 +127,25 @@ export const projects: Project[] = [
     category: "Bespoke Concept",
     coverImage: rrFusionQuarter,
     images: [
-      { src: rrFusionQuarter, title: "Quarter view" },
+      // Navy
+      { src: rrFusionQuarter, title: "Navy quarter view" },
+      { src: rrFusionAerial, title: "Navy aerial" },
+      { src: rrFusionSide, title: "Navy side profile" },
+      { src: rrFusionTop, title: "Navy top view" },
+      { src: rrFusionRear, title: "Navy rear view" },
+      // Bronze
       { src: rrFusionBronzeFront, title: "Bronze front" },
-      { src: rrFusionRear, title: "Rear view" },
-      { src: rrFusionAerial, title: "Aerial view" },
       { src: rrFusionBronzeAerial, title: "Bronze aerial" },
       { src: rrFusionBronzeTop, title: "Bronze top view" },
-      { src: rrFusionSide, title: "Side profile" },
-      { src: rrFusionTop, title: "Top view" },
+      // White
       { src: rrFusionWhiteAerial, title: "White aerial" },
       { src: rrFusionWhiteTop, title: "White top view" },
-      { src: rrFusionWhiteInterior, title: "Interior detail" },
+      { src: rrFusionWhiteInterior, title: "White interior" },
+      // Blue
+      { src: rrFusionBlueFront, title: "Blue front" },
+      { src: rrFusionBlueAerial, title: "Blue aerial" },
+      { src: rrFusionBlueSide, title: "Blue side profile" },
+      { src: rrFusionBlueInterior, title: "Blue interior" },
     ],
     description: "The Fusion is a modern luxury statement, blending timeless elegance with bold contemporary design. Featuring bespoke exterior elements, a sculpted grille, and a handcrafted open-top interior. A seamless fusion of power, refinement, and future vision.",
     modifications: [
