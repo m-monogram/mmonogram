@@ -249,7 +249,7 @@ const Header = ({
           behavior: "instant"
         });
       }} className="cursor-pointer touch-target flex items-center justify-center" type="button">
-        <img src={logoWhite} alt="M-Monogram" className="h-12 sm:h-14 md:h-16 w-auto" />
+        <img src={logoWhite} alt="M-Monogram" width={320} height={75} fetchPriority="high" decoding="sync" className="h-12 sm:h-14 md:h-16 w-auto" />
       </button>
     </div>}
 
