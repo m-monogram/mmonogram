@@ -127,26 +127,33 @@ const ProjectsRail = memo(
     const scrollRef = externalScrollRef || internalRef;
     const projectsToShow = providedProjects ?? [];
 
+    const rafRef = useRef<number | null>(null);
     const check = useCallback(() => {
-      if (!scrollRef.current) return;
-      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      const left = scrollLeft > 0;
-      const right = scrollLeft < scrollWidth - clientWidth - 4;
-      onScrollStateChange?.(left, right);
+      if (rafRef.current !== null) return;
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        const el = scrollRef.current;
+        if (!el) return;
+        const { scrollLeft, scrollWidth, clientWidth } = el;
+        const left = scrollLeft > 0;
+        const right = scrollLeft < scrollWidth - clientWidth - 4;
+        onScrollStateChange?.(left, right);
+      });
     }, [scrollRef, onScrollStateChange]);
 
     useEffect(() => {
       check();
       const el = scrollRef.current;
       if (!el) return;
-      el.addEventListener("scroll", check);
+      el.addEventListener("scroll", check, { passive: true });
       const ro = new ResizeObserver(check);
       ro.observe(el);
-      window.addEventListener("resize", check);
+      window.addEventListener("resize", check, { passive: true });
       return () => {
         el.removeEventListener("scroll", check);
         ro.disconnect();
         window.removeEventListener("resize", check);
+        if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
       };
     }, [scrollRef, check]);
 
