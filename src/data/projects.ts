@@ -14,6 +14,12 @@ import rrFusionRear from "@/assets/rr-fusion-rear.jpg";
 import rrFusionAerial from "@/assets/rr-fusion-aerial.jpg";
 import rrFusionSide from "@/assets/rr-fusion-side.jpg";
 import rrFusionTop from "@/assets/rr-fusion-top.jpg";
+import rrFusionBronzeFront from "@/assets/rr-fusion-bronze-front.jpg";
+import rrFusionBronzeAerial from "@/assets/rr-fusion-bronze-aerial.jpg";
+import rrFusionBronzeTop from "@/assets/rr-fusion-bronze-top.jpg";
+import rrFusionWhiteAerial from "@/assets/rr-fusion-white-aerial.jpg";
+import rrFusionWhiteTop from "@/assets/rr-fusion-white-top.jpg";
+import rrFusionWhiteInterior from "@/assets/rr-fusion-white-interior.jpg";
 
 export interface ProjectSpecs {
   exterior: string;
@@ -118,10 +124,16 @@ export const projects: Project[] = [
     coverImage: rrFusionQuarter,
     images: [
       { src: rrFusionQuarter, title: "Quarter view" },
+      { src: rrFusionBronzeFront, title: "Bronze front" },
       { src: rrFusionRear, title: "Rear view" },
       { src: rrFusionAerial, title: "Aerial view" },
+      { src: rrFusionBronzeAerial, title: "Bronze aerial" },
+      { src: rrFusionBronzeTop, title: "Bronze top view" },
       { src: rrFusionSide, title: "Side profile" },
       { src: rrFusionTop, title: "Top view" },
+      { src: rrFusionWhiteAerial, title: "White aerial" },
+      { src: rrFusionWhiteTop, title: "White top view" },
+      { src: rrFusionWhiteInterior, title: "Interior detail" },
     ],
     description: "The Fusion is a modern luxury statement, blending timeless elegance with bold contemporary design. Featuring bespoke exterior elements, a sculpted grille, and a handcrafted open-top interior. A seamless fusion of power, refinement, and future vision.",
     modifications: [
