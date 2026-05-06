@@ -24,6 +24,10 @@ import rrFusionBlueFront from "@/assets/rr-fusion-blue-front.jpg";
 import rrFusionBlueAerial from "@/assets/rr-fusion-blue-aerial.jpg";
 import rrFusionBlueSide from "@/assets/rr-fusion-blue-side.jpg";
 import rrFusionBlueInterior from "@/assets/rr-fusion-blue-interior.jpg";
+import rrFusionRedFront from "@/assets/rr-fusion-red-front.jpg";
+import rrFusionRedAerial from "@/assets/rr-fusion-red-aerial.jpg";
+import rrFusionRedSide from "@/assets/rr-fusion-red-side.jpg";
+import rrFusionPurpleSide from "@/assets/rr-fusion-purple-side.jpg";
 
 export interface ProjectSpecs {
   exterior: string;
@@ -146,6 +150,12 @@ export const projects: Project[] = [
       { src: rrFusionBlueAerial, title: "Blue aerial" },
       { src: rrFusionBlueSide, title: "Blue side profile" },
       { src: rrFusionBlueInterior, title: "Blue interior" },
+      // Red
+      { src: rrFusionRedFront, title: "Red front" },
+      { src: rrFusionRedAerial, title: "Red aerial" },
+      { src: rrFusionRedSide, title: "Red side profile" },
+      // Purple
+      { src: rrFusionPurpleSide, title: "Purple side profile" },
     ],
     description: "The Fusion is a modern luxury statement, blending timeless elegance with bold contemporary design. Featuring bespoke exterior elements, a sculpted grille, and a handcrafted open-top interior. A seamless fusion of power, refinement, and future vision.",
     modifications: [
