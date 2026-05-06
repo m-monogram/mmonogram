@@ -20,6 +20,10 @@ import rrFusionBronzeTop from "@/assets/rr-fusion-bronze-top.jpg";
 import rrFusionWhiteAerial from "@/assets/rr-fusion-white-aerial.jpg";
 import rrFusionWhiteTop from "@/assets/rr-fusion-white-top.jpg";
 import rrFusionWhiteInterior from "@/assets/rr-fusion-white-interior.jpg";
+import rrFusionBlueFront from "@/assets/rr-fusion-blue-front.jpg";
+import rrFusionBlueAerial from "@/assets/rr-fusion-blue-aerial.jpg";
+import rrFusionBlueSide from "@/assets/rr-fusion-blue-side.jpg";
+import rrFusionBlueInterior from "@/assets/rr-fusion-blue-interior.jpg";
 
 export interface ProjectSpecs {
   exterior: string;
