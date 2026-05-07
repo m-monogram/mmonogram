@@ -9,25 +9,21 @@ import g900Front from "@/assets/g900-white-front-new.jpg";
 import g900Aerial from "@/assets/g900-white-aerial-new.jpg";
 import g900Side from "@/assets/g900-white-side-new.jpg";
 import g900Rear from "@/assets/g900-white-rear-new.jpg";
-import rrFusionQuarter from "@/assets/rr-fusion-quarter.jpg";
-import rrFusionRear from "@/assets/rr-fusion-rear.jpg";
-import rrFusionAerial from "@/assets/rr-fusion-aerial.jpg";
-import rrFusionSide from "@/assets/rr-fusion-side.jpg";
-import rrFusionTop from "@/assets/rr-fusion-top.jpg";
-import rrFusionBronzeFront from "@/assets/rr-fusion-bronze-front.jpg";
-import rrFusionBronzeAerial from "@/assets/rr-fusion-bronze-aerial.jpg";
-import rrFusionBronzeTop from "@/assets/rr-fusion-bronze-top.jpg";
-import rrFusionWhiteAerial from "@/assets/rr-fusion-white-aerial.jpg";
-import rrFusionWhiteTop from "@/assets/rr-fusion-white-top.jpg";
-import rrFusionWhiteInterior from "@/assets/rr-fusion-white-interior.jpg";
-import rrFusionBlueFront from "@/assets/rr-fusion-blue-front.jpg";
-import rrFusionBlueAerial from "@/assets/rr-fusion-blue-aerial.jpg";
-import rrFusionBlueSide from "@/assets/rr-fusion-blue-side.jpg";
-import rrFusionBlueInterior from "@/assets/rr-fusion-blue-interior.jpg";
-import rrFusionRedFront from "@/assets/rr-fusion-red-front.jpg";
-import rrFusionRedAerial from "@/assets/rr-fusion-red-aerial.jpg";
-import rrFusionRedSide from "@/assets/rr-fusion-red-side.jpg";
-import rrFusionPurpleSide from "@/assets/rr-fusion-purple-side.jpg";
+import img6694 from "@/assets/IMG_6694.JPG";
+import img6695 from "@/assets/IMG_6695.JPG";
+import img6696 from "@/assets/IMG_6696.JPG";
+import img6697 from "@/assets/IMG_6697.JPG";
+import img6698 from "@/assets/IMG_6698.JPG";
+import img6699 from "@/assets/IMG_6699.JPG";
+import img6700 from "@/assets/IMG_6700.JPG";
+import img6701 from "@/assets/IMG_6701.JPG";
+import img6702 from "@/assets/IMG_6702.JPG";
+import img6703 from "@/assets/IMG_6703.JPG";
+import img6704 from "@/assets/IMG_6704.JPG";
+import img6705 from "@/assets/IMG_6705.JPG";
+import img6706 from "@/assets/IMG_6706.JPG";
+import img6707 from "@/assets/IMG_6707.JPG";
+import img6708 from "@/assets/IMG_6708.JPG";
 
 export interface ProjectSpecs {
   exterior: string;
@@ -129,33 +125,23 @@ export const projects: Project[] = [
     duration: "12 weeks",
     package: "Full",
     category: "Bespoke Concept",
-    coverImage: rrFusionQuarter,
+    coverImage: img6694,
     images: [
-      // Navy
-      { src: rrFusionQuarter, title: "Navy quarter view" },
-      { src: rrFusionAerial, title: "Navy aerial" },
-      { src: rrFusionSide, title: "Navy side profile" },
-      { src: rrFusionTop, title: "Navy top view" },
-      { src: rrFusionRear, title: "Navy rear view" },
-      // Bronze
-      { src: rrFusionBronzeFront, title: "Bronze front" },
-      { src: rrFusionBronzeAerial, title: "Bronze aerial" },
-      { src: rrFusionBronzeTop, title: "Bronze top view" },
-      // White
-      { src: rrFusionWhiteAerial, title: "White aerial" },
-      { src: rrFusionWhiteTop, title: "White top view" },
-      { src: rrFusionWhiteInterior, title: "White interior" },
-      // Blue
-      { src: rrFusionBlueFront, title: "Blue front" },
-      { src: rrFusionBlueAerial, title: "Blue aerial" },
-      { src: rrFusionBlueSide, title: "Blue side profile" },
-      { src: rrFusionBlueInterior, title: "Blue interior" },
-      // Red
-      { src: rrFusionRedFront, title: "Red front" },
-      { src: rrFusionRedAerial, title: "Red aerial" },
-      { src: rrFusionRedSide, title: "Red side profile" },
-      // Purple
-      { src: rrFusionPurpleSide, title: "Purple side profile" },
+      { src: img6694, title: "Fusion view 1" },
+      { src: img6695, title: "Fusion view 2" },
+      { src: img6696, title: "Fusion view 3" },
+      { src: img6697, title: "Fusion view 4" },
+      { src: img6698, title: "Fusion view 5" },
+      { src: img6699, title: "Fusion view 6" },
+      { src: img6700, title: "Fusion view 7" },
+      { src: img6701, title: "Fusion view 8" },
+      { src: img6702, title: "Fusion view 9" },
+      { src: img6703, title: "Fusion view 10" },
+      { src: img6704, title: "Fusion view 11" },
+      { src: img6705, title: "Fusion view 12" },
+      { src: img6706, title: "Fusion view 13" },
+      { src: img6707, title: "Fusion view 14" },
+      { src: img6708, title: "Fusion view 15" },
     ],
     description: "The Fusion is a modern luxury statement, blending timeless elegance with bold contemporary design. Featuring bespoke exterior elements, a sculpted grille, and a handcrafted open-top interior. A seamless fusion of power, refinement, and future vision.",
     modifications: [
