@@ -16,6 +16,7 @@ const formatCoord = (value: number, posLabel: string, negLabel: string) => {
 const RepresentativeDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const rep = id ? getRepresentativeById(id) : undefined;
 
   const goBackToMap = () => {
@@ -30,15 +31,15 @@ const RepresentativeDetailPage = () => {
       <div className="min-h-screen bg-premium-black text-foreground">
         <Header />
         <main className="pt-32 px-6 max-w-3xl mx-auto text-center">
-          <h1 className="h-display-3 uppercase mb-4">Representative Not Found</h1>
+          <h1 className="h-display-3 uppercase mb-4">{t("representatives.notFoundTitle")}</h1>
           <p className="text-foreground/60 mb-8">
-            This location does not exist or is no longer active.
+            {t("representatives.notFoundDescription")}
           </p>
           <button
             onClick={goBackToMap}
             className="inline-flex items-center gap-2 border border-white/20 hover:border-white/50 px-6 py-3 text-sm tracking-widest uppercase transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Map
+            <ArrowLeft className="w-4 h-4" /> {t("representatives.backToMap")}
           </button>
         </main>
       </div>
