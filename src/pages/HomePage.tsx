@@ -22,6 +22,7 @@ const Footer = lazy(() => import("@/components/Footer"));
 const HomePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(true);
 
   // Only show loading screen on initial page load (not on navigation)
