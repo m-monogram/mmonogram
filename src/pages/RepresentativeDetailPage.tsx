@@ -222,7 +222,7 @@ const RepresentativeDetailPage = () => {
                 onClick={() => navigate("/contact")}
                 className="group relative w-full inline-flex items-center justify-center gap-2 border border-white/20 hover:border-white/60 hover:bg-white/5 px-6 py-4 text-[11px] tracking-[0.3em] uppercase transition-all overflow-hidden"
               >
-                <span className="relative z-10">Request Appointment</span>
+                <span className="relative z-10">{t("representatives.requestAppointment")}</span>
                 <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
                 <span className="absolute inset-0 -translate-x-full group-hover:translate-x-0 bg-gradient-to-r from-transparent via-white/5 to-transparent transition-transform duration-700" />
               </button>
