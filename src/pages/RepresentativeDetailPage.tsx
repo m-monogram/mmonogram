@@ -3,6 +3,7 @@ import { ArrowLeft, MapPin, Phone, Mail, Clock, ArrowRight, Compass, ExternalLin
 import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
 import { getRepresentativeById, representatives } from "@/data/representatives";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const formatCoord = (value: number, posLabel: string, negLabel: string) => {
   const abs = Math.abs(value);
@@ -15,6 +16,7 @@ const formatCoord = (value: number, posLabel: string, negLabel: string) => {
 const RepresentativeDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const rep = id ? getRepresentativeById(id) : undefined;
 
   const goBackToMap = () => {
@@ -29,15 +31,15 @@ const RepresentativeDetailPage = () => {
       <div className="min-h-screen bg-premium-black text-foreground">
         <Header />
         <main className="pt-32 px-6 max-w-3xl mx-auto text-center">
-          <h1 className="h-display-3 uppercase mb-4">Representative Not Found</h1>
+          <h1 className="h-display-3 uppercase mb-4">{t("representatives.notFoundTitle")}</h1>
           <p className="text-foreground/60 mb-8">
-            This location does not exist or is no longer active.
+            {t("representatives.notFoundDescription")}
           </p>
           <button
             onClick={goBackToMap}
             className="inline-flex items-center gap-2 border border-white/20 hover:border-white/50 px-6 py-3 text-sm tracking-widest uppercase transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Map
+            <ArrowLeft className="w-4 h-4" /> {t("representatives.backToMap")}
           </button>
         </main>
       </div>
@@ -84,7 +86,7 @@ const RepresentativeDetailPage = () => {
           className="group inline-flex items-center gap-2 text-[10px] sm:text-xs tracking-[0.25em] uppercase text-foreground/50 hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
-          Global Network
+          {t("representatives.back")}
         </button>
 
         {/* Hero */}
@@ -147,7 +149,7 @@ const RepresentativeDetailPage = () => {
                 className="flex-1 px-4 sm:px-5 py-3.5 text-[10px] sm:text-xs tracking-[0.25em] uppercase text-foreground/60 hover:text-foreground transition-colors flex items-center gap-2"
               >
                 <ExternalLink className="w-3.5 h-3.5" strokeWidth={1.5} />
-                Open in Google Maps
+                {t("representatives.openGoogleMaps")}
               </a>
               <a
                 href={osmLink}
@@ -155,7 +157,7 @@ const RepresentativeDetailPage = () => {
                 rel="noopener noreferrer"
                 className="px-4 sm:px-5 py-3.5 text-[10px] sm:text-xs tracking-[0.25em] uppercase text-foreground/40 hover:text-foreground border-l border-white/10 transition-colors"
               >
-                OSM
+                {t("representatives.osm")}
               </a>
             </div>
           </div>
@@ -168,7 +170,7 @@ const RepresentativeDetailPage = () => {
             >
               <div>
                 <span className="text-[10px] tracking-[0.3em] uppercase text-foreground/40">
-                  Atelier
+                  {t("representatives.atelier")}
                 </span>
                 <h2 className="font-display text-xl sm:text-2xl uppercase tracking-wide mt-2 leading-tight">
                   {rep.name}
@@ -184,10 +186,10 @@ const RepresentativeDetailPage = () => {
 
               <ul className="space-y-5 text-sm">
                 {[
-                  { Icon: MapPin, label: "Address", value: rep.address ?? "Address coming soon", href: undefined },
-                  { Icon: Phone, label: "Phone", value: rep.phone ?? "Available on request", href: rep.phone ? `tel:${rep.phone.replace(/\s/g, "")}` : undefined },
-                  { Icon: Mail, label: "Email", value: rep.email ?? "info@mmonogram.com", href: `mailto:${rep.email ?? "info@mmonogram.com"}` },
-                  { Icon: Clock, label: "Hours", value: rep.hours ?? "By appointment", href: undefined },
+                  { Icon: MapPin, label: t("representatives.address"), value: rep.address ?? t("representatives.addressFallback"), href: undefined },
+                  { Icon: Phone, label: t("representatives.phone"), value: rep.phone ?? t("representatives.phoneFallback"), href: rep.phone ? `tel:${rep.phone.replace(/\s/g, "")}` : undefined },
+                  { Icon: Mail, label: t("representatives.email"), value: rep.email ?? "info@mmonogram.com", href: `mailto:${rep.email ?? "info@mmonogram.com"}` },
+                  { Icon: Clock, label: t("representatives.hours"), value: rep.hours ?? t("representatives.hoursFallback"), href: undefined },
                 ].map(({ Icon, label, value, href }) => {
                   const content = (
                     <>
@@ -220,7 +222,7 @@ const RepresentativeDetailPage = () => {
                 onClick={() => navigate("/contact")}
                 className="group relative w-full inline-flex items-center justify-center gap-2 border border-white/20 hover:border-white/60 hover:bg-white/5 px-6 py-4 text-[11px] tracking-[0.3em] uppercase transition-all overflow-hidden"
               >
-                <span className="relative z-10">Request Appointment</span>
+                <span className="relative z-10">{t("representatives.requestAppointment")}</span>
                 <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
                 <span className="absolute inset-0 -translate-x-full group-hover:translate-x-0 bg-gradient-to-r from-transparent via-white/5 to-transparent transition-transform duration-700" />
               </button>
@@ -234,10 +236,10 @@ const RepresentativeDetailPage = () => {
             <div className="flex items-end justify-between mb-8">
               <div>
                 <span className="text-[10px] tracking-[0.3em] uppercase text-foreground/40">
-                  Continue exploring
+                  {t("representatives.continueExploring")}
                 </span>
                 <h3 className="h-display-3 mt-2 uppercase">
-                  Also in {rep.region}
+                  {t("representatives.alsoIn")} {rep.region}
                 </h3>
               </div>
             </div>

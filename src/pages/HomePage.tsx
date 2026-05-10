@@ -9,6 +9,7 @@ import VinBanner from "@/components/VinBanner";
 import NextSectionCTA from "@/components/NextSectionCTA";
 import SEOHead from "@/components/SEOHead";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Lazy load below-the-fold sections for faster initial render
 const ParticleBackground = lazy(() => import("@/components/ParticleBackground"));
@@ -21,6 +22,7 @@ const Footer = lazy(() => import("@/components/Footer"));
 const HomePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(true);
 
   // Only show loading screen on initial page load (not on navigation)
@@ -118,8 +120,8 @@ const HomePage = () => {
             <RepresentativesMapSection />
           </Suspense>
           <NextSectionCTA
-            label="Explore"
-            nextLabel="The M-Monogram Story"
+            label={t("homeNextCta.label")}
+            nextLabel={t("homeNextCta.next")}
             onClick={() => handleSetCurrentView("brand")}
           />
           <VinBanner />

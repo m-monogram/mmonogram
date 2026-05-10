@@ -1,53 +1,82 @@
 ## Goal
 
-Move the Official Representatives map from its standalone page (`/representatives`) onto the homepage as a section near the bottom. Remove the "All Locations" list entirely. Keep pins on the map clickable — clicking a pin navigates to that representative's individual detail page (existing `/representatives/:id` route stays).
+Make every visible string on every public page fully translate when the user switches between EN, RU, and AR. Today there are three classes of gaps:
 
-## Placement on the homepage
+1. **24 keys missing in RU and AR** under `catalog.*` (exterior/interior/wheels/performance/exhaust/protection items 1–4). They fall back to the raw key string.
+2. **Recently added/rewritten UI uses hardcoded English** — `VinChecker`, `RepresentativesMapSection`, `RepresentativeDetailPage`, `NotFound`, plus one stray prop in `HomePage`.
+3. **`OfferAgreement.tsx`** is a 250-line legal document, fully English. Out of scope (legal text stays EN).
 
-Add a new `RepresentativesMapSection` between `StatsSection` and `NextSectionCTA`:
+## Audit summary
 
-```text
-HeroSection
-MissionStatement
-LatestAdditionsCarousel
-AboutUsSection
-BrandStrip
-StatsSection
-→ RepresentativesMapSection   ← NEW
-NextSectionCTA (Explore → Brand)
-VinBanner
-Footer
-```
+Hardcoded English strings to translate:
 
-Reasoning: this slot sits after the credibility build-up (projects, about, stats) and before the brand-story CTA — a natural "where to find us in the world" beat that reinforces global presence without breaking the existing narrative flow toward Brand → Commission → Contact.
+- **`src/components/VinChecker.tsx`**
+  - "Official Verification Service" badge
+  - Long description paragraph ("Authenticate your M-Monogram vehicle…")
+  - "24 / 7 Concierge", "Dubai · Mon — Sat" subtitles
+  - "M-Monogram · Authenticated Atelier" trust footer
+- **`src/components/sections/RepresentativesMapSection.tsx`**
+  - Eyebrow "Global Network"
+  - Title "Official Representatives"
+  - Subtitle "Locate the nearest M-Monogram representative."
+  - "Scroll to zoom · Drag to pan" hint
+  - "{N} Locations" counter (interpolate count)
+- **`src/pages/RepresentativeDetailPage.tsx`**
+  - "Global Network" back link
+  - "Atelier" eyebrow, default description fallback
+  - Field labels: "Address", "Phone", "Email", "Hours"
+  - Fallback values: "Address coming soon", "Available on request", "By appointment", "info@mmonogram.com" (keep email literal)
+  - "Open in Google Maps", "OSM"
+  - "Request Appointment" button
+  - "Continue exploring", "Also in {region}"
+  - 404 fallback: "Representative Not Found", description, "Back to Map"
+- **`src/pages/NotFound.tsx`**
+  - "Error 404", "Page Not Found", description, "Return to Home"
+- **`src/pages/HomePage.tsx`**
+  - `<NextSectionCTA label="Explore" nextLabel="The M-Monogram Story" />` — replace with `t()` calls (these props are already translated elsewhere via the `nextSection` keyspace; reuse them)
 
-## Section design
+Also missing in RU/AR (24 keys):
+`catalog.exteriorItem1..4`, `interiorItem1..4`, `wheelsItem1..4`, `performanceItem1..4`, `exhaustItem1..4`, `protectionItem1..4`.
 
-- Full-width dark section, generous vertical padding (`py-24 md:py-32`).
-- Eyebrow: "GLOBAL NETWORK" (`.text-eyebrow`, trilingual via `t()`).
-- H2 (`.h-display-2`): "OFFICIAL REPRESENTATIVES".
-- Subtitle (one short line): "Locate the nearest M-Monogram representative."
-- Interactive world map below, `max-w-6xl mx-auto`, glassmorphism frame (`bg-slate-900/30 border-white/10 backdrop-blur-xl`), aspect ratio ~16/9, rounded-none to match site language.
-- Bottom-left hint: "SCROLL TO ZOOM · DRAG TO PAN". Bottom-right counter: "{N} LOCATIONS".
-- No list of locations rendered anywhere on the page.
+## Plan
 
-## Pin interaction
+### 1. Extend `src/data/translations.ts`
 
-- Each pin is a clickable button with subtle pulsing white dot + outer ring on hover.
-- Click → `navigate('/representatives/' + rep.id)` (uses existing `RepresentativeDetailPage` and `representatives.ts` data — no changes there).
-- On hover: small floating tooltip with city name (no address, no extra info — keeps the editorial feel).
-- Lazy load the map section with `Suspense` to avoid weighing down LCP.
+Add three new namespaces (EN + RU + AR) with full parity:
 
-## Files to change
+- `verify` — extend with: `badge`, `descriptionLong`, `concierge`, `officeHours`, `trustLine`.
+- `representatives` — new namespace:
+  - `eyebrow`, `title`, `subtitle`
+  - `mapHint`, `locations` (e.g. "Locations" / "Локаций" / "مواقع")
+  - `back`, `atelier`, `address`, `phone`, `email`, `hours`
+  - `addressFallback`, `phoneFallback`, `hoursFallback`
+  - `openGoogleMaps`, `osm`
+  - `requestAppointment`
+  - `continueExploring`, `alsoIn` (string template "Also in {region}")
+  - `notFoundTitle`, `notFoundDescription`, `backToMap`
+- `notFound` — `error404`, `title`, `description`, `cta`.
 
-- **New** `src/components/sections/RepresentativesMapSection.tsx` — extract the map + pins (without the All Locations list) from the existing `RepresentativesPage`, wrap in homepage section styling.
-- **Edit** `src/pages/HomePage.tsx` — lazy-import and render the new section between `StatsSection` and `NextSectionCTA`.
-- **Delete** `src/pages/RepresentativesPage.tsx` — no longer used.
-- **Edit** `src/App.tsx` — remove the `/representatives` route (keep `/representatives/:id`).
-- **Edit** `src/components/Footer.tsx` — remove or repoint the "Representatives" footer link (point to `/#representatives` anchor on home).
-- **Edit** `src/data/translations.ts` — add `representatives.eyebrow`, `representatives.title`, `representatives.subtitle` keys in EN/RU/AR if not already present; remove the unused "All Locations" string.
+Backfill the 24 missing `catalog.*Item1..4` keys in `ru` and `ar` (translate using the same labels already used in EN; values are short item names like "Front bumper", "Carbon hood", etc. — pull from the EN block as the source of truth).
 
-## Out of scope
+### 2. Wire up components
 
-- Real geographic coordinates / new pin data — the existing `representatives.ts` mock pin positions are reused as-is.
-- Detail page redesign — `RepresentativeDetailPage` stays exactly as it is.
+For each file, import `useLanguage`, replace hardcoded strings with `t("...")`. Where a string interpolates a value (e.g. "11 Locations", "Also in Middle East"), use template strings: `${representatives.length} ${t("representatives.locations")}` and `${t("representatives.alsoIn")} ${rep.region}`. Region names themselves stay as-is (data field) — only the connector word translates.
+
+Files to edit:
+
+- `src/components/VinChecker.tsx`
+- `src/components/sections/RepresentativesMapSection.tsx`
+- `src/pages/RepresentativeDetailPage.tsx`
+- `src/pages/NotFound.tsx`
+- `src/pages/HomePage.tsx` (NextSectionCTA props only)
+
+### 3. Verification pass
+
+After the edits, re-run the parity check (`bun -e` script that flattens both trees) and confirm all three locales have identical key sets and zero missing keys. Then visually load `/`, `/brand`, `/projects`, `/commission`, `/verify`, `/contact`, `/representatives/dubai-uae`, `/404` in EN, RU, AR and confirm no English leaks through (especially under the map, the verification block, and the representative detail card).
+
+### Out of scope
+
+- `src/pages/OfferAgreement.tsx` — legal document, stays English.
+- `src/pages/PrivacyPolicy.tsx` — already wired to `t()`.
+- Admin dashboard pages — internal tool, EN only.
+- Region names inside `representatives.ts` data (Middle East, Europe, Asia, Americas) — stay in English as proper nouns within the data layer; only the surrounding UI text translates.

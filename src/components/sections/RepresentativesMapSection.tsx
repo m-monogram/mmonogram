@@ -8,12 +8,14 @@ import {
   ZoomableGroup,
 } from "react-simple-maps";
 import { representatives } from "@/data/representatives";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const GEO_URL =
   "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 const RepresentativesMapSection = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [hovered, setHovered] = useState<string | null>(null);
 
   return (
@@ -24,13 +26,13 @@ const RepresentativesMapSection = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center">
           <span className="text-eyebrow text-foreground/60">
-            Global Network
+            {t("representatives.eyebrow")}
           </span>
           <h2 className="h-display-2 mt-3 sm:mt-4 uppercase">
-            Official Representatives
+            {t("representatives.title")}
           </h2>
           <p className="mt-4 sm:mt-6 max-w-2xl mx-auto text-sm sm:text-base text-foreground/60 leading-relaxed">
-            Locate the nearest M-Monogram representative.
+            {t("representatives.subtitle")}
           </p>
         </div>
 
@@ -133,8 +135,8 @@ const RepresentativesMapSection = () => {
           </div>
 
           <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[10px] sm:text-xs text-foreground/40 uppercase tracking-widest pointer-events-none">
-            <span>Scroll to zoom · Drag to pan</span>
-            <span>{representatives.length} Locations</span>
+            <span>{t("representatives.mapHint")}</span>
+            <span>{representatives.length} {t("representatives.locations")}</span>
           </div>
         </div>
       </div>

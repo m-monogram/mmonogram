@@ -22,7 +22,7 @@ const VinChecker = () => {
         <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 border border-foreground/15 bg-foreground/[0.03] backdrop-blur-sm">
           <BadgeCheck className="w-3.5 h-3.5 text-foreground/70" strokeWidth={1.5} />
           <span className="font-body text-[10px] sm:text-xs text-foreground/70 uppercase tracking-[0.25em]">
-            Official Verification Service
+            {t("verify.badge")}
           </span>
         </div>
 
@@ -44,8 +44,7 @@ const VinChecker = () => {
 
         {/* Description */}
         <p className="font-body text-foreground/55 text-sm sm:text-base md:text-lg leading-relaxed max-w-xl mx-auto mb-14">
-          Authenticate your M-Monogram vehicle directly through our official channels.
-          Every commission is registered and traceable through our verification desk.
+          {t("verify.descriptionLong")}
         </p>
 
         {/* Contact Cards */}
@@ -67,7 +66,7 @@ const VinChecker = () => {
                 +971 54 507 7707
               </span>
               <span className="mt-3 block font-body text-[10px] uppercase tracking-[0.3em] text-foreground/35">
-                24 / 7 Concierge
+                {t("verify.concierge")}
               </span>
             </div>
           </a>
@@ -89,7 +88,7 @@ const VinChecker = () => {
                 +971 4 228 4177
               </span>
               <span className="mt-3 block font-body text-[10px] uppercase tracking-[0.3em] text-foreground/35">
-                Dubai · Mon — Sat
+                {t("verify.officeHours")}
               </span>
             </div>
           </a>
@@ -99,7 +98,7 @@ const VinChecker = () => {
         <div className="flex items-center justify-center gap-4 text-foreground/35">
           <span className="h-px w-10 bg-foreground/20" aria-hidden />
           <span className="font-body text-[10px] sm:text-xs uppercase tracking-[0.32em]">
-            M-Monogram · Authenticated Atelier
+            {t("verify.trustLine")}
           </span>
           <span className="h-px w-10 bg-foreground/20" aria-hidden />
         </div>
