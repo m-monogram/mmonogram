@@ -86,7 +86,7 @@ const RepresentativeDetailPage = () => {
           className="group inline-flex items-center gap-2 text-[10px] sm:text-xs tracking-[0.25em] uppercase text-foreground/50 hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
-          Global Network
+          {t("representatives.back")}
         </button>
 
         {/* Hero */}
