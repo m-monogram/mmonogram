@@ -98,7 +98,7 @@ const VinChecker = () => {
         <div className="flex items-center justify-center gap-4 text-foreground/35">
           <span className="h-px w-10 bg-foreground/20" aria-hidden />
           <span className="font-body text-[10px] sm:text-xs uppercase tracking-[0.32em]">
-            M-Monogram · Authenticated Atelier
+            {t("verify.trustLine")}
           </span>
           <span className="h-px w-10 bg-foreground/20" aria-hidden />
         </div>
