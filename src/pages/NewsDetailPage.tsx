@@ -162,75 +162,80 @@ const NewsDetailPage = () => {
       {/* Hero — editorial cinematic */}
       <article>
         <header>
-          <section className="relative w-full h-[80vh] min-h-[560px] overflow-hidden">
+          <section className="relative w-full h-[58vh] min-h-[420px] max-h-[680px] overflow-hidden">
             <img
               src={item.cover}
               alt={title}
               fetchPriority="high"
               decoding="async"
-              className="absolute inset-0 w-full h-full object-cover object-center scale-105"
+              className="absolute inset-0 w-full h-full object-cover object-center"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/35 to-premium-black" />
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.6)_100%)]" />
-
-            <div className="relative z-10 h-full flex flex-col justify-end pb-14 sm:pb-20 px-4 sm:px-8 lg:px-12 max-w-5xl mx-auto">
-              {/* Breadcrumbs */}
-              <motion.nav
-                aria-label="Breadcrumb"
-                initial={{ opacity: 0, y: -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="mb-8 flex items-center gap-2 font-display text-[10px] uppercase tracking-[0.25em] text-white/50"
-              >
-                <Link to="/" className="hover:text-white transition-colors">
-                  {t("news.backToHome")}
-                </Link>
-                <ChevronRight className="w-3 h-3" />
-                <Link to="/news" className="hover:text-white transition-colors">
-                  {t("news.title")}
-                </Link>
-                <ChevronRight className="w-3 h-3" />
-                <span className="text-white/70 truncate max-w-[40vw]">{categoryLabel}</span>
-              </motion.nav>
-
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-6">
-                <span className="px-3 py-1 bg-white/95 text-black font-display text-[10px] uppercase tracking-[0.25em]">
-                  {categoryLabel}
-                </span>
-                <span className="font-display text-[11px] uppercase tracking-[0.25em] text-white/65">
-                  {formattedDate}
-                </span>
-                <span className="inline-flex items-center gap-1.5 font-display text-[11px] uppercase tracking-[0.25em] text-white/65">
-                  <Clock className="w-3 h-3" />
-                  {readingMinutes} {t("news.minRead")}
-                </span>
-                {item.author && (
-                  <span className="font-display text-[11px] uppercase tracking-[0.25em] text-white/65">
-                    · {item.author}
-                  </span>
-                )}
-              </div>
-
-              <motion.h1
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-                className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-[88px] text-white tracking-tight leading-[1.02] max-w-4xl"
-              >
-                {title}
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.25 }}
-                className="mt-5 sm:mt-7 max-w-2xl font-body text-base sm:text-lg text-white/70 leading-relaxed"
-              >
-                {excerpt}
-              </motion.p>
-            </div>
+            {/* Soft top fade for header legibility + strong bottom fade into page */}
+            <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-premium-black via-premium-black/70 to-transparent" />
           </section>
-        </header>
+
+          {/* Editorial title block — sits BELOW the image, no overlap */}
+          <div className="relative z-10 -mt-16 sm:-mt-20 px-4 sm:px-8 lg:px-12 max-w-5xl mx-auto pb-2">
+            <motion.nav
+              aria-label="Breadcrumb"
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mb-6 flex items-center gap-2 font-display text-[10px] uppercase tracking-[0.25em] text-white/55"
+            >
+              <Link to="/" className="hover:text-white transition-colors">
+                {t("news.backToHome")}
+              </Link>
+              <ChevronRight className="w-3 h-3" />
+              <Link to="/news" className="hover:text-white transition-colors">
+                {t("news.title")}
+              </Link>
+              <ChevronRight className="w-3 h-3" />
+              <span className="text-white/75 truncate max-w-[40vw]">{categoryLabel}</span>
+            </motion.nav>
+
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mb-5">
+              <span className="px-2.5 py-1 bg-white text-black font-display text-[10px] uppercase tracking-[0.25em]">
+                {categoryLabel}
+              </span>
+              <span className="font-display text-[11px] uppercase tracking-[0.25em] text-white/70">
+                {formattedDate}
+              </span>
+              <span className="w-px h-3 bg-white/20" />
+              <span className="inline-flex items-center gap-1.5 font-display text-[11px] uppercase tracking-[0.25em] text-white/70">
+                <Clock className="w-3 h-3" />
+                {readingMinutes} {t("news.minRead")}
+              </span>
+              {item.author && (
+                <>
+                  <span className="w-px h-3 bg-white/20" />
+                  <span className="font-display text-[11px] uppercase tracking-[0.25em] text-white/70">
+                    {item.author}
+                  </span>
+                </>
+              )}
+            </div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
+              className="font-display text-white tracking-tight leading-[1.06] max-w-4xl break-words"
+              style={{ fontSize: "clamp(1.75rem, 4.4vw, 3.75rem)", hyphens: "auto" }}
+            >
+              {title}
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.18 }}
+              className="mt-4 sm:mt-5 max-w-2xl font-body text-sm sm:text-base text-white/65 leading-relaxed"
+            >
+              {excerpt}
+            </motion.p>
+          </div>
 
         {/* Body */}
         <section className="relative z-10 py-16 sm:py-24">
