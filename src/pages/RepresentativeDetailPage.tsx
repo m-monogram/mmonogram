@@ -157,7 +157,7 @@ const RepresentativeDetailPage = () => {
                 rel="noopener noreferrer"
                 className="px-4 sm:px-5 py-3.5 text-[10px] sm:text-xs tracking-[0.25em] uppercase text-foreground/40 hover:text-foreground border-l border-white/10 transition-colors"
               >
-                OSM
+                {t("representatives.osm")}
               </a>
             </div>
           </div>
