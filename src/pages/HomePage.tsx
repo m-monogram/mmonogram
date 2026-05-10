@@ -120,8 +120,8 @@ const HomePage = () => {
             <RepresentativesMapSection />
           </Suspense>
           <NextSectionCTA
-            label="Explore"
-            nextLabel="The M-Monogram Story"
+            label={t("homeNextCta.label")}
+            nextLabel={t("homeNextCta.next")}
             onClick={() => handleSetCurrentView("brand")}
           />
           <VinBanner />
