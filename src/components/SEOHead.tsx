@@ -6,13 +6,29 @@ interface SEOHeadProps {
   path?: string;
   image?: string;
   updateUrl?: boolean;
+  type?: "website" | "article";
+  publishedTime?: string;
+  modifiedTime?: string;
+  author?: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 /**
  * Dynamic SEO meta tags component
  * Updates document title and meta tags for each page
  */
-const SEOHead = ({ title, description, path = "", image = "https://m-monogram.com/og-image.jpg", updateUrl = true }: SEOHeadProps) => {
+const SEOHead = ({
+  title,
+  description,
+  path = "",
+  image = "https://m-monogram.com/og-image.jpg",
+  updateUrl = true,
+  type = "website",
+  publishedTime,
+  modifiedTime,
+  author,
+  jsonLd,
+}: SEOHeadProps) => {
   const baseUrl = "https://m-monogram.com";
   const fullUrl = `${baseUrl}${path}`;
 
