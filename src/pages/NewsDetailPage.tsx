@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
-import { motion } from "framer-motion";
-import { ArrowLeft, Calendar, MapPin, Share2, Link as LinkIcon, Check } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { motion, useScroll, useSpring } from "framer-motion";
+import { ArrowLeft, Calendar, MapPin, Share2, Link as LinkIcon, Check, Clock, ChevronRight } from "lucide-react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -16,8 +16,23 @@ const NewsDetailPage = () => {
   const { t, language } = useLanguage();
   const [copied, setCopied] = useState(false);
 
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.2 });
+
   const item = useMemo(() => (slug ? getNewsBySlug(slug) : undefined), [slug]);
   const related = useMemo(() => (slug ? getRelatedNews(slug, 2) : []), [slug]);
+
+  // Compute approximate reading time from paragraph blocks (200 wpm)
+  const readingMinutes = useMemo(() => {
+    if (!item) return 0;
+    const words = item.content
+      .filter((b) => b.type === "paragraph" || b.type === "heading" || b.type === "quote")
+      .map((b: any) => (b.text?.[language] || b.text?.en || "") as string)
+      .join(" ")
+      .split(/\s+/)
+      .filter(Boolean).length;
+    return Math.max(1, Math.round(words / 200));
+  }, [item, language]);
 
   if (!item) {
     return (
@@ -83,135 +98,217 @@ const NewsDetailPage = () => {
     }
   };
 
+  // SEO: Article + BreadcrumbList structured data
+  const baseUrl = "https://m-monogram.com";
+  const articleUrl = `${baseUrl}/news/${item.slug}`;
+  const coverAbs = item.cover.startsWith("http") ? item.cover : `${baseUrl}${item.cover}`;
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": item.category === "event" ? "NewsArticle" : "Article",
+      headline: title,
+      description: excerpt,
+      image: [coverAbs],
+      datePublished: item.publishedAt,
+      dateModified: item.publishedAt,
+      author: {
+        "@type": "Organization",
+        name: item.author || "M-Monogram Atelier",
+      },
+      publisher: {
+        "@type": "Organization",
+        name: "M-Monogram",
+        logo: {
+          "@type": "ImageObject",
+          url: `${baseUrl}/og-image.jpg`,
+        },
+      },
+      mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },
+      inLanguage: language,
+      articleSection: categoryLabel,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: baseUrl },
+        { "@type": "ListItem", position: 2, name: t("news.title"), item: `${baseUrl}/news` },
+        { "@type": "ListItem", position: 3, name: title, item: articleUrl },
+      ],
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-premium-black">
-      <SEOHead title={`${title} — M-Monogram`} description={excerpt} path={`/news/${item.slug}`} />
+      <SEOHead
+        title={`${title} — M-Monogram`}
+        description={excerpt}
+        path={`/news/${item.slug}`}
+        image={coverAbs}
+        type="article"
+        publishedTime={item.publishedAt}
+        modifiedTime={item.publishedAt}
+        author={item.author}
+        jsonLd={jsonLd}
+      />
       <Header />
 
-      {/* Hero */}
-      <section className="relative w-full h-[70vh] min-h-[480px] overflow-hidden">
-        <img
-          src={item.cover}
-          alt={title}
-          fetchPriority="high"
-          decoding="async"
-          className="absolute inset-0 w-full h-full object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/45 to-premium-black" />
-        <div className="relative z-10 h-full flex flex-col justify-end pb-12 sm:pb-16 px-4 sm:px-8 lg:px-12 max-w-5xl mx-auto">
-          <motion.button
-            type="button"
-            onClick={() => navigate("/news")}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 mb-6 text-white/60 hover:text-white transition-colors self-start"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span className="font-display text-[11px] uppercase tracking-[0.25em]">
-              {t("news.backToNews")}
-            </span>
-          </motion.button>
+      {/* Reading progress */}
+      <motion.div
+        style={{ scaleX: progress }}
+        className="fixed top-0 left-0 right-0 h-[2px] bg-white origin-left z-[60]"
+      />
 
-          <div className="flex flex-wrap items-center gap-3 mb-5">
-            <span className="px-3 py-1 bg-white/10 backdrop-blur-md border border-white/25 font-display text-[10px] uppercase tracking-[0.25em] text-white">
-              {categoryLabel}
-            </span>
-            <span className="font-display text-[11px] uppercase tracking-[0.25em] text-white/55">
-              {formattedDate}
-            </span>
-            {item.author && (
-              <span className="font-display text-[11px] uppercase tracking-[0.25em] text-white/55">
-                · {item.author}
-              </span>
-            )}
-          </div>
+      {/* Hero — editorial cinematic */}
+      <article>
+        <header>
+          <section className="relative w-full h-[80vh] min-h-[560px] overflow-hidden">
+            <img
+              src={item.cover}
+              alt={title}
+              fetchPriority="high"
+              decoding="async"
+              className="absolute inset-0 w-full h-full object-cover object-center scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/35 to-premium-black" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.6)_100%)]" />
 
-          <motion.h1
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="font-display text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight leading-[1.05] max-w-4xl"
-          >
-            {title}
-          </motion.h1>
-        </div>
-      </section>
+            <div className="relative z-10 h-full flex flex-col justify-end pb-14 sm:pb-20 px-4 sm:px-8 lg:px-12 max-w-5xl mx-auto">
+              {/* Breadcrumbs */}
+              <motion.nav
+                aria-label="Breadcrumb"
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mb-8 flex items-center gap-2 font-display text-[10px] uppercase tracking-[0.25em] text-white/50"
+              >
+                <Link to="/" className="hover:text-white transition-colors">
+                  {t("news.backToHome")}
+                </Link>
+                <ChevronRight className="w-3 h-3" />
+                <Link to="/news" className="hover:text-white transition-colors">
+                  {t("news.title")}
+                </Link>
+                <ChevronRight className="w-3 h-3" />
+                <span className="text-white/70 truncate max-w-[40vw]">{categoryLabel}</span>
+              </motion.nav>
 
-      {/* Body */}
-      <article className="relative z-10 py-16 sm:py-20 md:py-24">
-        <div className="max-w-3xl mx-auto px-4 sm:px-8">
-          {/* Event meta */}
-          {(formattedEventDate || item.location) && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12 p-6 bg-slate-900/30 backdrop-blur-xl border border-white/10">
-              {formattedEventDate && (
-                <div className="flex items-start gap-3">
-                  <Calendar className="w-4 h-4 text-white/60 mt-1 shrink-0" />
-                  <div>
-                    <p className="font-display text-[10px] uppercase tracking-[0.25em] text-white/45 mb-1">
-                      {t("news.eventDate")}
-                    </p>
-                    <p className="font-body text-sm text-white">{formattedEventDate}</p>
-                  </div>
-                </div>
-              )}
-              {item.location && (
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-4 h-4 text-white/60 mt-1 shrink-0" />
-                  <div>
-                    <p className="font-display text-[10px] uppercase tracking-[0.25em] text-white/45 mb-1">
-                      {t("news.eventLocation")}
-                    </p>
-                    <p className="font-body text-sm text-white">{item.location}</p>
-                  </div>
-                </div>
-              )}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-6">
+                <span className="px-3 py-1 bg-white/95 text-black font-display text-[10px] uppercase tracking-[0.25em]">
+                  {categoryLabel}
+                </span>
+                <span className="font-display text-[11px] uppercase tracking-[0.25em] text-white/65">
+                  {formattedDate}
+                </span>
+                <span className="inline-flex items-center gap-1.5 font-display text-[11px] uppercase tracking-[0.25em] text-white/65">
+                  <Clock className="w-3 h-3" />
+                  {readingMinutes} {t("news.minRead")}
+                </span>
+                {item.author && (
+                  <span className="font-display text-[11px] uppercase tracking-[0.25em] text-white/65">
+                    · {item.author}
+                  </span>
+                )}
+              </div>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-[88px] text-white tracking-tight leading-[1.02] max-w-4xl"
+              >
+                {title}
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.25 }}
+                className="mt-5 sm:mt-7 max-w-2xl font-body text-base sm:text-lg text-white/70 leading-relaxed"
+              >
+                {excerpt}
+              </motion.p>
             </div>
-          )}
+          </section>
+        </header>
 
-          {/* Excerpt as lead */}
-          <p className="font-body text-lg sm:text-xl text-white/80 leading-relaxed mb-10 sm:mb-12 border-l-2 border-white/30 pl-6">
-            {excerpt}
-          </p>
+        {/* Body */}
+        <section className="relative z-10 py-16 sm:py-24">
+          <div className="max-w-3xl mx-auto px-4 sm:px-8">
+            {/* Event meta */}
+            {(formattedEventDate || item.location) && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-14 p-6 bg-slate-900/30 backdrop-blur-xl border border-white/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]">
+                {formattedEventDate && (
+                  <div className="flex items-start gap-3">
+                    <Calendar className="w-4 h-4 text-white/60 mt-1 shrink-0" />
+                    <div>
+                      <p className="font-display text-[10px] uppercase tracking-[0.25em] text-white/45 mb-1">
+                        {t("news.eventDate")}
+                      </p>
+                      <p className="font-body text-sm text-white">{formattedEventDate}</p>
+                    </div>
+                  </div>
+                )}
+                {item.location && (
+                  <div className="flex items-start gap-3">
+                    <MapPin className="w-4 h-4 text-white/60 mt-1 shrink-0" />
+                    <div>
+                      <p className="font-display text-[10px] uppercase tracking-[0.25em] text-white/45 mb-1">
+                        {t("news.eventLocation")}
+                      </p>
+                      <p className="font-body text-sm text-white">{item.location}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
-          <NewsContentRenderer blocks={item.content} />
+            <NewsContentRenderer blocks={item.content} />
 
-          {/* Share row */}
-          <div className="mt-16 pt-8 border-t border-white/10 flex flex-wrap items-center gap-3">
-            <span className="font-display text-[11px] uppercase tracking-[0.25em] text-white/45 mr-2">
-              {t("news.share")}
-            </span>
-            <button
-              type="button"
-              onClick={handleShare}
-              className="inline-flex items-center gap-2 px-4 py-2 border border-white/15 hover:border-white/40 bg-white/5 hover:bg-white/10 transition-all text-white/80"
-            >
-              <Share2 className="w-4 h-4" />
-              <span className="font-display text-[11px] uppercase tracking-[0.25em]">
-                {t("news.shareCta")}
+            {/* Share row */}
+            <div className="mt-20 pt-8 border-t border-white/10 flex flex-wrap items-center gap-3">
+              <span className="font-display text-[11px] uppercase tracking-[0.25em] text-white/45 mr-2">
+                {t("news.share")}
               </span>
-            </button>
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="inline-flex items-center gap-2 px-4 py-2 border border-white/15 hover:border-white/40 bg-white/5 hover:bg-white/10 transition-all text-white/80"
-            >
-              {copied ? <Check className="w-4 h-4" /> : <LinkIcon className="w-4 h-4" />}
-              <span className="font-display text-[11px] uppercase tracking-[0.25em]">
-                {copied ? t("news.copied") : t("news.copyLink")}
-              </span>
-            </button>
+              <button
+                type="button"
+                onClick={handleShare}
+                className="inline-flex items-center gap-2 px-4 py-2 border border-white/15 hover:border-white/40 bg-white/5 hover:bg-white/10 transition-all text-white/80"
+              >
+                <Share2 className="w-4 h-4" />
+                <span className="font-display text-[11px] uppercase tracking-[0.25em]">
+                  {t("news.shareCta")}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="inline-flex items-center gap-2 px-4 py-2 border border-white/15 hover:border-white/40 bg-white/5 hover:bg-white/10 transition-all text-white/80"
+              >
+                {copied ? <Check className="w-4 h-4" /> : <LinkIcon className="w-4 h-4" />}
+                <span className="font-display text-[11px] uppercase tracking-[0.25em]">
+                  {copied ? t("news.copied") : t("news.copyLink")}
+                </span>
+              </button>
+            </div>
           </div>
-        </div>
+        </section>
       </article>
 
       {/* Gallery */}
       {item.gallery && item.gallery.length > 0 && (
-        <section className="relative z-10 pb-20">
+        <section className="relative z-10 pb-24">
           <div className="max-w-6xl mx-auto px-4 sm:px-8">
-            <h3 className="font-display text-2xl sm:text-3xl text-white mb-8 tracking-tight">
-              {t("news.galleryTitle")}
-            </h3>
+            <div className="flex items-end justify-between mb-8 gap-4">
+              <div>
+                <p className="font-display text-[11px] uppercase tracking-[0.35em] text-white/45 mb-3">
+                  {t("news.galleryEyebrow") || "Gallery"}
+                </p>
+                <h3 className="font-display text-2xl sm:text-4xl text-white tracking-tight">
+                  {t("news.galleryTitle")}
+                </h3>
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {item.gallery.map((src, i) => (
                 <div
@@ -220,11 +317,12 @@ const NewsDetailPage = () => {
                 >
                   <img
                     src={src}
-                    alt=""
+                    alt={`${title} — ${i + 1}`}
                     loading="lazy"
                     decoding="async"
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
               ))}
             </div>
@@ -234,9 +332,12 @@ const NewsDetailPage = () => {
 
       {/* Related */}
       {related.length > 0 && (
-        <section className="relative z-10 pb-24 pt-4">
-          <div className="max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12">
-            <h3 className="font-display text-2xl sm:text-3xl text-white mb-8 tracking-tight">
+        <section className="relative z-10 pb-28 pt-4 border-t border-white/10">
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 pt-16">
+            <p className="font-display text-[11px] uppercase tracking-[0.35em] text-white/45 mb-3">
+              {t("news.relatedEyebrow") || "Continue reading"}
+            </p>
+            <h3 className="font-display text-2xl sm:text-4xl text-white mb-10 tracking-tight">
               {t("news.relatedTitle")}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
