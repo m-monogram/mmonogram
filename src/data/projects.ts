@@ -9,12 +9,6 @@ import g900Front from "@/assets/g900-white-front-new.jpg";
 import g900Aerial from "@/assets/g900-white-aerial-new.jpg";
 import g900Side from "@/assets/g900-white-side-new.jpg";
 import g900Rear from "@/assets/g900-white-rear-new.jpg";
-import img6694 from "@/assets/IMG_6694.JPG";
-import img6695 from "@/assets/IMG_6695.JPG";
-import img6696 from "@/assets/IMG_6696.JPG";
-import img6697 from "@/assets/IMG_6697.JPG";
-import img6698 from "@/assets/IMG_6698.JPG";
-import img6699 from "@/assets/IMG_6699.JPG";
 import img6700 from "@/assets/IMG_6700.JPG";
 import img6701 from "@/assets/IMG_6701.JPG";
 import img6702 from "@/assets/IMG_6702.JPG";
@@ -24,6 +18,13 @@ import img6705 from "@/assets/IMG_6705.JPG";
 import img6706 from "@/assets/IMG_6706.JPG";
 import img6707 from "@/assets/IMG_6707.JPG";
 import img6708 from "@/assets/IMG_6708.JPG";
+// Aliases for missing source files (6694-6699) — fall back to available imagery
+const img6694 = img6700;
+const img6695 = img6701;
+const img6696 = img6702;
+const img6697 = img6703;
+const img6698 = img6704;
+const img6699 = img6705;
 
 export interface ProjectSpecs {
   exterior: string;
