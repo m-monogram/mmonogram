@@ -236,6 +236,8 @@ const NewsDetailPage = () => {
               {excerpt}
             </motion.p>
           </div>
+        </header>
+
 
         {/* Body */}
         <section className="relative z-10 py-16 sm:py-24">
