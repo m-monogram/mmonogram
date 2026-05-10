@@ -236,10 +236,10 @@ const RepresentativeDetailPage = () => {
             <div className="flex items-end justify-between mb-8">
               <div>
                 <span className="text-[10px] tracking-[0.3em] uppercase text-foreground/40">
-                  Continue exploring
+                  {t("representatives.continueExploring")}
                 </span>
                 <h3 className="h-display-3 mt-2 uppercase">
-                  Also in {rep.region}
+                  {t("representatives.alsoIn")} {rep.region}
                 </h3>
               </div>
             </div>
