@@ -14,6 +14,7 @@ import menuProjects from "@/assets/menu/menu-projects.webp";
 import menuModifications from "@/assets/commission-hero-final.webp";
 import menuVerify from "@/assets/menu/menu-verify.webp";
 import menuContact from "@/assets/menu/menu-contact-new.jpg.webp";
+import menuNews from "@/assets/hero-main-new.webp";
 interface HeaderProps {
   currentView?: string;
   setCurrentView?: (view: string) => void;
@@ -199,6 +200,12 @@ const Header = ({
     view: 'contact',
     image: menuContact,
     descKey: 'nav.contactDesc'
+  }, {
+    labelKey: 'nav.news',
+    view: 'news',
+    image: menuNews,
+    descKey: 'nav.newsDesc',
+    isWide: true
   }];
   const viewToPath: Record<string, string> = {
     "home": "/",
@@ -207,7 +214,8 @@ const Header = ({
     "modifications": "/commission",
     "verify": "/verify",
     "contact": "/contact",
-    "booking": "/booking"
+    "booking": "/booking",
+    "news": "/news"
   };
   const getViewFromPath = (path: string): string => {
     if (path === "/") return "home";
@@ -217,6 +225,7 @@ const Header = ({
     if (path === "/verify") return "verify";
     if (path === "/contact") return "contact";
     if (path === "/booking") return "booking";
+    if (path.startsWith("/news")) return "news";
     return "home";
   };
   const currentView = propCurrentView || getViewFromPath(location.pathname);
