@@ -5,10 +5,19 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-// Simple loading fallback component
+import logoMmonogram from "@/assets/logo-mmonogram.webp";
+
+// Smooth, branded loading fallback — softly pulsing M-Monogram logo
 const PageLoader = () => (
   <div className="fixed inset-0 z-50 bg-premium-black flex items-center justify-center">
-    <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-none animate-spin" />
+    <img
+      src={logoMmonogram}
+      alt="M-Monogram"
+      width={160}
+      height={160}
+      decoding="async"
+      className="w-24 sm:w-28 md:w-32 max-w-[40vw] opacity-90 animate-logo-pulse will-change-[opacity,transform]"
+    />
   </div>
 );
 
