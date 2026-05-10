@@ -9,24 +9,10 @@
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://m-monogram.com" />
 
-    <!-- Preconnect to Google Fonts for faster loading -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <!-- Remove Josefin Sans load as we use Rivera Nights now -->
-    <!-- Load Noto Sans Arabic for RTL languages -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet" /></noscript>
-    
-    <!-- Preload critical resources -->
-    <link rel="preload" as="image" href="/src/assets/hero-main.jpg" type="image/jpeg" fetchpriority="high" />
-    <link rel="preload" as="image" href="/src/assets/logo-white.png" type="image/png" fetchpriority="high" />
-    <!-- Preload critical fonts to break CSS->font request chain -->
-    <link rel="preload" as="font" type="font/otf" href="/riviera-font-family/RivieraNightsTrial-Ultralight.otf" crossorigin />
-    <link rel="preload" as="font" type="font/otf" href="/riviera-font-family/RivieraNightsTrial-Light.otf" crossorigin />
-    <link rel="preload" as="font" type="font/otf" href="/riviera-font-family/RivieraNightsTrial-Regular.otf" crossorigin />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Preload critical fonts (WOFF2) to break CSS->font request chain -->
+    <link rel="preload" as="font" type="font/woff2" href="/riviera-font-family/RivieraNightsTrial-Light.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/riviera-font-family/RivieraNightsTrial-Regular.woff2" crossorigin />
     <link rel="preconnect" href="https://cdn.gpteng.co" crossorigin />
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
     <link rel="dns-prefetch" href="https://cdn.gpteng.co" />
 
     <!-- Favicon -->

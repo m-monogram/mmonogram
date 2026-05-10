@@ -2,18 +2,18 @@ import { useState } from "react";
 import { Menu, X, Calendar } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
-import logoWhite from "@/assets/logo-white.png";
+import logoWhite from "@/assets/logo-white.webp";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 
 // Menu images - themed for each section
-import menuHome from "@/assets/menu/menu-home.jpg";
-import menuBrand from "@/assets/menu/menu-brand.jpg";
-import menuProjects from "@/assets/menu/menu-projects.jpg";
-import menuModifications from "@/assets/commission-hero-final.jpg";
-import menuVerify from "@/assets/menu/menu-verify.jpg";
-import menuContact from "@/assets/menu/menu-contact-new.jpg.png";
+import menuHome from "@/assets/menu/menu-home.webp";
+import menuBrand from "@/assets/menu/menu-brand.webp";
+import menuProjects from "@/assets/menu/menu-projects.webp";
+import menuModifications from "@/assets/commission-hero-final.webp";
+import menuVerify from "@/assets/menu/menu-verify.webp";
+import menuContact from "@/assets/menu/menu-contact-new.jpg.webp";
 interface HeaderProps {
   currentView?: string;
   setCurrentView?: (view: string) => void;
@@ -85,7 +85,7 @@ const MenuCard = ({
 
     {/* Background - Video or Image */}
     <div className="absolute inset-0 overflow-hidden z-0">
-      {item.video ? <video src={item.video} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover transition-all duration-700 will-change-transform group-hover:scale-105" /> : <img src={item.image} alt={t(item.labelKey)} loading="lazy" decoding="async" fetchpriority="low" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 will-change-transform group-hover:scale-110 group-hover:brightness-110 ${item.view === "brand" ? "object-[50%_70%]" : item.view === "contact" ? "object-[50%_52%] sm:object-[50%_60%]" : item.view === "verify" ? "object-[50%_65%]" : item.view === "home" ? "object-[50%_55%]" : "object-center"}`} />}
+      {item.video ? <video src={item.video} autoPlay muted loop playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover transition-all duration-700 will-change-transform group-hover:scale-105" /> : <img src={item.image} alt={t(item.labelKey)} loading="lazy" decoding="async" fetchpriority="low" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 will-change-transform group-hover:scale-110 group-hover:brightness-110 ${item.view === "brand" ? "object-[50%_70%]" : item.view === "contact" ? "object-[50%_52%] sm:object-[50%_60%]" : item.view === "verify" ? "object-[50%_65%]" : item.view === "home" ? "object-[50%_55%]" : "object-center"}`} />}
 
       {/* Light gradient overlay - minimal to show car */}
       <div className={`absolute inset-0 bg-gradient-to-t transition-all duration-500 ${item.video ? "from-black/50 via-black/15 to-transparent group-hover:from-black/40" : "from-black/50 via-black/20 to-transparent group-hover:from-black/40 group-hover:via-black/15"}`} />

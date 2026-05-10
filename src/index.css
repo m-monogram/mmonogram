@@ -7,42 +7,42 @@
 @layer base {
   @font-face {
     font-family: 'Riviera Nights';
-    src: url('/riviera-font-family/RivieraNightsTrial-Ultralight.otf') format('opentype');
+    src: url('/riviera-font-family/RivieraNightsTrial-Ultralight.woff2') format('woff2');
     font-weight: 200;
     font-style: normal;
     font-display: swap;
   }
   @font-face {
     font-family: 'Riviera Nights';
-    src: url('/riviera-font-family/RivieraNightsTrial-Light.otf') format('opentype');
+    src: url('/riviera-font-family/RivieraNightsTrial-Light.woff2') format('woff2');
     font-weight: 300;
     font-style: normal;
     font-display: swap;
   }
   @font-face {
     font-family: 'Riviera Nights';
-    src: url('/riviera-font-family/RivieraNightsTrial-Regular.otf') format('opentype');
+    src: url('/riviera-font-family/RivieraNightsTrial-Regular.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
   }
   @font-face {
     font-family: 'Riviera Nights';
-    src: url('/riviera-font-family/RivieraNightsTrial-Medium.otf') format('opentype');
+    src: url('/riviera-font-family/RivieraNightsTrial-Medium.woff2') format('woff2');
     font-weight: 500;
     font-style: normal;
     font-display: swap;
   }
   @font-face {
     font-family: 'Riviera Nights';
-    src: url('/riviera-font-family/RivieraNightsTrial-Bold.otf') format('opentype');
+    src: url('/riviera-font-family/RivieraNightsTrial-Bold.woff2') format('woff2');
     font-weight: 700;
     font-style: normal;
     font-display: swap;
   }
   @font-face {
     font-family: 'Riviera Nights';
-    src: url('/riviera-font-family/RivieraNightsTrial-Black.otf') format('opentype');
+    src: url('/riviera-font-family/RivieraNightsTrial-Black.woff2') format('woff2');
     font-weight: 900;
     font-style: normal;
     font-display: swap;

@@ -40,6 +40,14 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
   useEffect(() => {
     document.documentElement.dir = dir;
     document.documentElement.lang = language;
+    // Conditionally load Arabic font only when needed
+    if (language === 'ar' && !document.getElementById('noto-arabic-font')) {
+      const link = document.createElement('link');
+      link.id = 'noto-arabic-font';
+      link.rel = 'stylesheet';
+      link.href = 'https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;700&display=swap';
+      document.head.appendChild(link);
+    }
   }, [language, dir]);
 
   const t = (key: string): string => {
