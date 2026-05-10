@@ -22,7 +22,7 @@ const VinChecker = () => {
         <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 border border-foreground/15 bg-foreground/[0.03] backdrop-blur-sm">
           <BadgeCheck className="w-3.5 h-3.5 text-foreground/70" strokeWidth={1.5} />
           <span className="font-body text-[10px] sm:text-xs text-foreground/70 uppercase tracking-[0.25em]">
-            Official Verification Service
+            {t("verify.badge")}
           </span>
         </div>
 
