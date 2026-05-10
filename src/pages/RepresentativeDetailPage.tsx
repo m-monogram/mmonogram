@@ -3,6 +3,7 @@ import { ArrowLeft, MapPin, Phone, Mail, Clock, ArrowRight, Compass, ExternalLin
 import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
 import { getRepresentativeById, representatives } from "@/data/representatives";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const formatCoord = (value: number, posLabel: string, negLabel: string) => {
   const abs = Math.abs(value);
