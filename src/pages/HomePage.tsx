@@ -9,6 +9,7 @@ import VinBanner from "@/components/VinBanner";
 import NextSectionCTA from "@/components/NextSectionCTA";
 import SEOHead from "@/components/SEOHead";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Lazy load below-the-fold sections for faster initial render
 const ParticleBackground = lazy(() => import("@/components/ParticleBackground"));
