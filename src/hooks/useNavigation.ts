@@ -19,6 +19,7 @@ export const useNavigation = (options?: UseNavigationOptions) => {
         "verify": "/verify",
         "contact": "/contact",
         "booking": "/booking",
+        "news": "/news",
       };
       const path = viewToPath[view] || "/";
       navigate(path);
