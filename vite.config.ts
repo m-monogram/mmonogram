@@ -6,6 +6,7 @@ import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  assetsInclude: ['**/*.JPG', '**/*.JPEG', '**/*.PNG'],
   server: {
     host: "::",
     port: 8080,
