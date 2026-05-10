@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
-import logoWhite from '@/assets/logo-white.png';
+import logoWhite from '@/assets/logo-white.webp';
 import { z } from 'zod';
 
 const emailSchema = z.string().email('Некорректный email');

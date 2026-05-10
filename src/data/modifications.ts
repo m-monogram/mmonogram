@@ -1,22 +1,22 @@
 // Exterior images
-import exteriorPainting from "@/assets/mods/exterior-painting.jpg";
-import exterior6 from "@/assets/mods/exterior-6.jpg";
-import exteriorHeroPurple from "@/assets/mods/exterior-hero-purple.jpg";
-import exterior1 from "@/assets/mods/exterior-1.jpg";
-import exterior2 from "@/assets/mods/exterior-2.jpg";
-import exterior3 from "@/assets/mods/exterior-3.jpg";
-import exterior4 from "@/assets/mods/exterior-4.jpg";
+import exteriorPainting from "@/assets/mods/exterior-painting.webp";
+import exterior6 from "@/assets/mods/exterior-6.webp";
+import exteriorHeroPurple from "@/assets/mods/exterior-hero-purple.webp";
+import exterior1 from "@/assets/mods/exterior-1.webp";
+import exterior2 from "@/assets/mods/exterior-2.webp";
+import exterior3 from "@/assets/mods/exterior-3.webp";
+import exterior4 from "@/assets/mods/exterior-4.webp";
 
 // Interior images
-import interior1 from "@/assets/mods/interior-1.jpg";
-import interior2 from "@/assets/mods/interior-2.jpg";
-import interior3 from "@/assets/mods/interior-3.jpg";
-import interior4 from "@/assets/mods/interior-4.jpg";
-import interiorHero from "@/assets/mods/interior-hero.jpg";
+import interior1 from "@/assets/mods/interior-1.webp";
+import interior2 from "@/assets/mods/interior-2.webp";
+import interior3 from "@/assets/mods/interior-3.webp";
+import interior4 from "@/assets/mods/interior-4.webp";
+import interiorHero from "@/assets/mods/interior-hero.webp";
 
 // Wheels images
-import wheels5 from "@/assets/mods/wheels-5.jpg";
-import wheels6 from "@/assets/mods/wheels-6.jpg";
+import wheels5 from "@/assets/mods/wheels-5.webp";
+import wheels6 from "@/assets/mods/wheels-6.webp";
 
 import { Paintbrush, Car, Cog, LucideIcon } from "lucide-react";
 

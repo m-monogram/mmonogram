@@ -1,6 +1,6 @@
 import { useEffect, memo } from "react";
 import { motion } from "framer-motion";
-import logoMmonogram from "@/assets/logo-mmonogram.png";
+import logoMmonogram from "@/assets/logo-mmonogram.webp";
 
 interface LoadingScreenProps {
   onComplete: () => void;

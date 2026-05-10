@@ -1,11 +1,11 @@
 import { memo, forwardRef, useState, useCallback, useEffect, useMemo, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import g900WhiteFront from "@/assets/g900-white-front.jpg";
-import brand1 from "@/assets/brand/brand-1-optimized.jpg";
-import brand2 from "@/assets/brand/brand-2-optimized.jpg";
-import brand3 from "@/assets/brand/brand-3-optimized.jpg";
-import commissionHeroFinal from "@/assets/commission-hero-final.jpg";
+import g900WhiteFront from "@/assets/g900-white-front.webp";
+import brand1 from "@/assets/brand/brand-1-optimized.webp";
+import brand2 from "@/assets/brand/brand-2-optimized.webp";
+import brand3 from "@/assets/brand/brand-3-optimized.webp";
+import commissionHeroFinal from "@/assets/commission-hero-final.webp";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useNavigate } from "react-router-dom";

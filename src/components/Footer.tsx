@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Instagram, Phone, Mail, MapPin, ArrowRight, Youtube } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import logoMmonogram from "@/assets/logo-mmonogram.png";
+import logoMmonogram from "@/assets/logo-mmonogram.webp";
 import ScrollReveal from "./ScrollReveal";
 
 import { useLanguage } from "@/contexts/LanguageContext";

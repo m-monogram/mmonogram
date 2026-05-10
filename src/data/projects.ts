@@ -1,29 +1,29 @@
 // G63 Black Edition images
-import g63Front from "@/assets/g63-front-new.jpg";
-import g63Quarter from "@/assets/g63-quarter-new.jpg";
-import g63Side from "@/assets/g63-side-new.jpg";
-import g63Rear from "@/assets/g63-rear-new.jpg";
+import g63Front from "@/assets/g63-front-new.webp";
+import g63Quarter from "@/assets/g63-quarter-new.webp";
+import g63Side from "@/assets/g63-side-new.webp";
+import g63Rear from "@/assets/g63-rear-new.webp";
 
 // G900 White Pearl Edition images
-import g900Front from "@/assets/g900-white-front-new.jpg";
-import g900Aerial from "@/assets/g900-white-aerial-new.jpg";
-import g900Side from "@/assets/g900-white-side-new.jpg";
-import g900Rear from "@/assets/g900-white-rear-new.jpg";
-import img6694 from "@/assets/IMG_6694.jpg";
-import img6695 from "@/assets/IMG_6695.jpg";
-import img6696 from "@/assets/IMG_6696.jpg";
-import img6697 from "@/assets/IMG_6697.jpg";
-import img6698 from "@/assets/IMG_6698.jpg";
-import img6699 from "@/assets/IMG_6699.jpg";
-import img6700 from "@/assets/IMG_6700.jpg";
-import img6701 from "@/assets/IMG_6701.jpg";
-import img6702 from "@/assets/IMG_6702.jpg";
-import img6703 from "@/assets/IMG_6703.jpg";
-import img6704 from "@/assets/IMG_6704.jpg";
-import img6705 from "@/assets/IMG_6705.jpg";
-import img6706 from "@/assets/IMG_6706.jpg";
-import img6707 from "@/assets/IMG_6707.jpg";
-import img6708 from "@/assets/IMG_6708.jpg";
+import g900Front from "@/assets/g900-white-front-new.webp";
+import g900Aerial from "@/assets/g900-white-aerial-new.webp";
+import g900Side from "@/assets/g900-white-side-new.webp";
+import g900Rear from "@/assets/g900-white-rear-new.webp";
+import img6694 from "@/assets/IMG_6694.webp";
+import img6695 from "@/assets/IMG_6695.webp";
+import img6696 from "@/assets/IMG_6696.webp";
+import img6697 from "@/assets/IMG_6697.webp";
+import img6698 from "@/assets/IMG_6698.webp";
+import img6699 from "@/assets/IMG_6699.webp";
+import img6700 from "@/assets/IMG_6700.webp";
+import img6701 from "@/assets/IMG_6701.webp";
+import img6702 from "@/assets/IMG_6702.webp";
+import img6703 from "@/assets/IMG_6703.webp";
+import img6704 from "@/assets/IMG_6704.webp";
+import img6705 from "@/assets/IMG_6705.webp";
+import img6706 from "@/assets/IMG_6706.webp";
+import img6707 from "@/assets/IMG_6707.webp";
+import img6708 from "@/assets/IMG_6708.webp";
 
 export interface ProjectSpecs {
   exterior: string;

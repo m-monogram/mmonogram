@@ -5,7 +5,7 @@ import {
   LayoutDashboard, FileText, Navigation, Image, Settings, Users,
   LogOut, Menu, X, Car, ExternalLink, Layers, MessageSquare
 } from 'lucide-react';
-import logoWhite from '@/assets/logo-white.png';
+import logoWhite from '@/assets/logo-white.webp';
 
 const navItems = [
   { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },

@@ -2,18 +2,18 @@ import { useState } from "react";
 import { Menu, X, Calendar } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
-import logoWhite from "@/assets/logo-white.png";
+import logoWhite from "@/assets/logo-white.webp";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 
 // Menu images - themed for each section
-import menuHome from "@/assets/menu/menu-home.jpg";
-import menuBrand from "@/assets/menu/menu-brand.jpg";
-import menuProjects from "@/assets/menu/menu-projects.jpg";
-import menuModifications from "@/assets/commission-hero-final.jpg";
-import menuVerify from "@/assets/menu/menu-verify.jpg";
-import menuContact from "@/assets/menu/menu-contact-new.jpg.png";
+import menuHome from "@/assets/menu/menu-home.webp";
+import menuBrand from "@/assets/menu/menu-brand.webp";
+import menuProjects from "@/assets/menu/menu-projects.webp";
+import menuModifications from "@/assets/commission-hero-final.webp";
+import menuVerify from "@/assets/menu/menu-verify.webp";
+import menuContact from "@/assets/menu/menu-contact-new.jpg.webp";
 interface HeaderProps {
   currentView?: string;
   setCurrentView?: (view: string) => void;

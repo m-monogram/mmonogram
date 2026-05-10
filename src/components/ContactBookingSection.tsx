@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useNavigation } from "@/hooks/useNavigation";
 
 import { safeCall } from "@/lib/validation";
-import contactBuildingImage from "@/assets/menu/menu-contact-new.jpg.png";
+import contactBuildingImage from "@/assets/menu/menu-contact-new.jpg.webp";
 
 interface ContactBookingSectionProps {
   setCurrentView?: (view: string) => void;
