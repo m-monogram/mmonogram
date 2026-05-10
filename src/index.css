@@ -182,24 +182,6 @@
     background-image: none;
   }
 
-  .luxury-bg-contain {
-    background-color: hsl(0 0% 0%);
-    background-image: none;
-  }
-
-  .luxury-bg-overlay {
-    position: relative;
-  }
-
-  .luxury-bg-overlay::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: none;
-    opacity: 0;
-    pointer-events: none;
-  }
-
   /* ===== Premium Typography System ===== */
   /* Luxury Automotive Brand - Refined Type Scale */
   
@@ -696,15 +678,6 @@
 
 .animate-logo-glow {
   animation: logo-glow 3s ease-in-out infinite;
-}
-
-/* Hide scrollbar utility */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
 }
 
 /* GPU acceleration for smooth animations */
