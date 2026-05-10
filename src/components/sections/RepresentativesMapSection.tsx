@@ -8,12 +8,14 @@ import {
   ZoomableGroup,
 } from "react-simple-maps";
 import { representatives } from "@/data/representatives";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const GEO_URL =
   "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 const RepresentativesMapSection = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [hovered, setHovered] = useState<string | null>(null);
 
   return (
