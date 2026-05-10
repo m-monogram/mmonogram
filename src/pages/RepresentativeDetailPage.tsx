@@ -149,7 +149,7 @@ const RepresentativeDetailPage = () => {
                 className="flex-1 px-4 sm:px-5 py-3.5 text-[10px] sm:text-xs tracking-[0.25em] uppercase text-foreground/60 hover:text-foreground transition-colors flex items-center gap-2"
               >
                 <ExternalLink className="w-3.5 h-3.5" strokeWidth={1.5} />
-                Open in Google Maps
+                {t("representatives.openGoogleMaps")}
               </a>
               <a
                 href={osmLink}
