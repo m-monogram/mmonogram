@@ -135,8 +135,8 @@ const RepresentativesMapSection = () => {
           </div>
 
           <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[10px] sm:text-xs text-foreground/40 uppercase tracking-widest pointer-events-none">
-            <span>Scroll to zoom · Drag to pan</span>
-            <span>{representatives.length} Locations</span>
+            <span>{t("representatives.mapHint")}</span>
+            <span>{representatives.length} {t("representatives.locations")}</span>
           </div>
         </div>
       </div>
