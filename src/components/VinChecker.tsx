@@ -44,8 +44,7 @@ const VinChecker = () => {
 
         {/* Description */}
         <p className="font-body text-foreground/55 text-sm sm:text-base md:text-lg leading-relaxed max-w-xl mx-auto mb-14">
-          Authenticate your M-Monogram vehicle directly through our official channels.
-          Every commission is registered and traceable through our verification desk.
+          {t("verify.descriptionLong")}
         </p>
 
         {/* Contact Cards */}
