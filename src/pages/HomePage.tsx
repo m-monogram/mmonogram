@@ -15,6 +15,7 @@ const ParticleBackground = lazy(() => import("@/components/ParticleBackground"))
 const LatestAdditionsCarousel = lazy(() => import("@/components/sections/latest-additions-carousel"));
 const AboutUsSection = lazy(() => import("@/components/AboutUsSection"));
 const StatsSection = lazy(() => import("@/components/StatsSection"));
+const RepresentativesMapSection = lazy(() => import("@/components/sections/RepresentativesMapSection"));
 const Footer = lazy(() => import("@/components/Footer"));
 
 const HomePage = () => {
