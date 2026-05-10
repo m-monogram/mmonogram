@@ -1,63 +1,111 @@
-import { ShieldCheck, Phone, Building2 } from "lucide-react";
+import { ShieldCheck, Phone, Building2, BadgeCheck } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+
 const VinChecker = () => {
-  const {
-    t
-  } = useLanguage();
-  return <section className="min-h-screen flex items-center justify-center py-16 sm:py-20 px-4 sm:px-6 relative z-10 bg-black">
-      {/* Subtle gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-neutral-950 via-black to-neutral-950" />
-      
-      <div className="max-w-xl w-full relative z-10">
-        <div className="text-center">
-          {/* Shield Icon */}
-          
+  const { t } = useLanguage();
 
-          {/* Headline */}
-          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl tracking-widest mb-4 text-white uppercase">
-            {t("verify.title")}
-          </h1>
+  return (
+    <section className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 py-24 sm:py-32 overflow-hidden bg-premium-black">
+      {/* Layered atmospheric gradients */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-neutral-950 to-black" aria-hidden />
+      <div
+        className="absolute inset-0 opacity-[0.35] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255,255,255,0.08), transparent 60%), radial-gradient(ellipse 60% 40% at 50% 100%, rgba(255,255,255,0.05), transparent 60%)",
+        }}
+        aria-hidden
+      />
 
-          {/* Short description */}
-          <p className="font-body text-white/60 text-sm sm:text-base leading-relaxed max-w-md mx-auto mb-10">
-            Verify your M-Monogram vehicle through our official channels.
-          </p>
+      <div className="relative z-10 w-full max-w-3xl mx-auto text-center">
+        {/* Eyebrow / Official badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 border border-foreground/15 bg-foreground/[0.03] backdrop-blur-sm">
+          <BadgeCheck className="w-3.5 h-3.5 text-foreground/70" strokeWidth={1.5} />
+          <span className="font-body text-[10px] sm:text-xs text-foreground/70 uppercase tracking-[0.25em]">
+            Official Verification Service
+          </span>
+        </div>
 
-          {/* Contact Cards */}
-          <div className="grid sm:grid-cols-2 gap-4">
-            {/* Hotline / Mobile */}
-            <a href="tel:+971545077707" className="group block p-6 sm:p-8 rounded-none border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/30 transition-all duration-300 cursor-pointer">
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <Phone className="w-5 h-5 text-white/50 group-hover:text-white/80 transition-colors" />
-                <span className="font-body text-xs text-white/50 uppercase tracking-widest group-hover:text-white/80 transition-colors">
+        {/* Shield monogram */}
+        <div className="flex justify-center mb-8">
+          <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center border border-foreground/15 bg-foreground/[0.02] backdrop-blur-sm">
+            <ShieldCheck className="w-7 h-7 sm:w-9 sm:h-9 text-foreground/85" strokeWidth={1.25} />
+            <span className="absolute -inset-px border border-foreground/[0.06]" aria-hidden />
+          </div>
+        </div>
+
+        {/* Headline */}
+        <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-[0.08em] text-foreground uppercase leading-[1.05] mb-5">
+          {t("verify.title")}
+        </h1>
+
+        {/* Decorative divider */}
+        <div className="mx-auto mb-7 h-px w-24 bg-gradient-to-r from-transparent via-foreground/40 to-transparent" aria-hidden />
+
+        {/* Description */}
+        <p className="font-body text-foreground/55 text-sm sm:text-base md:text-lg leading-relaxed max-w-xl mx-auto mb-14">
+          Authenticate your M-Monogram vehicle directly through our official channels.
+          Every commission is registered and traceable through our verification desk.
+        </p>
+
+        {/* Contact Cards */}
+        <div className="grid sm:grid-cols-2 gap-4 sm:gap-5 mb-12">
+          {/* Hotline / Mobile */}
+          <a
+            href="tel:+971545077707"
+            className="group relative block p-7 sm:p-9 border border-foreground/10 bg-foreground/[0.025] backdrop-blur-md transition-all duration-500 hover:border-foreground/35 hover:bg-foreground/[0.06] hover:-translate-y-0.5"
+          >
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_30px_60px_-30px_rgba(255,255,255,0.18)]" aria-hidden />
+            <div className="relative">
+              <div className="flex items-center justify-center gap-2.5 mb-5">
+                <Phone className="w-4 h-4 text-foreground/55 group-hover:text-foreground/90 transition-colors" strokeWidth={1.5} />
+                <span className="font-body text-[10px] sm:text-xs text-foreground/55 uppercase tracking-[0.28em] group-hover:text-foreground/90 transition-colors">
                   {t("verify.hotline")}
                 </span>
               </div>
-              <span className="font-display text-xl sm:text-2xl tracking-widest text-white group-hover:text-amber-400 transition-colors block">
+              <span className="font-display text-2xl sm:text-3xl tracking-[0.12em] text-foreground block whitespace-nowrap">
                 +971 54 507 7707
               </span>
-            </a>
+              <span className="mt-3 block font-body text-[10px] uppercase tracking-[0.3em] text-foreground/35">
+                24 / 7 Concierge
+              </span>
+            </div>
+          </a>
 
-            {/* Office / Landline */}
-            <a href="tel:+97142284177" className="group block p-6 sm:p-8 rounded-none border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/30 transition-all duration-300 cursor-pointer">
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <Building2 className="w-5 h-5 text-white/50 group-hover:text-white/80 transition-colors" />
-                <span className="font-body text-xs text-white/50 uppercase tracking-widest group-hover:text-white/80 transition-colors">
+          {/* Office / Landline */}
+          <a
+            href="tel:+97142284177"
+            className="group relative block p-7 sm:p-9 border border-foreground/10 bg-foreground/[0.025] backdrop-blur-md transition-all duration-500 hover:border-foreground/35 hover:bg-foreground/[0.06] hover:-translate-y-0.5"
+          >
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_30px_60px_-30px_rgba(255,255,255,0.18)]" aria-hidden />
+            <div className="relative">
+              <div className="flex items-center justify-center gap-2.5 mb-5">
+                <Building2 className="w-4 h-4 text-foreground/55 group-hover:text-foreground/90 transition-colors" strokeWidth={1.5} />
+                <span className="font-body text-[10px] sm:text-xs text-foreground/55 uppercase tracking-[0.28em] group-hover:text-foreground/90 transition-colors">
                   {t("verify.office")}
                 </span>
               </div>
-              <span className="font-display text-xl sm:text-2xl tracking-widest text-white group-hover:text-amber-400 transition-colors block">
+              <span className="font-display text-2xl sm:text-3xl tracking-[0.12em] text-foreground block whitespace-nowrap">
                 +971 4 228 4177
               </span>
-            </a>
-          </div>
+              <span className="mt-3 block font-body text-[10px] uppercase tracking-[0.3em] text-foreground/35">
+                Dubai · Mon — Sat
+              </span>
+            </div>
+          </a>
+        </div>
 
-          {/* Trust badge */}
-          <p className="mt-8 text-white/40 text-xs tracking-wider uppercase">
-            Official M-Monogram Verification Service
-          </p>
+        {/* Trust footer line */}
+        <div className="flex items-center justify-center gap-4 text-foreground/35">
+          <span className="h-px w-10 bg-foreground/20" aria-hidden />
+          <span className="font-body text-[10px] sm:text-xs uppercase tracking-[0.32em]">
+            M-Monogram · Authenticated Atelier
+          </span>
+          <span className="h-px w-10 bg-foreground/20" aria-hidden />
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default VinChecker;
