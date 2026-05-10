@@ -1,82 +1,126 @@
-## Goal
+## News & Events — новый раздел сайта
 
-Make every visible string on every public page fully translate when the user switches between EN, RU, and AR. Today there are three classes of gaps:
+Создаём отдельный раздел "News & Events" с листингом всех новостей/событий и индивидуальной страницей для каждой записи. Всё в едином стиле: pure black, glassmorphism, Riviera Nights typography, EN/RU/AR.
 
-1. **24 keys missing in RU and AR** under `catalog.*` (exterior/interior/wheels/performance/exhaust/protection items 1–4). They fall back to the raw key string.
-2. **Recently added/rewritten UI uses hardcoded English** — `VinChecker`, `RepresentativesMapSection`, `RepresentativeDetailPage`, `NotFound`, plus one stray prop in `HomePage`.
-3. **`OfferAgreement.tsx`** is a 250-line legal document, fully English. Out of scope (legal text stays EN).
+---
 
-## Audit summary
+### 1. Где будет видно на главной
 
-Hardcoded English strings to translate:
+Добавим **заметную точку входа** в двух местах:
 
-- **`src/components/VinChecker.tsx`**
-  - "Official Verification Service" badge
-  - Long description paragraph ("Authenticate your M-Monogram vehicle…")
-  - "24 / 7 Concierge", "Dubai · Mon — Sat" subtitles
-  - "M-Monogram · Authenticated Atelier" trust footer
-- **`src/components/sections/RepresentativesMapSection.tsx`**
-  - Eyebrow "Global Network"
-  - Title "Official Representatives"
-  - Subtitle "Locate the nearest M-Monogram representative."
-  - "Scroll to zoom · Drag to pan" hint
-  - "{N} Locations" counter (interpolate count)
-- **`src/pages/RepresentativeDetailPage.tsx`**
-  - "Global Network" back link
-  - "Atelier" eyebrow, default description fallback
-  - Field labels: "Address", "Phone", "Email", "Hours"
-  - Fallback values: "Address coming soon", "Available on request", "By appointment", "info@mmonogram.com" (keep email literal)
-  - "Open in Google Maps", "OSM"
-  - "Request Appointment" button
-  - "Continue exploring", "Also in {region}"
-  - 404 fallback: "Representative Not Found", description, "Back to Map"
-- **`src/pages/NotFound.tsx`**
-  - "Error 404", "Page Not Found", description, "Return to Home"
-- **`src/pages/HomePage.tsx`**
-  - `<NextSectionCTA label="Explore" nextLabel="The M-Monogram Story" />` — replace with `t()` calls (these props are already translated elsewhere via the `nextSection` keyspace; reuse them)
+1. **Header / Navigation menu (2x2 grid)** — добавляем 7-ю карточку "News & Events" с собственной обложкой (подберу `menu-news.webp` из существующих ассетов или временно используем подходящее фото). Меню расширится до 3-колоночной сетки на десктопе либо новая карточка станет `isWide` снизу — выберу вариант, который лучше ляжет.
+2. **HomePage** — новая секция **`NewsHighlightSection`** между `StatsSection` и `RepresentativesMapSection`. Тёмная секция с eyebrow "Latest News", крупным заголовком, 3 последними карточками новостей (image + дата + заголовок) и кнопкой-ссылкой "All News & Events →". Карточки в той же эстетике, что `LatestAdditionsCarousel` (glassmorphism, единая типографика, hover-glow).
 
-Also missing in RU/AR (24 keys):
-`catalog.exteriorItem1..4`, `interiorItem1..4`, `wheelsItem1..4`, `performanceItem1..4`, `exhaustItem1..4`, `protectionItem1..4`.
+---
 
-## Plan
+### 2. Структура страниц
 
-### 1. Extend `src/data/translations.ts`
+**`/news`** — листинг:
+- Hero: фоновое фото + eyebrow "Journal", h-display заголовок "News & Events", подзаголовок "Check out the newest updates and information about events".
+- Сетка карточек (2 кол. на десктопе, 1 на мобиле): обложка, дата, категория-чип (News / Event / Press), заголовок, короткий excerpt, "Read more →".
+- Опциональный фильтр по категории (chip-row сверху сетки).
+- Footer + NextSectionCTA на Contact.
 
-Add three new namespaces (EN + RU + AR) with full parity:
+**`/news/:slug`** — страница новости:
+- Hero-баннер с обложкой (ratio 21/9), overlay с категорией, датой, заголовком, автором (опц.).
+- Контентная колонка max-w-3xl: rich text (параграфы, подзаголовки, цитаты, картинки внутри) — рендерим из `content_blocks` (массив блоков с типами `paragraph | heading | image | quote`).
+- Галерея фото внизу (опц.) — переиспользуем `ProjectGallery` стиль с lightbox.
+- "Related news" — 2-3 карточки других записей.
+- Sticky share-row: copy link, WhatsApp, Telegram (как в `RepresentativeDetailPage`).
+- Back-link "← All News & Events".
 
-- `verify` — extend with: `badge`, `descriptionLong`, `concierge`, `officeHours`, `trustLine`.
-- `representatives` — new namespace:
-  - `eyebrow`, `title`, `subtitle`
-  - `mapHint`, `locations` (e.g. "Locations" / "Локаций" / "مواقع")
-  - `back`, `atelier`, `address`, `phone`, `email`, `hours`
-  - `addressFallback`, `phoneFallback`, `hoursFallback`
-  - `openGoogleMaps`, `osm`
-  - `requestAppointment`
-  - `continueExploring`, `alsoIn` (string template "Also in {region}")
-  - `notFoundTitle`, `notFoundDescription`, `backToMap`
-- `notFound` — `error404`, `title`, `description`, `cta`.
+---
 
-Backfill the 24 missing `catalog.*Item1..4` keys in `ru` and `ar` (translate using the same labels already used in EN; values are short item names like "Front bumper", "Carbon hood", etc. — pull from the EN block as the source of truth).
+### 3. Данные
 
-### 2. Wire up components
+Сейчас новостей ещё нет — стартуем с чистого листа. План:
 
-For each file, import `useLanguage`, replace hardcoded strings with `t("...")`. Where a string interpolates a value (e.g. "11 Locations", "Also in Middle East"), use template strings: `${representatives.length} ${t("representatives.locations")}` and `${t("representatives.alsoIn")} ${rep.region}`. Region names themselves stay as-is (data field) — only the connector word translates.
+- **Файл `src/data/news.ts`** с TypeScript-моделью `NewsItem` и сидовым массивом из 3 примерных записей (mix EN/RU/AR контента в multilingual-объектах). Это даст рабочий MVP без БД.
+- Модель:
+  ```ts
+  type NewsCategory = 'news' | 'event' | 'press';
+  type LocalizedString = { en: string; ru: string; ar: string };
+  type ContentBlock =
+    | { type: 'paragraph'; text: LocalizedString }
+    | { type: 'heading'; text: LocalizedString }
+    | { type: 'image'; src: string; alt?: LocalizedString }
+    | { type: 'quote'; text: LocalizedString; author?: string };
+  interface NewsItem {
+    slug: string;
+    category: NewsCategory;
+    publishedAt: string;          // ISO
+    cover: string;
+    gallery?: string[];
+    title: LocalizedString;
+    excerpt: LocalizedString;
+    content: ContentBlock[];
+    author?: string;
+    eventDate?: string;           // для events
+    location?: string;
+  }
+  ```
+- Хелперы: `getAllNews()`, `getNewsBySlug(slug)`, `getRelatedNews(slug, n)`.
 
-Files to edit:
+> CMS-интеграция (Supabase-таблица `news`) — это следующий шаг, уже под админ-дашборд. На этой итерации не делаем, чтобы не раздувать диф; модель сделана так, чтобы потом легко перенести в БД.
 
-- `src/components/VinChecker.tsx`
-- `src/components/sections/RepresentativesMapSection.tsx`
-- `src/pages/RepresentativeDetailPage.tsx`
-- `src/pages/NotFound.tsx`
-- `src/pages/HomePage.tsx` (NextSectionCTA props only)
+---
 
-### 3. Verification pass
+### 4. Translations (EN/RU/AR)
 
-After the edits, re-run the parity check (`bun -e` script that flattens both trees) and confirm all three locales have identical key sets and zero missing keys. Then visually load `/`, `/brand`, `/projects`, `/commission`, `/verify`, `/contact`, `/representatives/dubai-uae`, `/404` in EN, RU, AR and confirm no English leaks through (especially under the map, the verification block, and the representative detail card).
+Добавим namespace `news` в `src/data/translations.ts`:
+- `nav.news`, `nav.newsDesc`
+- `news.eyebrow`, `news.title`, `news.subtitle`, `news.allNews`, `news.readMore`, `news.backToNews`, `news.relatedTitle`, `news.share`, `news.copyLink`, `news.copied`, `news.publishedOn`, `news.category.news/event/press`, `news.eventDate`, `news.eventLocation`, `news.empty`
+- `homeNews.eyebrow`, `homeNews.title`, `homeNews.cta`
 
-### Out of scope
+---
 
-- `src/pages/OfferAgreement.tsx` — legal document, stays English.
-- `src/pages/PrivacyPolicy.tsx` — already wired to `t()`.
-- Admin dashboard pages — internal tool, EN only.
-- Region names inside `representatives.ts` data (Middle East, Europe, Asia, Americas) — stay in English as proper nouns within the data layer; only the surrounding UI text translates.
+### 5. Routing
+
+В `src/App.tsx`:
+```tsx
+<Route path="/news" element={<NewsPage />} />
+<Route path="/news/:slug" element={<NewsDetailPage />} />
+```
+
+В `useNavigation` — добавить маппинг `"news" → "/news"`.
+
+---
+
+### 6. Файлы
+
+**Новые:**
+- `src/data/news.ts`
+- `src/pages/NewsPage.tsx`
+- `src/pages/NewsDetailPage.tsx`
+- `src/components/sections/NewsHighlightSection.tsx`
+- `src/components/news/NewsCard.tsx`
+- `src/components/news/NewsContentRenderer.tsx`
+
+**Изменяемые:**
+- `src/App.tsx` — 2 новых route + lazy import
+- `src/components/Header.tsx` — добавить карточку News в menu-grid + импорт обложки
+- `src/pages/HomePage.tsx` — вставить `<NewsHighlightSection />`
+- `src/components/Footer.tsx` — линк "News & Events" в навигации футера
+- `src/data/translations.ts` — новый namespace во всех 3 языках
+- `src/hooks/useNavigation.ts` — маппинг "news"
+
+---
+
+### 7. Стилистика
+
+- Pure black background (`bg-premium-black`), glassmorphism cards (`bg-slate-900/30 backdrop-blur-xl border-white/10` + inner glow).
+- Riviera Nights через `.h-display-1/2/3`, `.text-eyebrow`.
+- Hover: subtle scale + glow, как у проектных карточек.
+- Изображения через `ResponsiveImage` (WebP, lazy, LCP priority для hero).
+- Mobile-first, snap-scroll где уместно.
+- Полная RTL-совместимость для AR.
+
+---
+
+### Что НЕ входит в этот план
+
+- Supabase CMS-таблица `news` и админка (отдельной задачей).
+- Загрузка обложек через storage (пока — статические импорты из `src/assets`).
+- Email-подписка / RSS.
+
+После approve соберу всё, добавлю 3 демо-новости (1 news, 1 event, 1 press) с осмысленным контентом на 3 языках и проверю что переключение EN/RU/AR работает на обеих страницах.
