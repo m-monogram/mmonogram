@@ -142,6 +142,11 @@ export const translations: Record<Language, any> = {
       office: 'Office / Landline',
       guarantee: 'Authenticity Guaranteed',
       shortDesc: 'Contact us to verify the authenticity of M-Monogram tuning',
+      badge: 'Official Verification Service',
+      descriptionLong: 'Authenticate your M-Monogram vehicle directly through our official channels. Every commission is registered and traceable through our verification desk.',
+      concierge: '24 / 7 Concierge',
+      officeHours: 'Dubai · Mon — Sat',
+      trustLine: 'M-Monogram · Authenticated Atelier',
     },
     footer: {
       rights: 'All Rights Reserved',
