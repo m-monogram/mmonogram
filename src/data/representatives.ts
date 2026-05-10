@@ -1,3 +1,10 @@
+export interface RepresentativeSocials {
+  instagram?: string;
+  whatsapp?: string; // E.164 phone for wa.me
+  telegram?: string; // username without @
+  website?: string;
+}
+
 export interface Representative {
   id: string;
   name: string;
@@ -5,13 +12,38 @@ export interface Representative {
   country: string;
   region: string;
   coordinates: [number, number]; // [longitude, latitude]
+  timezone?: string; // IANA tz e.g. "Asia/Dubai"
   address?: string;
   phone?: string;
   email?: string;
   hours?: string;
   description?: string;
   image?: string;
+  flagship?: boolean;
+  established?: number;
+  services?: string[];
+  socials?: RepresentativeSocials;
 }
+
+export const DEFAULT_SOCIALS: RepresentativeSocials = {
+  instagram: "https://www.instagram.com/metagarage_m_monogram/?igsh=MTBtejVmOGdzYW5jMQ%3D%3D",
+  whatsapp: "971545077707",
+};
+
+const TZ_BY_REGION: Record<string, string> = {
+  "Middle East": "Asia/Dubai",
+  Europe: "Europe/London",
+  "North America": "America/Los_Angeles",
+  Asia: "Asia/Tokyo",
+};
+
+export const getRepresentativeTimezone = (rep: Representative) =>
+  rep.timezone ?? TZ_BY_REGION[rep.region] ?? "UTC";
+
+export const getRepresentativeSocials = (rep: Representative): RepresentativeSocials => ({
+  ...DEFAULT_SOCIALS,
+  ...(rep.socials ?? {}),
+});
 
 // Placeholder data — exact addresses will be provided later.
 // Coordinates use [longitude, latitude] order for react-simple-maps.
@@ -23,7 +55,19 @@ export const representatives: Representative[] = [
     country: "United Arab Emirates",
     region: "Middle East",
     coordinates: [55.2708, 25.2048],
+    timezone: "Asia/Dubai",
+    flagship: true,
+    established: 2018,
+    address: "Al Quoz Industrial Area 3, Dubai, UAE",
+    phone: "+971 54 507 7707",
+    email: "info@mmonogram.com",
+    hours: "Mon — Sat · 09:00 — 19:00",
     description: "Flagship atelier and global headquarters.",
+    services: ["Exterior", "Interior", "Forged Wheels", "Performance"],
+    socials: {
+      instagram: "https://www.instagram.com/metagarage_m_monogram/?igsh=MTBtejVmOGdzYW5jMQ%3D%3D",
+      whatsapp: "971545077707",
+    },
   },
   {
     id: "riyadh-ksa",
