@@ -98,7 +98,7 @@ const ModificationDetail = ({
     }} className="relative w-full h-[70vh] sm:h-[75vh] md:h-[80vh] overflow-hidden">
         {/* Full-width background image */}
         <div className="absolute inset-0">
-          <img src={category.coverImage} alt={category.title} loading="eager" decoding="async" fetchpriority="high" sizes="100vw" className="w-full h-full object-cover" style={{
+          <img src={category.coverImage} alt={category.title} loading="eager" decoding="async" fetchPriority="high" sizes="100vw" className="w-full h-full object-cover" style={{
           objectPosition: getImagePosition()
         }} />
         </div>

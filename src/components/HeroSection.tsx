@@ -56,7 +56,7 @@ const HeroSection = memo(({ setCurrentView }: HeroSectionProps) => {
             onLoad={() => setImageLoaded(true)}
             loading="eager"
             decoding="sync"
-            fetchpriority="high"
+            fetchPriority="high"
             className={`w-full h-full transition-opacity duration-300 ${
               imageLoaded ? "opacity-100" : "opacity-0"
             } object-cover scale-[1.25] origin-bottom sm:scale-100 sm:origin-center`}
