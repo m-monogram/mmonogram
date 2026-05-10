@@ -16,23 +16,33 @@ const HeroSection = memo(({ setCurrentView }: HeroSectionProps) => {
   const { t } = useLanguage();
 
   // Адаптивная позиция изображения - оптимально для каждого устройства
+  // Use matchMedia + rAF to avoid forced reflows from synchronous innerWidth reads
   useEffect(() => {
+    const desktopMql = window.matchMedia("(min-width: 1280px)");
+    const tabletMql = window.matchMedia("(min-width: 768px)");
+    let rafId = 0;
+
     const updatePosition = () => {
-      if (window.innerWidth >= 1280) {
-        // Большие экраны: ~23.5% неба, фокус на машине
-        setImagePosition("center 66%");
-      } else if (window.innerWidth >= 768) {
-        // Десктоп: сбалансированный вид
-        setImagePosition("center 70%");
-      } else {
-        // Мобильные: фокус на машине
-        setImagePosition("center 75%");
-      }
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        if (desktopMql.matches) {
+          setImagePosition("center 66%");
+        } else if (tabletMql.matches) {
+          setImagePosition("center 70%");
+        } else {
+          setImagePosition("center 75%");
+        }
+      });
     };
 
     updatePosition();
-    window.addEventListener("resize", updatePosition);
-    return () => window.removeEventListener("resize", updatePosition);
+    desktopMql.addEventListener("change", updatePosition);
+    tabletMql.addEventListener("change", updatePosition);
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      desktopMql.removeEventListener("change", updatePosition);
+      tabletMql.removeEventListener("change", updatePosition);
+    };
   }, []);
 
   return (
