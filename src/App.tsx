@@ -30,7 +30,6 @@ const ModificationsPage = lazy(() => import("./pages/ModificationsPage"));
 const VerifyPage = lazy(() => import("./pages/VerifyPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
 const BookingPage = lazy(() => import("./pages/BookingPage"));
-const RepresentativesPage = lazy(() => import("./pages/RepresentativesPage"));
 const RepresentativeDetailPage = lazy(() => import("./pages/RepresentativeDetailPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const OfferAgreement = lazy(() => import("./pages/OfferAgreement"));
@@ -67,7 +66,6 @@ const App = () => (
               <Route path="/verify" element={<VerifyPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/booking" element={<BookingPage />} />
-              <Route path="/representatives" element={<RepresentativesPage />} />
               <Route path="/representatives/:id" element={<RepresentativeDetailPage />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/offer-agreement" element={<OfferAgreement />} />
