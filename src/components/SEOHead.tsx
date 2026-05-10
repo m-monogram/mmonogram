@@ -6,13 +6,29 @@ interface SEOHeadProps {
   path?: string;
   image?: string;
   updateUrl?: boolean;
+  type?: "website" | "article";
+  publishedTime?: string;
+  modifiedTime?: string;
+  author?: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 /**
  * Dynamic SEO meta tags component
  * Updates document title and meta tags for each page
  */
-const SEOHead = ({ title, description, path = "", image = "https://m-monogram.com/og-image.jpg", updateUrl = true }: SEOHeadProps) => {
+const SEOHead = ({
+  title,
+  description,
+  path = "",
+  image = "https://m-monogram.com/og-image.jpg",
+  updateUrl = true,
+  type = "website",
+  publishedTime,
+  modifiedTime,
+  author,
+  jsonLd,
+}: SEOHeadProps) => {
   const baseUrl = "https://m-monogram.com";
   const fullUrl = `${baseUrl}${path}`;
 
@@ -58,6 +74,12 @@ const SEOHead = ({ title, description, path = "", image = "https://m-monogram.co
     updateOGTag("og:description", description);
     updateOGTag("og:url", fullUrl);
     updateOGTag("og:image", image);
+    updateOGTag("og:type", type);
+    if (type === "article") {
+      if (publishedTime) updateOGTag("article:published_time", publishedTime);
+      if (modifiedTime) updateOGTag("article:modified_time", modifiedTime);
+      if (author) updateOGTag("article:author", author);
+    }
 
     // Update Twitter tags
     const updateTwitterTag = (name: string, content: string) => {
@@ -73,7 +95,25 @@ const SEOHead = ({ title, description, path = "", image = "https://m-monogram.co
     updateTwitterTag("twitter:title", title);
     updateTwitterTag("twitter:description", description);
     updateTwitterTag("twitter:image", image);
-  }, [title, description, fullUrl, image, path, updateUrl]);
+    updateTwitterTag("twitter:card", "summary_large_image");
+
+    // JSON-LD structured data
+    const ldId = "seo-jsonld";
+    const existing = document.getElementById(ldId);
+    if (existing) existing.remove();
+    if (jsonLd) {
+      const script = document.createElement("script");
+      script.type = "application/ld+json";
+      script.id = ldId;
+      script.text = JSON.stringify(jsonLd);
+      document.head.appendChild(script);
+    }
+
+    return () => {
+      const ld = document.getElementById(ldId);
+      if (ld) ld.remove();
+    };
+  }, [title, description, fullUrl, image, path, updateUrl, type, publishedTime, modifiedTime, author, jsonLd]);
 
   return null;
 };
