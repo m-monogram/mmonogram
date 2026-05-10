@@ -2,21 +2,21 @@ import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import logoMmonogram from "@/assets/logo-mmonogram.webp";
 
-// Smooth, branded loading fallback — softly pulsing M-Monogram logo
+// Premium branded loading fallback — large softly pulsing M-Monogram logo
 const PageLoader = () => (
   <div className="fixed inset-0 z-50 bg-premium-black flex items-center justify-center">
     <img
       src={logoMmonogram}
       alt="M-Monogram"
-      width={160}
-      height={160}
+      width={320}
+      height={320}
       decoding="async"
-      className="w-24 sm:w-28 md:w-32 max-w-[40vw] opacity-90 animate-logo-pulse will-change-[opacity,transform]"
+      fetchPriority="high"
+      className="w-56 sm:w-72 md:w-80 lg:w-96 max-w-[70vw] opacity-95 animate-logo-pulse will-change-[opacity,transform]"
     />
   </div>
 );
@@ -47,24 +47,10 @@ const AdminMedia = lazy(() => import("./pages/admin/AdminMedia"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminBookings = lazy(() => import("./pages/admin/AdminBookings"));
-import AdminLayout from "./components/admin/AdminLayout";
-import ProtectedRoute from "./components/admin/ProtectedRoute";
-
-// Optimized QueryClient for better performance
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes (renamed from cacheTime in v5)
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      retry: 1,
-    },
-  },
-});
+const AdminLayout = lazy(() => import("./components/admin/AdminLayout"));
+const ProtectedRoute = lazy(() => import("./components/admin/ProtectedRoute"));
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
     <LanguageProvider>
       <TooltipProvider>
         <Toaster />
@@ -105,7 +91,6 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
     </LanguageProvider>
-  </QueryClientProvider>
 );
 
 export default App;
