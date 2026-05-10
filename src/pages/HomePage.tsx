@@ -17,6 +17,7 @@ const LatestAdditionsCarousel = lazy(() => import("@/components/sections/latest-
 const AboutUsSection = lazy(() => import("@/components/AboutUsSection"));
 const StatsSection = lazy(() => import("@/components/StatsSection"));
 const RepresentativesMapSection = lazy(() => import("@/components/sections/RepresentativesMapSection"));
+const NewsHighlightSection = lazy(() => import("@/components/sections/NewsHighlightSection"));
 const Footer = lazy(() => import("@/components/Footer"));
 
 const HomePage = () => {
@@ -115,6 +116,9 @@ const HomePage = () => {
           <BrandStrip />
           <Suspense fallback={null}>
             <StatsSection />
+          </Suspense>
+          <Suspense fallback={null}>
+            <NewsHighlightSection />
           </Suspense>
           <Suspense fallback={null}>
             <RepresentativesMapSection />
