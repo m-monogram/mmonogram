@@ -96,7 +96,7 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
     <section className="w-full bg-premium-black pt-20 sm:pt-24 md:pt-28 lg:pt-32 pb-6 sm:pb-8 md:pb-10 lg:pb-12">
       {/* Video Container - Wider Aspect Ratio */}
       <div className="relative w-full aspect-[16/9] sm:aspect-[16/8] md:aspect-[21/9] lg:aspect-[21/9] overflow-hidden">
-        <video src={BRAND_HERO_VIDEO} autoPlay loop muted playsInline className="w-full h-full object-cover" style={{
+        <video src={BRAND_HERO_VIDEO} autoPlay loop muted playsInline preload="metadata" className="w-full h-full object-cover" style={{
           objectPosition: "center center"
         }} onError={e => {
           // Fallback: if video fails to load, show image
