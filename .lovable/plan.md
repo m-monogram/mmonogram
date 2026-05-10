@@ -1,24 +1,53 @@
-План подготовки сайта к проверке производительности:
+## Goal
 
-1. Ускорить старт и переходы между страницами
-- Убрать из глобального старта лишний `React Query`, потому что в проекте он сейчас нигде не используется, но грузится на каждой странице.
-- Разорвать импорт админ-auth/backend-клиента из публичного бандла: `ProtectedRoute` и `AdminLayout` сделать lazy-loaded, чтобы обычные страницы (`/verify`, `/brand`, `/commission`, `/contact`) не тянули backend/auth код при первом открытии.
-- Убрать `framer-motion` из элементов, которые есть на каждой странице: `Header`, `LanguageSwitcher`, home loader. Заменить на CSS-анимации, чтобы не грузить тяжелый animation vendor на простых страницах.
-- Разделить меню в шапке: базовая шапка грузится сразу, тяжелое полноэкранное меню с карточками/картинками подгружается только после клика по hamburger.
-- Добавить аккуратный idle-prefetch основных публичных маршрутов после первого рендера, чтобы следующие разделы открывались быстрее без блокировки первого экрана.
-- Исправить `fetchPriority` warning на изображениях, чтобы консоль была чище и React не делал лишнюю работу.
+Move the Official Representatives map from its standalone page (`/representatives`) onto the homepage as a section near the bottom. Remove the "All Locations" list entirely. Keep pins on the map clickable — clicking a pin navigates to that representative's individual detail page (existing `/representatives/:id` route stays).
 
-2. Сделать loading logo больше и премиальнее
-- Увеличить логотип в route loader и initial home loader.
-- Убрать прогресс-бар/лишние элементы, оставить крупный M-Monogram logo с мягким дыханием: opacity + scale + subtle glow.
-- Сделать анимацию чисто CSS, без `framer-motion`, чтобы сам loader не замедлял загрузку.
+## Placement on the homepage
 
-3. Переделать страницу VIN Verification
-- Пересобрать `/verify` в более дорогом стиле сайта: крупнее композиция, лучше вертикальные отступы, glassmorphism-контейнеры, тонкие линии, официальный verification tone.
-- Улучшить карточки контактов: больше размер, четкая иерархия, hover-glow, кликабельные `tel:` ссылки, аккуратная мобильная адаптация.
-- Добавить визуальный “official authentication” блок/печать без перегруза, чтобы страница не выглядела пустой и дешевой.
-- Сохранить текущий контент и номера, не добавляя новую бизнес-логику.
+Add a new `RepresentativesMapSection` between `StatsSection` and `NextSectionCTA`:
 
-4. Проверка результата
-- Проверить `/verify` через browser performance profile: убедиться, что стало меньше глобальных тяжелых ресурсов и нет критичных console warnings.
-- Быстро проверить визуально desktop/mobile, чтобы VIN страница не ломалась и текст не налезал.
+```text
+HeroSection
+MissionStatement
+LatestAdditionsCarousel
+AboutUsSection
+BrandStrip
+StatsSection
+→ RepresentativesMapSection   ← NEW
+NextSectionCTA (Explore → Brand)
+VinBanner
+Footer
+```
+
+Reasoning: this slot sits after the credibility build-up (projects, about, stats) and before the brand-story CTA — a natural "where to find us in the world" beat that reinforces global presence without breaking the existing narrative flow toward Brand → Commission → Contact.
+
+## Section design
+
+- Full-width dark section, generous vertical padding (`py-24 md:py-32`).
+- Eyebrow: "GLOBAL NETWORK" (`.text-eyebrow`, trilingual via `t()`).
+- H2 (`.h-display-2`): "OFFICIAL REPRESENTATIVES".
+- Subtitle (one short line): "Locate the nearest M-Monogram representative."
+- Interactive world map below, `max-w-6xl mx-auto`, glassmorphism frame (`bg-slate-900/30 border-white/10 backdrop-blur-xl`), aspect ratio ~16/9, rounded-none to match site language.
+- Bottom-left hint: "SCROLL TO ZOOM · DRAG TO PAN". Bottom-right counter: "{N} LOCATIONS".
+- No list of locations rendered anywhere on the page.
+
+## Pin interaction
+
+- Each pin is a clickable button with subtle pulsing white dot + outer ring on hover.
+- Click → `navigate('/representatives/' + rep.id)` (uses existing `RepresentativeDetailPage` and `representatives.ts` data — no changes there).
+- On hover: small floating tooltip with city name (no address, no extra info — keeps the editorial feel).
+- Lazy load the map section with `Suspense` to avoid weighing down LCP.
+
+## Files to change
+
+- **New** `src/components/sections/RepresentativesMapSection.tsx` — extract the map + pins (without the All Locations list) from the existing `RepresentativesPage`, wrap in homepage section styling.
+- **Edit** `src/pages/HomePage.tsx` — lazy-import and render the new section between `StatsSection` and `NextSectionCTA`.
+- **Delete** `src/pages/RepresentativesPage.tsx` — no longer used.
+- **Edit** `src/App.tsx` — remove the `/representatives` route (keep `/representatives/:id`).
+- **Edit** `src/components/Footer.tsx` — remove or repoint the "Representatives" footer link (point to `/#representatives` anchor on home).
+- **Edit** `src/data/translations.ts` — add `representatives.eyebrow`, `representatives.title`, `representatives.subtitle` keys in EN/RU/AR if not already present; remove the unused "All Locations" string.
+
+## Out of scope
+
+- Real geographic coordinates / new pin data — the existing `representatives.ts` mock pin positions are reused as-is.
+- Detail page redesign — `RepresentativeDetailPage` stays exactly as it is.
