@@ -26,13 +26,13 @@ const RepresentativesMapSection = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center">
           <span className="text-eyebrow text-foreground/60">
-            Global Network
+            {t("representatives.eyebrow")}
           </span>
           <h2 className="h-display-2 mt-3 sm:mt-4 uppercase">
-            Official Representatives
+            {t("representatives.title")}
           </h2>
           <p className="mt-4 sm:mt-6 max-w-2xl mx-auto text-sm sm:text-base text-foreground/60 leading-relaxed">
-            Locate the nearest M-Monogram representative.
+            {t("representatives.subtitle")}
           </p>
         </div>
 
