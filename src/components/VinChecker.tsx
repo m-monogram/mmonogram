@@ -88,7 +88,7 @@ const VinChecker = () => {
                 +971 4 228 4177
               </span>
               <span className="mt-3 block font-body text-[10px] uppercase tracking-[0.3em] text-foreground/35">
-                Dubai · Mon — Sat
+                {t("verify.officeHours")}
               </span>
             </div>
           </a>
