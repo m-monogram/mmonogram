@@ -186,10 +186,10 @@ const RepresentativeDetailPage = () => {
 
               <ul className="space-y-5 text-sm">
                 {[
-                  { Icon: MapPin, label: "Address", value: rep.address ?? "Address coming soon", href: undefined },
-                  { Icon: Phone, label: "Phone", value: rep.phone ?? "Available on request", href: rep.phone ? `tel:${rep.phone.replace(/\s/g, "")}` : undefined },
-                  { Icon: Mail, label: "Email", value: rep.email ?? "info@mmonogram.com", href: `mailto:${rep.email ?? "info@mmonogram.com"}` },
-                  { Icon: Clock, label: "Hours", value: rep.hours ?? "By appointment", href: undefined },
+                  { Icon: MapPin, label: t("representatives.address"), value: rep.address ?? t("representatives.addressFallback"), href: undefined },
+                  { Icon: Phone, label: t("representatives.phone"), value: rep.phone ?? t("representatives.phoneFallback"), href: rep.phone ? `tel:${rep.phone.replace(/\s/g, "")}` : undefined },
+                  { Icon: Mail, label: t("representatives.email"), value: rep.email ?? "info@mmonogram.com", href: `mailto:${rep.email ?? "info@mmonogram.com"}` },
+                  { Icon: Clock, label: t("representatives.hours"), value: rep.hours ?? t("representatives.hoursFallback"), href: undefined },
                 ].map(({ Icon, label, value, href }) => {
                   const content = (
                     <>
