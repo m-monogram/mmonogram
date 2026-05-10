@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import logoMmonogram from "@/assets/logo-mmonogram.webp";
+import ScrollToTop from "@/components/ScrollToTop";
 
 // Premium branded loading fallback — large softly pulsing M-Monogram logo
 const PageLoader = () => (
@@ -57,6 +58,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<HomePage />} />
