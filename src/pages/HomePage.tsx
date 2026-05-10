@@ -114,6 +114,9 @@ const HomePage = () => {
           <Suspense fallback={null}>
             <StatsSection />
           </Suspense>
+          <Suspense fallback={null}>
+            <RepresentativesMapSection />
+          </Suspense>
           <NextSectionCTA
             label="Explore"
             nextLabel="The M-Monogram Story"
