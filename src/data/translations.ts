@@ -668,6 +668,11 @@ export const translations: Record<Language, any> = {
       office: 'المكتب / الهاتف الثابت',
       guarantee: 'الأصالة مضمونة',
       shortDesc: 'اتصل بنا للتحقق من أصالة تعديلات M-Monogram',
+      badge: 'خدمة التحقق الرسمية',
+      descriptionLong: 'تحقق من أصالة سيارة M-Monogram الخاصة بك مباشرة من خلال قنواتنا الرسمية. كل مشروع مسجل ويمكن تتبعه من خلال مكتب التحقق لدينا.',
+      concierge: 'كونسيرج 24 / 7',
+      officeHours: 'دبي · الإثنين — السبت',
+      trustLine: 'M-Monogram · ورشة موثقة',
     },
     footer: {
       rights: 'جميع الحقوق محفوظة',
