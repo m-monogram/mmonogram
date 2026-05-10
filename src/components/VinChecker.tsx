@@ -66,7 +66,7 @@ const VinChecker = () => {
                 +971 54 507 7707
               </span>
               <span className="mt-3 block font-body text-[10px] uppercase tracking-[0.3em] text-foreground/35">
-                24 / 7 Concierge
+                {t("verify.concierge")}
               </span>
             </div>
           </a>
