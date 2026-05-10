@@ -12,8 +12,14 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const assetsDir = resolve(__dirname, '../src/assets');
 
-const SUPABASE_URL = 'https://mgyufoyornzbwvgdfojb.supabase.co';
-const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1neXVmb3lvcm56Ynd2Z2Rmb2piIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTE0NjY3NiwiZXhwIjoyMDg0NzIyNjc2fQ.9IdhPD4tvJH6g4VXy4ZTKHW84AX8XqAYkZ7p9Dx8Khk';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!SUPABASE_URL || !SERVICE_KEY) {
+  console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY environment variables.');
+  console.error('Set them locally before running, e.g. via a gitignored .env.local file.');
+  process.exit(1);
+}
 
 const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
 const BUCKET = 'project-images';
