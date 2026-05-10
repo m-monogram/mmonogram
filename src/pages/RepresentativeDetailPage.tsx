@@ -170,7 +170,7 @@ const RepresentativeDetailPage = () => {
             >
               <div>
                 <span className="text-[10px] tracking-[0.3em] uppercase text-foreground/40">
-                  Atelier
+                  {t("representatives.atelier")}
                 </span>
                 <h2 className="font-display text-xl sm:text-2xl uppercase tracking-wide mt-2 leading-tight">
                   {rep.name}
