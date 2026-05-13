@@ -8,6 +8,7 @@ import BrandStrip from "@/components/BrandStrip";
 import VinBanner from "@/components/VinBanner";
 import NextSectionCTA from "@/components/NextSectionCTA";
 import SEOHead from "@/components/SEOHead";
+import LazyOnVisible from "@/components/LazyOnVisible";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -121,7 +122,9 @@ const HomePage = () => {
             <NewsHighlightSection />
           </Suspense>
           <Suspense fallback={null}>
-            <RepresentativesMapSection />
+            <LazyOnVisible minHeight="600px" rootMargin="400px">
+              <RepresentativesMapSection />
+            </LazyOnVisible>
           </Suspense>
           <NextSectionCTA
             label={t("homeNextCta.label")}
