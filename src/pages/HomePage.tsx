@@ -122,7 +122,9 @@ const HomePage = () => {
             <NewsHighlightSection />
           </Suspense>
           <Suspense fallback={null}>
-            <RepresentativesMapSection />
+            <LazyOnVisible minHeight="600px" rootMargin="400px">
+              <RepresentativesMapSection />
+            </LazyOnVisible>
           </Suspense>
           <NextSectionCTA
             label={t("homeNextCta.label")}
