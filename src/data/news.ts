@@ -1,4 +1,8 @@
 import cover from "@/assets/news/m-monogram-g-iconic/01-cover.jpeg";
+import iksAerial from "@/assets/news/iksanov-review/01-aerial.png";
+import iksSide from "@/assets/news/iksanov-review/02-side.png";
+import iksRear from "@/assets/news/iksanov-review/03-rear.png";
+import iksFront from "@/assets/news/iksanov-review/04-front-driving.png";
 import frontGrille from "@/assets/news/m-monogram-g-iconic/02-front-grille.jpeg";
 import binz1950 from "@/assets/news/m-monogram-g-iconic/03-binz-1950.jpeg";
 import amgBase from "@/assets/news/m-monogram-g-iconic/04-amg-base.jpeg";
@@ -37,6 +41,111 @@ export interface NewsItem {
 }
 
 export const NEWS: NewsItem[] = [
+  {
+    slug: "was-g63-became-m-monogram-iconic",
+    category: "press",
+    publishedAt: "2026-05-04",
+    cover: iksFront,
+    gallery: [iksFront, iksAerial, iksSide, iksRear],
+    author: "Манас Иксанов",
+    location: "Dubai, UAE",
+    title: {
+      en: "It Was a G63 — Now It Is the M Monogram G 3.0 Iconic",
+      ru: "Был G63 — стал M Monogram G 3.0 Iconic",
+      ar: "كان جي 63 — والآن هو إم مونوغرام جي 3.0 آيكونيك",
+    },
+    excerpt: {
+      en: "A Dubai atelier reshapes the G-Class face in Mercedes' newest signature style — and the result is genuinely shocking.",
+      ru: "Дубайское ателье преобразило облик G-класса в новейшем фирменном стиле автопроизводителя — и результат шокирует.",
+      ar: "أتيليه في دبي يعيد تشكيل وجه فئة G بأحدث الأسلوب المميز لمرسيدس — والنتيجة صادمة فعلاً.",
+    },
+    content: [
+      {
+        type: "paragraph",
+        text: {
+          en: "The G-Wagen was originally built as a military vehicle, and went into production with a utilitarian face and a simplified radiator panel that had nothing in common with the chrome grilles of the brand's civilian models. Even so, attempts to dress it up — to make it look richer, more pompous — have been made many times, and almost certainly will keep coming.",
+          ru: "«Гелендваген», изначально создававшийся как армейская модель, в производство пошёл с утилитарным передком и упрощённой облицовкой радиатора, которая в корне отличалась от «гриля» гражданских моделей той же марки. И всё же попытки украсить внедорожник, сделать его облик дороже и помпезнее предпринимались неоднократно и вряд ли прекратятся в обозримом будущем.",
+          ar: "صُممت جي-فاغن أصلاً كمركبة عسكرية، ودخلت الإنتاج بواجهة نفعية وشبكة رادياتير مبسطة لا علاقة لها بشبكات الكروم في الموديلات المدنية للعلامة. ومع ذلك، جرت محاولات عديدة لتزيينها — لجعلها تبدو أغنى وأكثر فخامة — ومن المؤكد أنها ستستمر.",
+        },
+      },
+      {
+        type: "image",
+        src: iksAerial,
+        alt: {
+          en: "Top-down view of the M Monogram G 3.0 Iconic",
+          ru: "Вид сверху на M Monogram G 3.0 Iconic",
+          ar: "منظر علوي لإم مونوغرام جي 3.0 آيكونيك",
+        },
+      },
+      {
+        type: "heading",
+        text: {
+          en: "Mercedes' New Signature Look",
+          ru: "Новый фирменный стиль Mercedes",
+          ar: "المظهر المميز الجديد لمرسيدس",
+        },
+      },
+      {
+        type: "paragraph",
+        text: {
+          en: "As is well known, Mercedes-Benz is gradually rolling out a large, chrome-rich radiator grille across a whole range of new cars — the electric C-Class and VLE are typical examples. Yet there is no public talk of redesigning the G-Class in this same direction.",
+          ru: "Как известно, сейчас в Mercedes-Benz потихоньку внедряют крупную радиаторную решётку с обилием хрома на целый ряд своих новинок. В качестве примера можно привести электрические С-класс и VLE. Тем не менее о том, чтобы переоформить в таком стиле ещё и G-класс, речь пока не идёт.",
+          ar: "كما هو معلوم، تطرح مرسيدس-بنز تدريجياً شبكة رادياتير كبيرة غنية بالكروم على مجموعة كاملة من سياراتها الجديدة — كفئة C الكهربائية و VLE. ومع ذلك لا يوجد حديث علني عن إعادة تصميم فئة G بنفس الاتجاه.",
+        },
+      },
+      {
+        type: "image",
+        src: iksFront,
+        alt: {
+          en: "The new front: oversized chrome grille and triangular star fog lamps",
+          ru: "Новый передок: огромная хромированная решётка и звёздочки противотуманок",
+          ar: "الواجهة الجديدة: شبكة كروم كبيرة ومصابيح ضباب على شكل نجوم",
+        },
+      },
+      {
+        type: "paragraph",
+        text: {
+          en: "But where Mercedes-Benz has not yet thought about such a transformation, Dubai has done it for them. The local atelier MetaGarage — founded by an entrepreneur from Russia — has built the M Monogram G 3.0 Iconic: a G63 crowned with a vast, glittering radiator grille and triangular star-shaped fog lamps. The designers do not name the current Mercedes design language as their inspiration. Instead they cite a little-known seven-decade-old wagon built by Binz on the chassis of the 300C saloon.",
+          ru: "Но если в Mercedes-Benz о таком преображении ещё не думают, то за них новый облик гелика создали в Дубае, где организованное выходцем из России тюнинг-ателье MetaGarage построило M Monogram G 3.0 Iconic. Это G63, увенчанный огромной блестящей радиаторной решёткой и звёздочками противотуманок. При этом текущие веяния в мерседесовском дизайне в качестве источника вдохновения не указаны, вместо них дизайнеры упоминают малоизвестный универсал 70-летней давности, сделанный мастерами Binz на шасси седана 300С.",
+          ar: "لكن حيث لم تفكر مرسيدس-بنز بعد في مثل هذا التحول، قامت دبي بذلك نيابةً عنها. فقد بنى الأتيليه المحلي ميتاغاراج — الذي أسسه رجل أعمال من روسيا — طراز إم مونوغرام جي 3.0 آيكونيك: جي 63 متوج بشبكة رادياتير ضخمة ولامعة ومصابيح ضباب مثلثة على شكل نجوم. لا يذكر المصممون لغة تصميم مرسيدس الحالية كمصدر إلهامهم، بل يشيرون إلى ستيشن قليل الشهرة عمره سبعة عقود صنعه ماهرو Binz على شاسيه سيدان 300C.",
+        },
+      },
+      {
+        type: "image",
+        src: iksSide,
+        alt: {
+          en: "Side profile — the silhouette of the donor G63 remains, the language has changed",
+          ru: "Боковая проекция — силуэт донорского G63 сохранён, язык дизайна изменён",
+          ar: "المنظر الجانبي — تبقى صورة G63 الأصلية، لكن لغة التصميم تغيرت",
+        },
+      },
+      {
+        type: "heading",
+        text: {
+          en: "One Car Today, Up to Fifty",
+          ru: "Сегодня — одна машина, в перспективе до пятидесяти",
+          ar: "سيارة واحدة اليوم، حتى خمسين",
+        },
+      },
+      {
+        type: "paragraph",
+        text: {
+          en: "Whether MetaGarage limited the work to a new exterior, or also touched the cabin and the powertrain, has not been disclosed. For now the car exists as a single example. But MetaGarage is open to building more for clients who want one — the plan calls for up to fifty units, with prices starting at USD 700,000.",
+          ru: "Ограничились ли тюнеры из MetaGarage созданием нового внешнего облика для внедорожника или поработали и над салоном с силовой установкой тоже, не уточняется. Более того, пока этот автомобиль существует в единственном экземпляре, но желающим заполучить аналогичный G-Class в MetaGarage рады пойти навстречу. В планах ателье значится постройка до 50 подобных машин с ценой от 700 тыс. долларов США.",
+          ar: "لم يُكشف ما إذا كان ميتاغاراج اقتصر على المظهر الخارجي الجديد أم أنه عمل على المقصورة ومجموعة نقل الحركة أيضاً. حالياً، توجد السيارة كنموذج فردي. لكن ميتاغاراج مستعد لبناء المزيد للعملاء الراغبين — تتضمن الخطة بناء ما يصل إلى خمسين وحدة، بأسعار تبدأ من 700,000 دولار أمريكي.",
+        },
+      },
+      {
+        type: "image",
+        src: iksRear,
+        alt: {
+          en: "Rear view — chrome strip, monogram spare-wheel cover and signature script",
+          ru: "Вид сзади — хромированная полоса, монограмма на кожухе запаски и фирменная подпись",
+          ar: "المنظر الخلفي — شريط كروم، مونوغرام على غطاء العجلة الاحتياطية وتوقيع مميز",
+        },
+      },
+    ],
+  },
   {
     slug: "m-monogram-g-3-0-iconic",
     category: "news",
