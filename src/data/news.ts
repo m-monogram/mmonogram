@@ -324,6 +324,152 @@ export const NEWS: NewsItem[] = [
       },
     ],
   },
+  {
+    slug: "dubai-tuner-700k-g-class-face-mercedes-only-sketched",
+    category: "press",
+    publishedAt: "2026-05-10",
+    cover: dtFront,
+    gallery: [dtFront, dtAerial, dtSide, dtWheel, dtEmblem],
+    author: "Carscoops",
+    location: "Dubai, UAE",
+    title: {
+      en: "Dubai Tuner's $700,000 G-Class Wears A Face Mercedes Only Dared To Sketch",
+      ru: "Дубайский тюнер за $700 000 надел на G-Class лицо, которое Mercedes только осмелился набросать",
+      ar: "تيونر دبي بقيمة 700 ألف دولار يضع على فئة G وجهاً لم يجرؤ مرسيدس إلا على رسمه",
+    },
+    excerpt: {
+      en: "M Monogram G 3.0 Iconic is based on the AMG G63 and inspired by a classic one-off Mercedes wagon.",
+      ru: "M Monogram G 3.0 Iconic построен на базе AMG G63 и вдохновлён уникальным универсалом Mercedes из 1950-х.",
+      ar: "إم مونوغرام جي 3.0 آيكونيك مبنية على AMG G63 ومستوحاة من سيارة مرسيدس فريدة كلاسيكية.",
+    },
+    content: [
+      {
+        type: "paragraph",
+        text: {
+          en: "Middle-East-based MetaGarage has revealed its latest G-Class project. The M Monogram G 3.0 Iconic draws inspiration from a 1950s Binz Benz one-off, with mods that include a huge grille and matching curved hood, plus star-design DRLs.",
+          ru: "Базирующееся на Ближнем Востоке ателье MetaGarage представило свой новейший проект на базе G-Class. M Monogram G 3.0 Iconic вдохновлён уникальным Binz Benz 1950-х годов: огромная решётка радиатора, скруглённый капот в её стиль и DRL в форме звезды.",
+          ar: "كشفت ميتاغراج التي تتخذ من الشرق الأوسط مقراً عن أحدث مشاريعها على فئة G. إم مونوغرام جي 3.0 آيكونيك مستوحاة من بنز بنز فريدة من الخمسينيات، مع شبكة ضخمة وغطاء محرك منحنٍ مطابق، وأضواء نهارية على شكل نجمة.",
+        },
+      },
+      {
+        type: "paragraph",
+        text: {
+          en: "In the \"nothing succeeds like excess\" car landscape of Dubai, where luxury cars are everywhere and even Mansory-style modifications aren't uncommon, it takes something truly extraordinary to stand out. MetaGarage has done it — and it might even have given Mercedes some ideas in the process.",
+          ru: "В дубайском автомобильном ландшафте, где «избыток — лучший рецепт успеха», где роскошные машины повсюду, а доработки в стиле Mansory никого не удивляют, чтобы выделиться, нужно что-то по-настоящему экстраординарное. MetaGarage это удалось — и, возможно, попутно подкинул идею самому Mercedes.",
+          ar: "في مشهد سيارات دبي حيث \"لا شيء ينجح كالإفراط\"، وحيث السيارات الفاخرة في كل مكان وتعديلات على طراز مانسوري ليست غريبة، يتطلب التميز شيئاً استثنائياً حقاً. ميتاغراج فعلتها — وربما أعطت مرسيدس بعض الأفكار في العملية.",
+        },
+      },
+      {
+        type: "image",
+        src: dtAerial,
+        alt: {
+          en: "Top-down view of the M Monogram G 3.0 Iconic",
+          ru: "Вид сверху на M Monogram G 3.0 Iconic",
+          ar: "منظر علوي لإم مونوغرام جي 3.0 آيكونيك",
+        },
+      },
+      {
+        type: "heading",
+        text: {
+          en: "A Face That Rewrites the G-Class",
+          ru: "Лицо, переписывающее G-Class",
+          ar: "وجه يعيد كتابة فئة G",
+        },
+      },
+      {
+        type: "paragraph",
+        text: {
+          en: "We've seen plenty of modified G-Class SUVs before, but what really sets the M Monogram G 3.0 Iconic apart is its humongous retro grille. As wide as it is tall, the grille dominates the G's nose and completely changes the entire face of the otherwise boxy utility.",
+          ru: "Мы видели множество доработанных G-Class, но M Monogram G 3.0 Iconic выделяет колоссальная ретро-решётка. Такая же широкая, как и высокая, она доминирует над передком и полностью меняет лицо в остальном угловатого внедорожника.",
+          ar: "رأينا الكثير من سيارات فئة G المعدّلة، لكن ما يميز إم مونوغرام جي 3.0 آيكونيك حقاً هو شبكتها الضخمة بطراز ريترو. عريضة بقدر ما هي عالية، تهيمن الشبكة على مقدمة جي وتغير وجه السيارة بالكامل.",
+        },
+      },
+      {
+        type: "image",
+        src: dtSide,
+        alt: {
+          en: "Side profile of the M Monogram G 3.0 Iconic",
+          ru: "Боковая проекция M Monogram G 3.0 Iconic",
+          ar: "المنظر الجانبي لإم مونوغرام جي 3.0 آيكونيك",
+        },
+      },
+      {
+        type: "paragraph",
+        text: {
+          en: "MetaGarage founder, Russian Alexey Gashkov, says the G 3.0 Iconic is inspired by a one-off coachbuilt wagon from the 1950s — crafted from a Mercedes 300 C by Binz for a wealthy American client. But it's also hard not to be reminded of the Vision Iconic coupe concept Mercedes revealed in 2025.",
+          ru: "Основатель MetaGarage, россиянин Алексей Гашков, говорит, что G 3.0 Iconic вдохновлён уникальным кузовным универсалом 1950-х — сделанным ателье Binz на базе Mercedes 300 C для богатого американского клиента. При этом трудно не вспомнить и концепт-купе Vision Iconic, показанный Mercedes в 2025-м.",
+          ar: "يقول مؤسس ميتاغراج، الروسي أليكسي غاشكوف، إن جي 3.0 آيكونيك مستوحاة من واغن مصنوع يدوياً من الخمسينيات — صنعته بنز من مرسيدس 300 C لعميل أمريكي ثري. لكن من الصعب أيضاً ألا يذكّر بمفهوم كوبيه فيجن آيكونيك الذي كشفت عنه مرسيدس عام 2025.",
+        },
+      },
+      {
+        type: "paragraph",
+        text: {
+          en: "Tear yourself away from staring at that schnozzle and you might just notice the star-shaped DRLs lifted from Mercedes' latest passenger cars, the sci-fi-looking lower bumper and industrial-style side skirts.",
+          ru: "Отвлекитесь от созерцания этого «носа» — и заметите DRL в форме звезды, позаимствованные у новейших легковых Mercedes, sci-fi-нижний бампер и индустриального вида пороги.",
+          ar: "ابتعد عن التحديق في تلك المقدمة وقد تلاحظ الأضواء النهارية على شكل نجمة المأخوذة من أحدث سيارات مرسيدس، والمصد السفلي ذي المظهر الخيال العلمي وعتبات جانبية بطراز صناعي.",
+        },
+      },
+      {
+        type: "heading",
+        text: {
+          en: "Is That a Maybach Badge?",
+          ru: "Это что, шильдик Maybach?",
+          ar: "هل هذا شعار مايباخ؟",
+        },
+      },
+      {
+        type: "image",
+        src: dtEmblem,
+        alt: {
+          en: "M Monogram emblem",
+          ru: "Эмблема M Monogram",
+          ar: "شعار إم مونوغرام",
+        },
+      },
+      {
+        type: "paragraph",
+        text: {
+          en: "Chrome strips finish off the bottom of the front and rear bumpers, there are MetaGarage M Monogram badges — whose similarity to Maybach's logo might raise eyebrows in Stuttgart — and the whole lot rides on fat six-spoke wheels.",
+          ru: "Хромированные полосы завершают низ переднего и заднего бамперов, на кузове красуются шильдики MetaGarage M Monogram — их сходство с логотипом Maybach наверняка поднимет брови в Штутгарте — а вся эта картина опирается на массивные шестиспицевые диски.",
+          ar: "تنتهي شرائط الكروم من أسفل المصدّين الأمامي والخلفي، وهناك شعارات إم مونوغرام من ميتاغراج — التي قد يثير تشابهها مع شعار مايباخ الدهشة في شتوتغارت — وكل ذلك يقف على عجلات ضخمة بستة أذرع.",
+        },
+      },
+      {
+        type: "image",
+        src: dtWheel,
+        alt: {
+          en: "Six-spoke forged wheel detail",
+          ru: "Деталь кованого шестиспицевого диска",
+          ar: "تفاصيل العجلة المطروقة بستة أذرع",
+        },
+      },
+      {
+        type: "paragraph",
+        text: {
+          en: "There are pictures of a couple of different Iconics on MetaGarage's socials. One is plain black, allowing the huge chrome grille to take center stage. The other, dressed in black over white and with a black grille, is even more arresting as an overall package — though its black grille is (marginally) less shouty.",
+          ru: "В соцсетях MetaGarage есть фотографии нескольких Iconic. Один — полностью чёрный, что выводит на первый план огромную хромированную решётку. Другой — в чёрно-белой ливрее с чёрной решёткой — выглядит как пакет ещё эффектнее, хотя его чёрный «гриль» (чуть-чуть) сдержаннее.",
+          ar: "هناك صور لعدة طرازات آيكونيك مختلفة على حسابات ميتاغراج. واحدة سوداء بالكامل، مما يسمح للشبكة الكرومية الضخمة بأخذ المسرح. والأخرى بطلاء أسود فوق أبيض وشبكة سوداء، أكثر جاذبية كحزمة كاملة — رغم أن شبكتها السوداء أقل صخباً (بقليل).",
+        },
+      },
+      {
+        type: "paragraph",
+        text: {
+          en: "The company says it's willing to build 50 examples of the restraint-free G-wagons, with prices starting at $700,000 — though we don't doubt that some buyers' personalization requests will send the total soaring.",
+          ru: "Компания готова построить 50 экземпляров этих лишённых сдержанности «гелендвагенов», цены стартуют от $700 000 — но мы не сомневаемся, что персонализация некоторых заказчиков отправит итоговую цифру в космос.",
+          ar: "تقول الشركة إنها مستعدة لبناء 50 نسخة من هذه الجي-واغن الخالية من القيود، بأسعار تبدأ من 700,000 دولار — لكننا لا نشك في أن طلبات التخصيص لبعض المشترين سترفع المجموع إلى أرقام أعلى بكثير.",
+        },
+      },
+      {
+        type: "quote",
+        text: {
+          en: "Do you think Mercedes ought to integrate its massive new grilles into factory-built G-Class models, or are curves a crime when it comes to the G?",
+          ru: "Должен ли Mercedes интегрировать свои массивные новые решётки в заводские G-Class, или плавные линии — преступление, когда речь о «Гелике»?",
+          ar: "هل تعتقد أن مرسيدس يجب أن تدمج شبكاتها الجديدة الضخمة في طرازات فئة G من المصنع، أم أن المنحنيات جريمة عندما يتعلق الأمر بجي؟",
+        },
+        author: "Carscoops",
+      },
+    ],
+  },
 ];
 
 export const getAllNews = (): NewsItem[] =>
