@@ -8,6 +8,7 @@ import BrandStrip from "@/components/BrandStrip";
 import VinBanner from "@/components/VinBanner";
 import NextSectionCTA from "@/components/NextSectionCTA";
 import SEOHead from "@/components/SEOHead";
+import LazyOnVisible from "@/components/LazyOnVisible";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 
