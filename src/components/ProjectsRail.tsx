@@ -142,14 +142,26 @@ const ProjectsRail = memo(
     }, [scrollRef, onScrollStateChange]);
 
     useEffect(() => {
-      check();
       const el = scrollRef.current;
       if (!el) return;
+      // Defer initial check past the current frame to avoid forced reflow
+      // during mount + image load layout churn.
+      const initialId = requestAnimationFrame(check);
       el.addEventListener("scroll", check, { passive: true });
-      const ro = new ResizeObserver(check);
+      // Skip ResizeObserver's first synchronous callback (fires on observe());
+      // the deferred initial check above already covers it.
+      let roPrimed = false;
+      const ro = new ResizeObserver(() => {
+        if (!roPrimed) {
+          roPrimed = true;
+          return;
+        }
+        check();
+      });
       ro.observe(el);
       window.addEventListener("resize", check, { passive: true });
       return () => {
+        cancelAnimationFrame(initialId);
         el.removeEventListener("scroll", check);
         ro.disconnect();
         window.removeEventListener("resize", check);
