@@ -302,40 +302,7 @@ const NewsDetailPage = () => {
         </section>
       </article>
 
-      {/* Gallery */}
-      {item.gallery && item.gallery.length > 0 && (
-        <section className="relative z-10 pb-24">
-          <div className="max-w-6xl mx-auto px-4 sm:px-8">
-            <div className="flex items-end justify-between mb-8 gap-4">
-              <div>
-                <p className="font-display text-[11px] uppercase tracking-[0.35em] text-white/45 mb-3">
-                  {t("news.galleryEyebrow") || "Gallery"}
-                </p>
-                <h3 className="font-display text-2xl sm:text-4xl text-white tracking-tight">
-                  {t("news.galleryTitle")}
-                </h3>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-              {item.gallery.map((src, i) => (
-                <div
-                  key={i}
-                  className="relative aspect-[4/3] overflow-hidden border border-white/10 group"
-                >
-                  <img
-                    src={src}
-                    alt={`${title} — ${i + 1}`}
-                    loading="lazy"
-                    decoding="async"
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+      {/* Gallery removed — all images already inline in article */}
 
       {/* Related */}
       {related.length > 0 && (
