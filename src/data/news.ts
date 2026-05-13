@@ -11,6 +11,11 @@ import aero from "@/assets/news/m-monogram-g-iconic/06-aero.jpeg";
 import fiftyUnits from "@/assets/news/m-monogram-g-iconic/07-50-units.jpeg";
 import price from "@/assets/news/m-monogram-g-iconic/08-price.jpeg";
 import frontBlack from "@/assets/news/m-monogram-g-iconic/09-front-black.jpeg";
+import dtFront from "@/assets/news/dubai-tuner-700k/01-front.png";
+import dtAerial from "@/assets/news/dubai-tuner-700k/02-aerial.png";
+import dtSide from "@/assets/news/dubai-tuner-700k/03-side.png";
+import dtWheel from "@/assets/news/dubai-tuner-700k/04-wheel.png";
+import dtEmblem from "@/assets/news/dubai-tuner-700k/05-emblem.png";
 
 export type NewsCategory = "news" | "event" | "press";
 
