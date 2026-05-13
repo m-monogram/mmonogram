@@ -1,11 +1,12 @@
-import heroMain from "@/assets/hero-main-new.webp";
-import g900Front from "@/assets/g900-white-front-new.webp";
-import g900Aerial from "@/assets/g900-white-aerial-new.webp";
-import g900Side from "@/assets/g900-white-side-new.webp";
-import g63Front from "@/assets/g63-front-new.webp";
-import g63Side from "@/assets/g63-side-new.webp";
-import g63Aerial from "@/assets/g63-aerial.webp";
-import commissionHero from "@/assets/commission-hero-final.webp";
+import cover from "@/assets/news/m-monogram-g-iconic/01-cover.jpeg";
+import frontGrille from "@/assets/news/m-monogram-g-iconic/02-front-grille.jpeg";
+import binz1950 from "@/assets/news/m-monogram-g-iconic/03-binz-1950.jpeg";
+import amgBase from "@/assets/news/m-monogram-g-iconic/04-amg-base.jpeg";
+import grilleRetro from "@/assets/news/m-monogram-g-iconic/05-grille-retro.jpeg";
+import aero from "@/assets/news/m-monogram-g-iconic/06-aero.jpeg";
+import fiftyUnits from "@/assets/news/m-monogram-g-iconic/07-50-units.jpeg";
+import price from "@/assets/news/m-monogram-g-iconic/08-price.jpeg";
+import frontBlack from "@/assets/news/m-monogram-g-iconic/09-front-black.jpeg";
 
 export type NewsCategory = "news" | "event" | "press";
 
@@ -31,170 +32,181 @@ export interface NewsItem {
   excerpt: LocalizedString;
   content: ContentBlock[];
   author?: string;
-  eventDate?: string; // ISO (for events)
+  eventDate?: string;
   location?: string;
 }
 
 export const NEWS: NewsItem[] = [
   {
-    slug: "g900-black-edition-unveiled",
+    slug: "m-monogram-g-3-0-iconic",
     category: "news",
-    publishedAt: "2026-04-22",
-    cover: g900Front,
-    gallery: [g900Front, g900Aerial, g900Side],
+    publishedAt: "2026-05-13",
+    cover,
+    gallery: [cover, frontGrille, amgBase, grilleRetro, aero, fiftyUnits, frontBlack],
+    author: "MetaGarage Atelier",
+    location: "Dubai, UAE",
     title: {
-      en: "G900 Black Edition: A New Chapter for the Atelier",
-      ru: "G900 Black Edition: новая глава ателье",
-      ar: "جي 900 الإصدار الأسود: فصل جديد للأتيليه",
+      en: "M Monogram G 3.0 Iconic — A G-Wagen Reimagined in the Spirit of Classic Mercedes",
+      ru: "M Monogram G 3.0 Iconic — Гелик в стиле классических Мерседесов",
+      ar: "إم مونوغرام جي 3.0 آيكونيك — جي-فاغن بروح مرسيدس الكلاسيكية",
     },
     excerpt: {
-      en: "Our flagship G-Class transformation enters a new era — a stealth silhouette built around forged carbon and obsidian leather.",
-      ru: "Наша флагманская трансформация G-Class открывает новую эру — стелс-силуэт из кованого карбона и кожи обсидиан.",
-      ar: "تدخل تحويلتنا الرائدة لفئة G حقبة جديدة — صورة ظلية متخفية مبنية على كربون مطروق وجلد سبج.",
+      en: "MetaGarage unveils a strictly limited reinterpretation of the AMG G63 — inspired by the rare 1950s Mercedes by Binz, hand-built in Dubai, capped at fifty examples worldwide.",
+      ru: "MetaGarage представил лимитированную переработку AMG G63, вдохновлённую редким универсалом Mercedes от Binz из 1950-х. Ручная сборка в Дубае, всего 50 экземпляров.",
+      ar: "تكشف ميتاغاراج عن إعادة تصور محدودة للغاية لطراز AMG G63 — مستوحاة من مرسيدس النادرة من Binz في الخمسينيات، مصنوعة يدوياً في دبي، محدودة بخمسين نسخة عالمياً.",
     },
-    author: "M-Monogram Atelier",
     content: [
       {
         type: "paragraph",
         text: {
-          en: "After eighteen months of development, the G900 Black Edition makes its debut — a complete re-imagination of the silhouette in matte obsidian, forged carbon and brushed titanium.",
-          ru: "Спустя восемнадцать месяцев разработки G900 Black Edition выходит в свет — полное переосмысление силуэта в матовом обсидиане, кованом карбоне и шлифованном титане.",
-          ar: "بعد ثمانية عشر شهراً من التطوير، تظهر G900 الإصدار الأسود لأول مرة — إعادة تصور كاملة للصورة الظلية بالسبج المطفأ والكربون المطروق والتيتانيوم المصقول.",
+          en: "MetaGarage — the Dubai-based atelier founded by Russian designer Alexey Gashkov — has revealed its most ambitious project to date: the M Monogram G 3.0 Iconic. The brief was as bold as it sounds. Take the AMG G63, strip it back to silhouette, and rebuild it in the language of the great post-war Mercedes coachbuilders.",
+          ru: "MetaGarage — ателье из Дубая, основанное российским дизайнером Алексеем Гашковым — представило свой самый амбициозный проект: M Monogram G 3.0 Iconic. Задача стояла дерзкая: взять AMG G63, разобрать до силуэта и пересобрать на языке великих послевоенных кузовщиков Mercedes.",
+          ar: "كشفت ميتاغاراج — الأتيليه ومقره دبي والذي أسسه المصمم الروسي أليكسي غاشكوف — عن أكثر مشاريعها طموحاً حتى الآن: إم مونوغرام جي 3.0 آيكونيك. كانت المهمة جريئة بقدر ما تبدو: أخذ AMG G63، تجريده إلى الصورة الظلية، وإعادة بنائه بلغة كبار صانعي هياكل مرسيدس في فترة ما بعد الحرب.",
+        },
+      },
+      {
+        type: "image",
+        src: frontBlack,
+        alt: {
+          en: "M Monogram G 3.0 Iconic — front view, matte black finish",
+          ru: "M Monogram G 3.0 Iconic — вид спереди, матовый чёрный",
+          ar: "إم مونوغرام جي 3.0 آيكونيك — منظر أمامي، أسود مطفأ",
         },
       },
       {
         type: "heading",
         text: {
-          en: "Stealth, Refined",
-          ru: "Стелс, доведённый до совершенства",
-          ar: "تخفّي مصقول",
+          en: "Inspired by a 1950s Mercedes by Binz",
+          ru: "Вдохновение — Mercedes от Binz из 1950-х",
+          ar: "مستوحاة من مرسيدس بنز في الخمسينيات",
         },
       },
       {
         type: "paragraph",
         text: {
-          en: "Every panel was re-engineered in-house. The body kit is hand-laid forged carbon, finished with a 7-stage matte ceramic — a depth that absorbs light rather than reflects it.",
-          ru: "Каждая панель переосмыслена внутри ателье. Обвес — вручную уложенный кованый карбон с семиступенчатой матовой керамикой, поглощающей свет, а не отражающей его.",
-          ar: "تم إعادة هندسة كل لوحة داخلياً. مجموعة الهيكل مصنوعة يدوياً من الكربون المطروق، مع طلاء سيراميك مطفأ من سبع مراحل — عمق يمتص الضوء بدلاً من عكسه.",
+          en: "The reference is unusual. In the 1950s the German coachbuilder Binz produced a handful of long, elegant Mercedes estates for clients who wanted a saloon's grace with a wagon's purpose. That single car — proportional, restrained, unmistakably mid-century — became the visual North Star of the Iconic project.",
+          ru: "Референс неожиданный. В 1950-х немецкий кузовной ателье Binz собрало несколько длинных и элегантных универсалов на базе Mercedes для тех, кто хотел грацию седана с практичностью универсала. Именно эта машина — пропорциональная, сдержанная, безошибочно середины века — стала визуальным ориентиром для Iconic.",
+          ar: "المرجع غير عادي. في الخمسينيات، أنتج صانع الهياكل الألماني Binz عدداً قليلاً من سيارات مرسيدس الطويلة والأنيقة لعملاء أرادوا أناقة السيدان مع وظيفة الستيشن. تلك السيارة بالذات — متناسقة، مقتصدة، لا تخطئها العين كأيقونة منتصف القرن — أصبحت النجم القطبي البصري لمشروع آيكونيك.",
         },
       },
       {
         type: "image",
-        src: g900Aerial,
-      },
-      {
-        type: "quote",
-        text: {
-          en: "We did not want a darker car. We wanted a quieter one.",
-          ru: "Нам не нужна была более тёмная машина. Нам нужна была более тихая.",
-          ar: "لم نكن نريد سيارة أغمق. أردنا سيارة أكثر هدوءاً.",
-        },
-        author: "Lead Designer, M-Monogram",
-      },
-      {
-        type: "paragraph",
-        text: {
-          en: "The Black Edition will be limited to twelve commissions worldwide. First deliveries begin Q3 2026.",
-          ru: "Black Edition будет ограничен двенадцатью заказами по всему миру. Первые поставки — Q3 2026.",
-          ar: "سيقتصر الإصدار الأسود على اثنتي عشرة طلبية عالمياً. تبدأ التسليمات الأولى في الربع الثالث من 2026.",
-        },
-      },
-    ],
-  },
-  {
-    slug: "dubai-private-preview-2026",
-    category: "event",
-    publishedAt: "2026-03-15",
-    eventDate: "2026-06-12",
-    location: "Meta Garage, Al Quoz, Dubai",
-    cover: commissionHero,
-    gallery: [commissionHero, heroMain],
-    title: {
-      en: "Private Preview · Dubai 2026",
-      ru: "Закрытый предпоказ · Дубай 2026",
-      ar: "عرض خاص · دبي 2026",
-    },
-    excerpt: {
-      en: "An invitation-only evening at Meta Garage to preview the next four flagship commissions before public reveal.",
-      ru: "Вечер по приглашениям в Meta Garage с предпоказом четырёх флагманских проектов до их публичного релиза.",
-      ar: "أمسية بدعوة خاصة في ميتا غاراج لاستعراض الطلبيات الرائدة الأربع التالية قبل الكشف العلني.",
-    },
-    content: [
-      {
-        type: "paragraph",
-        text: {
-          en: "On June 12, 2026, the atelier will open its doors to a private circle of clients, partners and press for an evening dedicated to the work of the past year.",
-          ru: "12 июня 2026 года ателье откроет двери для закрытого круга клиентов, партнёров и прессы — вечер, посвящённый работе ушедшего года.",
-          ar: "في 12 يونيو 2026، سيفتح الأتيليه أبوابه لدائرة خاصة من العملاء والشركاء والصحافة لأمسية مكرسة لأعمال العام الماضي.",
+        src: binz1950,
+        alt: {
+          en: "The 1950s Mercedes-Benz wagon by Binz that inspired the project",
+          ru: "Универсал Mercedes-Benz от Binz 1950-х — источник вдохновения",
+          ar: "ستيشن مرسيدس-بنز من Binz في الخمسينيات الذي ألهم المشروع",
         },
       },
       {
         type: "heading",
         text: {
-          en: "What to Expect",
-          ru: "Чего ожидать",
-          ar: "ما يمكن توقعه",
+          en: "Built on the AMG G63",
+          ru: "Построен на базе AMG G63",
+          ar: "مبني على أساس AMG G63",
         },
       },
       {
         type: "paragraph",
         text: {
-          en: "Four unreleased commissions, a guided tour of the workshop, and a conversation with the design team. Limited to 60 guests.",
-          ru: "Четыре нереализованных проекта, экскурсия по мастерской и беседа с командой дизайна. Не более 60 гостей.",
-          ar: "أربع طلبيات لم تُكشف بعد، جولة موجهة في الورشة، وحوار مع فريق التصميم. يقتصر العدد على 60 ضيفاً.",
+          en: "Underneath the new bodywork sits the modern AMG G63 — its drivetrain, chassis and electronics untouched. Everything visible is new: a fully redesigned aero kit, sculpted wide arches, rear diffuser, custom forged wheels and a bespoke spare-wheel cover that doubles as the project's signature.",
+          ru: "Под новым кузовом — современный AMG G63: трансмиссия, шасси и электроника остались без изменений. Всё, что снаружи, переделано заново: полный аэродинамический обвес, расширенные арки, задний диффузор, кованые диски на заказ и фирменный кожух запаски — главный росчерк проекта.",
+          ar: "تحت الهيكل الجديد يقع طراز AMG G63 الحديث — مجموعة نقل الحركة والشاسيه والإلكترونيات دون تغيير. كل ما هو ظاهر جديد: مجموعة ديناميكية هوائية معاد تصميمها بالكامل، أقواس عريضة منحوتة، ناشر خلفي، عجلات مصبوبة حسب الطلب، وغطاء عجلة احتياطية مخصص يعمل كتوقيع المشروع.",
         },
       },
       {
         type: "image",
-        src: heroMain,
-      },
-      {
-        type: "paragraph",
-        text: {
-          en: "RSVP is strictly by invitation. To request access, contact the atelier directly.",
-          ru: "Регистрация — только по приглашениям. Для запроса доступа свяжитесь с ателье напрямую.",
-          ar: "التأكيد بالحضور حصراً بالدعوة. لطلب الوصول، يرجى التواصل مع الأتيليه مباشرة.",
+        src: amgBase,
+        alt: {
+          en: "Rear three-quarter — based on the AMG G63",
+          ru: "Задние три четверти — база AMG G63",
+          ar: "منظر الربع الخلفي — على قاعدة AMG G63",
         },
       },
-    ],
-  },
-  {
-    slug: "robb-report-feature",
-    category: "press",
-    publishedAt: "2026-02-04",
-    cover: g63Front,
-    gallery: [g63Front, g63Side, g63Aerial],
-    title: {
-      en: "Featured in Robb Report Middle East",
-      ru: "Публикация в Robb Report Middle East",
-      ar: "ميزة في روب ريبورت الشرق الأوسط",
-    },
-    excerpt: {
-      en: "Robb Report Middle East spotlights the atelier in a six-page feature on the new generation of bespoke automotive houses.",
-      ru: "Robb Report Middle East посвятил ателье шестистраничный материал о новом поколении домов индивидуального автомобилестроения.",
-      ar: "تسلط روب ريبورت الشرق الأوسط الضوء على الأتيليه في تقرير من ست صفحات حول الجيل الجديد من بيوت السيارات المصممة حسب الطلب.",
-    },
-    content: [
+      {
+        type: "heading",
+        text: {
+          en: "A Retro Grille and a New Silhouette",
+          ru: "Ретро-решётка и новая линия силуэта",
+          ar: "شبكة كلاسيكية وصورة ظلية جديدة",
+        },
+      },
       {
         type: "paragraph",
         text: {
-          en: "The February issue of Robb Report Middle East features a six-page profile of the atelier, with original photography of the G63 Black commission.",
-          ru: "Февральский номер Robb Report Middle East включает шестистраничный профиль ателье с оригинальной фотосъёмкой проекта G63 Black.",
-          ar: "يتضمن عدد فبراير من روب ريبورت الشرق الأوسط ملفاً تعريفياً من ست صفحات عن الأتيليه، مع تصوير حصري لطلبية جي 63 السوداء.",
+          en: "The defining gesture is the front: an oversized, vertically-slatted radiator grille drawn directly from the 1950s reference, paired with a softly rounded bonnet that breaks fifty years of G-Class orthodoxy. The aerodynamic body kit is both decorative and functional — channelling air around the new arches without disturbing the upright stance the G is loved for.",
+          ru: "Главный жест — спереди: крупная вертикальная решётка радиатора, взятая прямо из референса 1950-х, в паре с мягко закруглённым капотом, который ломает полвека ортодоксальности G-Class. Аэродинамический обвес одновременно декоративный и функциональный — направляет потоки вокруг новых арок, не разрушая вертикальную осанку, за которую любят G.",
+          ar: "اللفتة الحاسمة في المقدمة: شبكة رادياتير كبيرة بقضبان عمودية مستوحاة مباشرة من مرجع الخمسينيات، مقترنة بغطاء محرك مدوّر بنعومة يكسر خمسين عاماً من تقاليد فئة G. مجموعة الهيكل الأيروديناميكية زخرفية ووظيفية في آن واحد — توجه الهواء حول الأقواس الجديدة دون الإخلال بالوضعية المنتصبة التي تُحب فئة G لأجلها.",
+        },
+      },
+      {
+        type: "image",
+        src: grilleRetro,
+        alt: {
+          en: "The retro-styled radiator grille — the project's signature",
+          ru: "Решётка радиатора в ретро-стиле — фирменный элемент",
+          ar: "شبكة الرادياتير على الطراز الكلاسيكي — التوقيع المميز",
+        },
+      },
+      {
+        type: "image",
+        src: aero,
+        alt: {
+          en: "Rounded bonnet and full aerodynamic body kit",
+          ru: "Закруглённый капот и полный аэродинамический обвес",
+          ar: "غطاء محرك مدوّر ومجموعة هوائية كاملة",
         },
       },
       {
         type: "quote",
         text: {
-          en: "A house where the discipline of haute horlogerie meets the geometry of the road.",
-          ru: "Дом, где дисциплина высокого часового искусства встречается с геометрией дороги.",
-          ar: "بيت يلتقي فيه انضباط الساعات الراقية بهندسة الطريق.",
+          en: "We were not chasing nostalgia. We were chasing the discipline that built those cars — and bringing it forward into the next G-Class.",
+          ru: "Мы не гнались за ностальгией. Мы гнались за дисциплиной, которая строила те машины — и переносили её в следующий G-Class.",
+          ar: "لم نكن نسعى وراء الحنين. كنا نسعى وراء الانضباط الذي بنى تلك السيارات — ونقله إلى فئة G التالية.",
         },
-        author: "Robb Report Middle East",
+        author: "Alexey Gashkov, Founder · MetaGarage",
+      },
+      {
+        type: "heading",
+        text: {
+          en: "Fifty Cars. From $700,000.",
+          ru: "Пятьдесят машин. От $700 000.",
+          ar: "خمسون سيارة. ابتداءً من 700,000 دولار.",
+        },
+      },
+      {
+        type: "paragraph",
+        text: {
+          en: "Production is capped at fifty examples worldwide. Each car is built to order in the Dubai workshop, and pricing starts from USD 700,000 — climbing with the depth of personalisation: bespoke leathers, marquetry, embroidery, paint and one-off interior architecture.",
+          ru: "Тираж ограничен пятьюдесятью экземплярами на весь мир. Каждая машина собирается под заказ в мастерской в Дубае, цена стартует от $700 000 и растёт вместе с глубиной персонализации: эксклюзивные кожи, маркетри, вышивка, окраска и индивидуальная архитектура салона.",
+          ar: "الإنتاج محدود بخمسين نسخة عالمياً. تُبنى كل سيارة حسب الطلب في ورشة دبي، ويبدأ السعر من 700,000 دولار أمريكي — ويرتفع مع عمق التخصيص: جلود حصرية، تطعيمات، تطريز، دهان، وهندسة داخلية فريدة.",
+        },
       },
       {
         type: "image",
-        src: g63Side,
+        src: fiftyUnits,
+        alt: {
+          en: "Top view — limited to fifty units",
+          ru: "Вид сверху — лимит в пятьдесят экземпляров",
+          ar: "منظر علوي — محدود بخمسين نسخة",
+        },
+      },
+      {
+        type: "image",
+        src: price,
+        alt: {
+          en: "Side profile — pricing from USD 700,000",
+          ru: "Боковая проекция — цена от $700 000",
+          ar: "المنظر الجانبي — السعر من 700,000 دولار",
+        },
+      },
+      {
+        type: "paragraph",
+        text: {
+          en: "The Iconic is divisive by design. It is meant to be. For those who see it for what it is — a serious piece of coachbuilding that quietly references one of the most graceful Mercedes ever made — commissions are open now.",
+          ru: "Iconic поляризует по задумке. Так и должно быть. Для тех, кто видит его таким, какой он есть — серьёзная кузовная работа, тихо цитирующая один из самых грациозных Mercedes в истории — приём заказов уже открыт.",
+          ar: "آيكونيك مثيرة للجدل بتصميمها. ومن المفترض أن تكون كذلك. لمن يراها على حقيقتها — قطعة جادة من فن بناء الهياكل تستشهد بهدوء بإحدى أكثر سيارات مرسيدس أناقة على الإطلاق — الطلبات مفتوحة الآن.",
+        },
       },
     ],
   },
