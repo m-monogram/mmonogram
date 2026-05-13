@@ -165,7 +165,7 @@ const NewsPage = () => {
                         alt={featured.title[language]}
                         fetchPriority="high"
                         decoding="async"
-                        className="absolute inset-0 w-full h-full object-cover object-[50%_92%] transition-transform duration-[900ms] group-hover:scale-[1.04]"
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-[1.04]"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-black/30" />
                       <div className="absolute top-5 left-5 px-3 py-1 bg-white text-black font-display text-[10px] uppercase tracking-[0.25em]">
