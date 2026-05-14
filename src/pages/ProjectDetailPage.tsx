@@ -52,8 +52,31 @@ const ProjectDetailPage = () => {
       
       <SEOHead
         title={`${selectedProject.title} ${selectedProject.subtitle} - M-Monogram`}
-        description={selectedProject.description || `Explore ${selectedProject.title} ${selectedProject.subtitle} - a bespoke automotive transformation by M-Monogram.`}
+        description={(selectedProject.description || `Explore ${selectedProject.title} ${selectedProject.subtitle} - a bespoke automotive transformation by M-Monogram.`).slice(0, 160)}
         path={`/projects/${selectedProject.slug}`}
+        image={selectedProject.cover_image}
+        type="article"
+        jsonLd={[
+          {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: `${selectedProject.title} ${selectedProject.subtitle}`,
+            description: selectedProject.description,
+            image: selectedProject.cover_image,
+            category: selectedProject.category,
+            brand: { "@type": "Brand", name: "M-Monogram" },
+            url: `https://mmonogram.lovable.app/projects/${selectedProject.slug}`,
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "https://mmonogram.lovable.app/" },
+              { "@type": "ListItem", position: 2, name: "Projects", item: "https://mmonogram.lovable.app/projects" },
+              { "@type": "ListItem", position: 3, name: `${selectedProject.title} ${selectedProject.subtitle}`, item: `https://mmonogram.lovable.app/projects/${selectedProject.slug}` },
+            ],
+          },
+        ]}
       />
 
       <Suspense fallback={<div className="min-h-screen bg-background" />}>

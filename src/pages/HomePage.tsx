@@ -95,8 +95,8 @@ const HomePage = () => {
           <Header />
 
           <SEOHead
-            title="M-Monogram - Luxury Car Modification & Customization Services in UAE"
-            description="Elite G900 customization studio in Dubai. Bespoke Maybach & Brabus modifications for Mercedes G-Class. Luxury car modification and customization services in the UAE."
+            title="M-Monogram | Luxury G-Class Customization, Dubai"
+            description="Elite Dubai atelier crafting bespoke Maybach & Brabus modifications for the Mercedes G-Class."
             path="/"
           />
 

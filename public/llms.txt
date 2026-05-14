@@ -1,0 +1,24 @@
+# M-Monogram
+
+> Elite G900 customization atelier in Dubai. Bespoke Maybach and Brabus modifications for the Mercedes G-Class, plus a curated catalog of exterior, interior, and forged-wheel commissions.
+
+## Pages
+
+- [Home](/): Studio overview, featured transformations, and contact.
+- [Brand](/brand): The M-Monogram story, design pillars, and atelier philosophy.
+- [Projects](/projects): Curated gallery of flagship G-Class transformations.
+- [Modifications](/modifications): Catalog of exterior, interior, and forged-wheel commission services.
+- [VIN Verification](/verify): Verify the authenticity of an M-Monogram build.
+- [News](/news): Press features and atelier updates.
+- [Contact](/contact): Book a consultation with the Dubai atelier.
+
+## Featured Projects
+
+- [G900 Maybach Edition](/projects/g900-maybach): Flagship Maybach-grade G-Class transformation.
+- [G63 Signature](/projects/g63-signature): Signature M-Monogram G63 build.
+- [Rolls-Royce Fusion](/projects/rolls-royce-fusion): Cross-marque bespoke commission.
+
+## Optional
+
+- [Privacy Policy](/privacy-policy)
+- [Offer Agreement](/offer-agreement)
