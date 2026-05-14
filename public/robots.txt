@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://m-monogram.com/sitemap.xml
+Sitemap: https://mmonogram.lovable.app/sitemap.xml
 
 # Disallow admin or private areas if any
 Disallow: /api/
