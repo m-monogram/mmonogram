@@ -1,14 +1,15 @@
-// G63 Black Edition images
-import g63Front from "@/assets/g63-front-new.webp";
-import g63Quarter from "@/assets/g63-quarter-new.webp";
-import g63Side from "@/assets/g63-side-new.webp";
-import g63Rear from "@/assets/g63-rear-new.webp";
+// G3.0 M Monogram ICONIC – Gold Edition images
+import g3GoldFront from "@/assets/g3-iconic-gold-front.jpg";
+import g3GoldSide from "@/assets/g3-iconic-gold-side.jpg";
+import g3GoldRear from "@/assets/g3-iconic-gold-rear.jpg";
+import g3GoldDetail from "@/assets/g3-iconic-gold-detail.jpg";
+import g3GoldWindow from "@/assets/g3-iconic-gold-window.jpg";
+import g3GoldWheel from "@/assets/g3-iconic-gold-wheel.jpg";
+import g3GoldInterior from "@/assets/g3-iconic-gold-interior.jpg";
+import g3GoldRearSeats from "@/assets/g3-iconic-gold-rearseats.jpg";
+import g3GoldCabin from "@/assets/g3-iconic-gold-cabin.jpg";
+import g3GoldDash from "@/assets/g3-iconic-gold-dash.jpg";
 
-// G900 White Pearl Edition images
-import g900Front from "@/assets/g900-white-front-new.webp";
-import g900Aerial from "@/assets/g900-white-aerial-new.webp";
-import g900Side from "@/assets/g900-white-side-new.webp";
-import g900Rear from "@/assets/g900-white-rear-new.webp";
 import img6694 from "@/assets/IMG_6694.webp";
 import img6695 from "@/assets/IMG_6695.webp";
 import img6696 from "@/assets/IMG_6696.webp";
