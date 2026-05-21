@@ -1,14 +1,15 @@
-// G63 Black Edition images
-import g63Front from "@/assets/g63-front-new.webp";
-import g63Quarter from "@/assets/g63-quarter-new.webp";
-import g63Side from "@/assets/g63-side-new.webp";
-import g63Rear from "@/assets/g63-rear-new.webp";
+// G3.0 M Monogram ICONIC – Gold Edition images
+import g3GoldFront from "@/assets/g3-iconic-gold-front.jpg";
+import g3GoldSide from "@/assets/g3-iconic-gold-side.jpg";
+import g3GoldRear from "@/assets/g3-iconic-gold-rear.jpg";
+import g3GoldDetail from "@/assets/g3-iconic-gold-detail.jpg";
+import g3GoldWindow from "@/assets/g3-iconic-gold-window.jpg";
+import g3GoldWheel from "@/assets/g3-iconic-gold-wheel.jpg";
+import g3GoldInterior from "@/assets/g3-iconic-gold-interior.jpg";
+import g3GoldRearSeats from "@/assets/g3-iconic-gold-rearseats.jpg";
+import g3GoldCabin from "@/assets/g3-iconic-gold-cabin.jpg";
+import g3GoldDash from "@/assets/g3-iconic-gold-dash.jpg";
 
-// G900 White Pearl Edition images
-import g900Front from "@/assets/g900-white-front-new.webp";
-import g900Aerial from "@/assets/g900-white-aerial-new.webp";
-import g900Side from "@/assets/g900-white-side-new.webp";
-import g900Rear from "@/assets/g900-white-rear-new.webp";
 import img6694 from "@/assets/IMG_6694.webp";
 import img6695 from "@/assets/IMG_6695.webp";
 import img6696 from "@/assets/IMG_6696.webp";
@@ -52,71 +53,45 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    id: "g900-maybach",
-    title: "G900 M Monogram",
-    subtitle: "White Pearl Edition",
+    id: "g3-iconic",
+    title: "G3.0 M Monogram ICONIC",
+    subtitle: "Gold Edition",
     year: "2024",
-    duration: "10 weeks",
-    package: "Full",
-    category: "G63",
-    coverImage: g900Front,
+    duration: "12 weeks",
+    package: "Ultra-Limited",
+    category: "G-Class",
+    coverImage: g3GoldFront,
     images: [
-      { src: g900Front, title: "Front view" },
-      { src: g900Aerial, title: "Aerial view" },
-      { src: g900Side, title: "Side profile" },
-      { src: g900Rear, title: "Rear view" },
+      { src: g3GoldFront, title: "Front view" },
+      { src: g3GoldSide, title: "Side profile" },
+      { src: g3GoldRear, title: "Rear view" },
+      { src: g3GoldDetail, title: "Hood & wheel detail" },
+      { src: g3GoldWindow, title: "Cabin through window" },
+      { src: g3GoldWheel, title: "Forged wheel" },
+      { src: g3GoldInterior, title: "Cockpit" },
+      { src: g3GoldDash, title: "Dashboard signature" },
+      { src: g3GoldCabin, title: "Rear cabin & door detail" },
+      { src: g3GoldRearSeats, title: "Rear seats" },
     ],
-    description: "This M-Monogram G900 is a signature project defined by precision and architectural design. Custom M-Monogram grille, proprietary monogram detailing, and exclusive forged wheels form a clear and recognizable identity. Created as a statement of control, individuality, and modern luxury.",
+    description: "An ultra-limited luxury transformation of the G-Class, created in three exclusive editions — Gold, Silver and Black. Each edition features a distinctive M Monogram exterior identity, bespoke details and a commanding collector-level presence. Gold Edition: a bold black-and-gold statement for those who choose visibility, power and ultimate luxury. Silver Edition: a refined monochrome interpretation with a sharper, colder and more futuristic character. Black Edition: a pure dark signature edition — discreet, aggressive and uncompromising.",
     modifications: [
-      "Custom Maybach front grille conversion",
-      "Exclusive monogram pattern wrap on hood & roof",
-      "24'' Multi-spoke forged wheels",
-      "Carbon fiber roof spoiler",
-      "Brabus exhaust system G900",
-      "Full body PPF protection",
+      "M Monogram exterior identity package",
+      "24K gold-accented forged wheels",
+      "Custom Maybach grille with gold mesh",
+      "Bespoke two-tone leather cabin (black / cognac)",
+      "M Monogram signature dashboard inlay",
+      "Three exclusive editions: Gold, Silver, Black",
     ],
     specs: {
-      exterior: "White Pearl Metallic with PPF",
-      interior: "Maybach exclusive leather",
-      carbon: "Carbon roof & hood accents",
-      spoilers: "Carbon fiber roof spoiler",
-      wheels: "24'' Maybach forged multi-spoke",
-      aeroKit: "Maybach widebody conversion",
+      exterior: "Obsidian Black with gold trim",
+      interior: "Black & Cognac Nappa, gold accents",
+      carbon: "Gloss black carbon detailing",
+      spoilers: "Integrated roof spoiler",
+      wheels: "24'' Forged M Monogram, gold center",
+      aeroKit: "M Monogram ICONIC bodykit",
     },
   },
-  {
-    id: "g63-signature",
-    title: "G900 M Monogram",
-    subtitle: "FULL Black Edition",
-    year: "2024",
-    duration: "8 weeks",
-    package: "Full",
-    category: "G63",
-    coverImage: g63Front,
-    images: [
-      { src: g63Front, title: "Front view" },
-      { src: g63Quarter, title: "Quarter view" },
-      { src: g63Side, title: "Side profile" },
-      { src: g63Rear, title: "Rear view" },
-    ],
-    description: "This M-Monogram G900 is a signature project defined by precision and architectural design. Custom M-Monogram grille, proprietary monogram detailing, and exclusive forged wheels form a clear and recognizable identity. Created as a statement of control, individuality, and modern luxury.",
-    modifications: [
-      "Brabus Widestar carbon body kit",
-      "23'' forged wheels with exclusive design",
-      "Full interior retrim in Nappa leather",
-      "Stage 2 chip tuning (+150 HP)",
-      "Akrapovič exhaust system",
-      "PPF protection film on entire body",
-    ],
-    specs: {
-      exterior: "Obsidian Black Metallic with PPF",
-      interior: "Nappa Leather Cognac/Black",
-      carbon: "Full Brabus carbon package",
-      spoilers: "Carbon rear spoiler",
-      wheels: "23'' Forged Monoblock",
-      aeroKit: "Brabus Widestar widebody",
-    },
-  },
+
   {
     id: "rolls-royce-fusion",
     title: "The Fusion",
