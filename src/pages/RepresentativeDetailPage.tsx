@@ -170,7 +170,7 @@ const RepresentativeDetailPage = () => {
                   </span>
                 )}
                 {rep.established && (
-                  <span className="text-[10px] tracking-[0.25em] uppercase text-foreground/40 font-mono">
+                  <span className="text-[10px] tracking-[0.25em] uppercase text-foreground/40">
                     {t("representatives.established")} {rep.established}
                   </span>
                 )}
