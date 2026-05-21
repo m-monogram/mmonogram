@@ -33,7 +33,7 @@ const NewsCard = ({ item, index = 0, variant = "default" }: NewsCardProps) => {
       className="group h-full"
     >
       <Link
-        to={`/news/${item.slug}`}
+        to={`/press/${item.slug}`}
         className="block h-full bg-slate-900/30 backdrop-blur-xl border border-white/10 hover:border-white/30 transition-all duration-500 overflow-hidden relative shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] hover:shadow-[0_0_40px_rgba(255,255,255,0.08)]"
       >
         {/* Cover */}

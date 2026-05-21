@@ -24,7 +24,7 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
     { labelKey: "nav.projects", view: "projects" },
     { labelKey: "nav.modifications", view: "modifications" },
     { labelKey: "nav.brand", view: "brand" },
-    { labelKey: "nav.news", view: "news" },
+    { labelKey: "nav.press", view: "press" },
     { labelKey: "nav.contact", view: "contact" },
   ];
 
