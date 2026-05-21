@@ -46,7 +46,7 @@ const NewsDetailPage = () => {
             {t("news.notFoundDescription")}
           </p>
           <Link
-            to="/news"
+            to="/press"
             className="inline-flex items-center gap-2 px-6 py-3 border border-white/30 hover:bg-white hover:text-black transition-all font-display text-xs uppercase tracking-[0.25em] text-white"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -100,7 +100,7 @@ const NewsDetailPage = () => {
 
   // SEO: Article + BreadcrumbList structured data
   const baseUrl = "https://m-monogram.com";
-  const articleUrl = `${baseUrl}/news/${item.slug}`;
+  const articleUrl = `${baseUrl}/press/${item.slug}`;
   const coverAbs = item.cover.startsWith("http") ? item.cover : `${baseUrl}${item.cover}`;
   const jsonLd = [
     {
@@ -132,7 +132,7 @@ const NewsDetailPage = () => {
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: baseUrl },
-        { "@type": "ListItem", position: 2, name: t("news.title"), item: `${baseUrl}/news` },
+        { "@type": "ListItem", position: 2, name: t("news.title"), item: `${baseUrl}/press` },
         { "@type": "ListItem", position: 3, name: title, item: articleUrl },
       ],
     },
@@ -143,7 +143,7 @@ const NewsDetailPage = () => {
       <SEOHead
         title={`${title} — M-Monogram`}
         description={excerpt}
-        path={`/news/${item.slug}`}
+        path={`/press/${item.slug}`}
         image={coverAbs}
         type="article"
         publishedTime={item.publishedAt}
@@ -188,7 +188,7 @@ const NewsDetailPage = () => {
                 {t("news.backToHome")}
               </Link>
               <ChevronRight className="w-3 h-3" />
-              <Link to="/news" className="hover:text-white transition-colors">
+              <Link to="/press" className="hover:text-white transition-colors">
                 {t("news.title")}
               </Link>
               <ChevronRight className="w-3 h-3" />

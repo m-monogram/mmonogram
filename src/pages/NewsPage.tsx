@@ -50,7 +50,7 @@ const NewsPage = () => {
     itemListElement: filtered.map((n, i) => ({
       "@type": "ListItem",
       position: i + 1,
-      url: `${baseUrl}/news/${n.slug}`,
+      url: `${baseUrl}/press/${n.slug}`,
       name: n.title[language],
     })),
   };
@@ -156,7 +156,7 @@ const NewsPage = () => {
                   className="mb-12 sm:mb-16"
                 >
                   <Link
-                    to={`/news/${featured.slug}`}
+                    to={`/press/${featured.slug}`}
                     className="group grid grid-cols-1 lg:grid-cols-12 gap-0 bg-slate-900/30 backdrop-blur-xl border border-white/10 hover:border-white/30 transition-all duration-500 overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] hover:shadow-[0_0_60px_rgba(255,255,255,0.08)]"
                   >
                     <div className="lg:col-span-7 relative aspect-[16/10] lg:aspect-auto lg:min-h-[480px] overflow-hidden">
