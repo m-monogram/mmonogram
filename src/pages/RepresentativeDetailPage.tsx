@@ -170,7 +170,7 @@ const RepresentativeDetailPage = () => {
                   </span>
                 )}
                 {rep.established && (
-                  <span className="text-[10px] tracking-[0.25em] uppercase text-foreground/40 font-mono">
+                  <span className="text-[10px] tracking-[0.25em] uppercase text-foreground/40">
                     {t("representatives.established")} {rep.established}
                   </span>
                 )}
@@ -178,10 +178,10 @@ const RepresentativeDetailPage = () => {
               <h1 className="h-display-1 mt-4 uppercase leading-[0.9]">{rep.city}</h1>
               <p className="mt-3 text-base sm:text-lg text-foreground/55 tracking-wide">{rep.country}</p>
             </div>
-            <div className="flex flex-col items-start sm:items-end gap-2 text-[10px] sm:text-xs tracking-[0.2em] uppercase text-foreground/40 font-mono">
+            <div className="flex flex-col items-start sm:items-end gap-2 text-[10px] sm:text-xs tracking-[0.2em] uppercase text-foreground/40">
               <div className="flex items-center gap-2">
                 <Clock className="w-3.5 h-3.5" strokeWidth={1.5} />
-                <span className="text-foreground/85 text-base font-mono tracking-widest">{localTime}</span>
+                <span className="text-foreground/85 text-base tracking-widest">{localTime}</span>
                 <span className="opacity-50">{t("representatives.localTime")}</span>
               </div>
               <div className="flex items-center gap-2">
