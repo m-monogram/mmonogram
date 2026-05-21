@@ -50,7 +50,7 @@ const NewsHighlightSection = () => {
           className="mt-10 sm:mt-12"
         >
           <Link
-            to="/news"
+            to="/press"
             className="group inline-flex items-center gap-3 px-8 py-4 sm:px-10 sm:py-5 bg-white text-black hover:bg-white/90 transition-all duration-300 shadow-lg hover:shadow-xl"
           >
             <Newspaper className="w-4 h-4 sm:w-5 sm:h-5" />

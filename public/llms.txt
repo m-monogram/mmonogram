@@ -9,7 +9,7 @@
 - [Projects](/projects): Curated gallery of flagship G-Class transformations.
 - [Modifications](/modifications): Catalog of exterior, interior, and forged-wheel commission services.
 - [VIN Verification](/verify): Verify the authenticity of an M-Monogram build.
-- [News](/news): Press features and atelier updates.
+- [Press](/press): Press features and atelier updates.
 - [Contact](/contact): Book a consultation with the Dubai atelier.
 
 ## Featured Projects
