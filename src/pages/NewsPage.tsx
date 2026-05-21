@@ -58,9 +58,9 @@ const NewsPage = () => {
   return (
     <div className="min-h-screen bg-premium-black">
       <SEOHead
-        title="News & Events — M-Monogram"
-        description="Latest news, events and press from the M-Monogram atelier — bespoke G-Class transformations, private reveals and editorial features."
-        path="/news"
+        title="Press — M-Monogram"
+        description="Latest press features, events and stories from the M-Monogram atelier — bespoke G-Class transformations, private reveals and editorial coverage."
+        path="/press"
         jsonLd={jsonLd}
       />
       <Header />
