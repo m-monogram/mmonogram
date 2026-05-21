@@ -47,7 +47,8 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
         "verify": "/verify",
         "contact": "/contact",
         "booking": "/booking",
-        "news": "/news",
+        "press": "/press",
+        "news": "/press",
       };
       const path = viewToPath[view] || "/";
       navigate(path);

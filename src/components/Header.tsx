@@ -201,10 +201,10 @@ const Header = ({
     image: menuContact,
     descKey: 'nav.contactDesc'
   }, {
-    labelKey: 'nav.news',
-    view: 'news',
+    labelKey: 'nav.press',
+    view: 'press',
     image: menuNews,
-    descKey: 'nav.newsDesc',
+    descKey: 'nav.pressDesc',
     isWide: true
   }];
   const viewToPath: Record<string, string> = {
@@ -215,7 +215,7 @@ const Header = ({
     "verify": "/verify",
     "contact": "/contact",
     "booking": "/booking",
-    "news": "/news"
+    "press": "/press"
   };
   const getViewFromPath = (path: string): string => {
     if (path === "/") return "home";
@@ -225,7 +225,7 @@ const Header = ({
     if (path === "/verify") return "verify";
     if (path === "/contact") return "contact";
     if (path === "/booking") return "booking";
-    if (path.startsWith("/news")) return "news";
+    if (path.startsWith("/press") || path.startsWith("/news")) return "press";
     return "home";
   };
   const currentView = propCurrentView || getViewFromPath(location.pathname);
