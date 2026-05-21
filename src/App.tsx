@@ -2,7 +2,7 @@ import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import logoMmonogram from "@/assets/logo-mmonogram.webp";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -71,8 +71,11 @@ const App = () => (
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/booking" element={<BookingPage />} />
               <Route path="/representatives/:id" element={<RepresentativeDetailPage />} />
-              <Route path="/news" element={<NewsPage />} />
-              <Route path="/news/:slug" element={<NewsDetailPage />} />
+              <Route path="/press" element={<NewsPage />} />
+              <Route path="/press/:slug" element={<NewsDetailPage />} />
+              {/* Legacy /news URLs redirect to /press */}
+              <Route path="/news" element={<Navigate to="/press" replace />} />
+              <Route path="/news/:slug" element={<Navigate to="/press" replace />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/offer-agreement" element={<OfferAgreement />} />
               {/* Admin routes */}
