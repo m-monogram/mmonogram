@@ -46,10 +46,12 @@ const RepresentativesMapSection = () => {
           <div className="aspect-[16/9] w-full">
             <ComposableMap
               projection="geoEqualEarth"
-              projectionConfig={{ scale: 165 }}
-              style={{ width: "100%", height: "100%" }}
+              width={800}
+              height={450}
+              projectionConfig={{ scale: 145, center: [10, 25] }}
+              style={{ width: "100%", height: "100%", display: "block" }}
             >
-              <ZoomableGroup minZoom={1} maxZoom={5} center={[20, 15]}>
+              <ZoomableGroup minZoom={1} maxZoom={5} center={[10, 25]}>
                 <Geographies geography={GEO_URL}>
                   {({ geographies }) =>
                     geographies.map((geo) => (
