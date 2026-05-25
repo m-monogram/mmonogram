@@ -203,9 +203,9 @@ const ProjectTemplate = memo(function ProjectTemplate({
   }, [title]);
   return <div className="min-h-screen relative z-10 bg-black">
       {/* ——— A) HERO ——— Premium cinematic hero with car positioned higher ——— */}
-      <header className="relative min-h-[75vh] md:min-h-[90vh] w-full flex flex-col justify-end overflow-hidden bg-black">
+      <header className="relative min-h-[60vh] md:min-h-[90vh] w-full flex flex-col justify-end overflow-hidden bg-black">
         <div className="absolute inset-0 bg-black">
-          <img src={heroImage} alt={title} loading="eager" decoding="sync" fetchPriority="high" className="w-full h-full object-cover" style={{
+          <img src={heroImage} alt={title} loading="eager" decoding="sync" fetchPriority="high" className="w-full h-full object-contain md:object-cover" style={{
           objectPosition: imagePosition
         }} />
         </div>
