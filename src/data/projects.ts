@@ -10,7 +10,7 @@ import g3GoldRearSeats from "@/assets/g3-iconic-gold-rearseats.jpg";
 import g3GoldCabin from "@/assets/g3-iconic-gold-cabin.jpg";
 import g3GoldDash from "@/assets/g3-iconic-gold-dash.jpg";
 
-import fusionCover from "@/assets/fusion-cover.png";
+import fusionCover from "@/assets/fusion-cover.jpg";
 import img6694 from "@/assets/IMG_6694.webp";
 import img6695 from "@/assets/IMG_6695.webp";
 import img6696 from "@/assets/IMG_6696.webp";
