@@ -48,10 +48,15 @@ const RepresentativesMapSection = () => {
               projection="geoEqualEarth"
               width={800}
               height={450}
-              projectionConfig={{ scale: 145, center: [10, 25] }}
+              projectionConfig={{ scale: 700, center: [8, 47] }}
               style={{ width: "100%", height: "100%", display: "block" }}
             >
-              <ZoomableGroup minZoom={1} maxZoom={5} center={[10, 25]}>
+              <ZoomableGroup
+                minZoom={1}
+                maxZoom={4}
+                center={[8, 47]}
+                translateExtent={[[0, 0], [800, 450]]}
+              >
                 <Geographies geography={GEO_URL}>
                   {({ geographies }) =>
                     geographies.map((geo) => (
