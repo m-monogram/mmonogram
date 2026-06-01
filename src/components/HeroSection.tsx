@@ -51,18 +51,21 @@ const HeroSection = memo(({ setCurrentView }: HeroSectionProps) => {
       <section className="relative h-full flex flex-col justify-end overflow-hidden w-full z-10">
         {/* Background Image */}
           <div className="absolute inset-0 z-0 bg-premium-black w-full">
-          <img
-            src={heroImage}
-            alt={t("hero.alt")}
-            onLoad={() => setImageLoaded(true)}
-            loading="eager"
-            decoding="sync"
-            fetchPriority="high"
+          <video
+            src={heroVideo.url}
+            poster={heroImage}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            onLoadedData={() => setImageLoaded(true)}
             className={`w-full h-full transition-opacity duration-300 ${
               imageLoaded ? "opacity-100" : "opacity-0"
             } object-cover scale-[1.25] origin-bottom sm:scale-100 sm:origin-center`}
             style={{ objectPosition: imagePosition }}
           />
+
           {/* Gradient overlay - адаптивный */}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent md:from-black md:via-black/30" />
         </div>
