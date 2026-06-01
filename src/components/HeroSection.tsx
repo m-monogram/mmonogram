@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { useNavigation } from "@/hooks/useNavigation";
 import heroImage from "@/assets/hero-main.webp";
+import heroVideo from "@/assets/hero-main-new.mp4.asset.json";
 
 interface HeroSectionProps {
   setCurrentView?: (view: string) => void;
