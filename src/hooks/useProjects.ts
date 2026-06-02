@@ -90,12 +90,16 @@ export function useProjects(includeUnpublished = false) {
       return acc;
     }, {} as Record<string, DBProjectImage[]>);
 
-    const result = (projectsData as DBProject[]).map(p => ({
+    const dbResult = (projectsData as DBProject[]).map(p => ({
       ...p,
       images: imagesByProject[p.id] || [],
     }));
 
-    setProjects(result);
+    // Merge: DB projects first (by sort_order), then static fallback projects
+    // that aren't already represented in the DB by slug.
+    const dbSlugs = new Set(dbResult.map(p => p.slug));
+    const extras = fallbackProjects.filter(p => !dbSlugs.has(p.slug));
+    setProjects([...dbResult, ...extras]);
     setLoading(false);
   }, [includeUnpublished]);
 
