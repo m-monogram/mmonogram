@@ -245,10 +245,10 @@ const ProjectDetail = ({ project, onClose }: ProjectDetailProps) => {
             </button>
 
             {/* 3D Card Container - 1:1 format */}
-            <div onClick={(e) => e.stopPropagation()} className="w-[90vw] h-[90vw] max-w-[500px] max-h-[500px]">
+            <div onClick={(e) => e.stopPropagation()} className="flex items-center justify-center max-w-[90vw] max-h-[80vh]">
               <CardContainer
-                containerClassName="w-full h-full"
-                className="w-full h-full"
+                containerClassName="!py-0"
+                className="!p-0"
               >
                 <motion.div
                   key={selectedImage}
@@ -257,12 +257,12 @@ const ProjectDetail = ({ project, onClose }: ProjectDetailProps) => {
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <CardBody className="w-full h-full bg-black border border-white/20 rounded-none overflow-hidden shadow-2xl">
-                    <CardItem translateZ="80" className="w-full h-full">
+                  <CardBody className="!h-auto !w-auto bg-transparent border-0 rounded-none overflow-hidden shadow-2xl">
+                    <CardItem translateZ="80" className="!w-auto !h-auto">
                       <img
                         src={project.images[selectedImage].src}
                         alt={project.images[selectedImage].title}
-                        className="w-full h-full object-contain"
+                        className="max-w-[90vw] max-h-[80vh] w-auto h-auto object-contain block"
                       />
                     </CardItem>
                   </CardBody>
