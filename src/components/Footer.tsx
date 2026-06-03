@@ -187,8 +187,8 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
         {/* Bottom Bar */}
         <div>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 py-3">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-white/30 font-body text-caption">
-              <p>© {new Date().getFullYear()} M-Monogram. {t("footer.rights")}.</p>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-white/30 font-body text-caption uppercase tracking-widest">
+              <p>© {new Date().getFullYear()} M-MONOGRAM. {t("footer.rights")}.</p>
               <div className="flex gap-4">
                 <Link to="/privacy-policy" className="hover:text-white/60 transition-colors">
                   {t("footer.privacy")}
