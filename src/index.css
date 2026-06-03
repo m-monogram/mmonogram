@@ -238,7 +238,7 @@
 
   /* Body Typography - Readable Text */
   .font-body {
-    font-family: var(--font-family-primary);
+    font-family: var(--font-family-body);
     font-weight: var(--weight-regular);
     letter-spacing: var(--ls-body);
     line-height: var(--lh-body);
