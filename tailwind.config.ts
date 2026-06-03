@@ -14,9 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-family-primary)", "sans-serif"],
+        sans: ["var(--font-family-body)", "sans-serif"],
         display: ["var(--font-family-primary)", "sans-serif"],
-        body: ["var(--font-family-primary)", "sans-serif"],
+        body: ["var(--font-family-body)", "sans-serif"],
       },
       letterSpacing: {
         widest: "var(--ls-caps)",
