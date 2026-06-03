@@ -53,6 +53,7 @@
        1. ШРИФТ И ВЕС (Typography & Weight)
     ========================================= */
     --font-family-primary: 'Riviera Nights', sans-serif;
+    --font-family-body: 'Inter', 'Riviera Nights', sans-serif;
     
     --weight-light: 300; /* Основной вес для роскошного вида */
     --weight-regular: 400; /* Для длинных читаемых текстов */
