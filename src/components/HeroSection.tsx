@@ -60,9 +60,9 @@ const HeroSection = memo(({ setCurrentView }: HeroSectionProps) => {
             playsInline
             preload="auto"
             onLoadedData={() => setImageLoaded(true)}
-            className={`w-full h-full transition-opacity duration-300 ${
+            className={`w-full h-full object-cover transition-opacity duration-300 ${
               imageLoaded ? "opacity-100" : "opacity-0"
-            } object-contain sm:object-cover`}
+            }`}
             style={{ objectPosition: imagePosition }}
           />
 
