@@ -62,7 +62,7 @@ const HeroSection = memo(({ setCurrentView }: HeroSectionProps) => {
             onLoadedData={() => setImageLoaded(true)}
             className={`w-full h-full transition-opacity duration-300 ${
               imageLoaded ? "opacity-100" : "opacity-0"
-            } object-cover scale-[1.25] origin-bottom sm:scale-100 sm:origin-center`}
+            } object-contain sm:object-cover`}
             style={{ objectPosition: imagePosition }}
           />
 
