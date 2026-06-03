@@ -217,7 +217,7 @@
 
   /* Body/Paragraph - Highly Readable */
   p {
-    font-family: var(--font-family-primary);
+    font-family: var(--font-family-body);
     font-weight: var(--weight-regular);
     font-style: normal;
     font-size: var(--text-body);
