@@ -39,7 +39,7 @@ const SlideCard = memo(
         transition={{ duration: 0.5, delay: index * 0.1 }}
         className={cn(
           "relative cursor-pointer group shrink-0 snap-center",
-          "w-full min-w-full sm:flex-[0_0_calc((100%-24px)/2)] sm:min-w-0 lg:flex-[0_0_calc((100%-32px)/2)]"
+          "w-full min-w-full sm:flex-[0_0_calc((100%_-_24px)/2)] sm:min-w-0 lg:flex-[0_0_calc((100%_-_32px)/2)]"
         )}
         onClick={onClick}
       >
@@ -168,6 +168,11 @@ const ProjectsRail = memo(
         if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
       };
     }, [scrollRef, check]);
+
+      useEffect(() => {
+        const id = requestAnimationFrame(check);
+        return () => cancelAnimationFrame(id);
+      }, [check, projectsToShow.length]);
 
     const handleClick = useCallback(
       (slug: string) => onProjectClick?.(slug),
