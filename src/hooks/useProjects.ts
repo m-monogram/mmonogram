@@ -95,10 +95,7 @@ export function useProjects(includeUnpublished = false) {
       images: imagesByProject[p.id] || [],
     }));
 
-    const dbSlugs = new Set(dbResult.map(p => p.slug));
-    const extras = fallbackProjects.filter(p => !dbSlugs.has(p.slug));
-
-    setProjects([...dbResult, ...extras]);
+    setProjects(dbResult);
     setLoading(false);
   }, [includeUnpublished]);
 
