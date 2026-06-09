@@ -95,11 +95,8 @@ export function useProjects(includeUnpublished = false) {
       images: imagesByProject[p.id] || [],
     }));
 
-    // Merge: DB projects first (by sort_order), then static fallback projects
-    // that aren't already represented in the DB by slug.
-    const dbSlugs = new Set(dbResult.map(p => p.slug));
-    const extras = fallbackProjects.filter(p => !dbSlugs.has(p.slug));
-    setProjects([...dbResult, ...extras]);
+    // Show only DB projects (no static fallback merge) to avoid duplicates/legacy entries.
+    setProjects(dbResult);
     setLoading(false);
   }, [includeUnpublished]);
 
