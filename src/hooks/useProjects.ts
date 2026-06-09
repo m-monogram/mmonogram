@@ -95,8 +95,10 @@ export function useProjects(includeUnpublished = false) {
       images: imagesByProject[p.id] || [],
     }));
 
-    // Show only DB projects (no static fallback merge) to avoid duplicates/legacy entries.
-    setProjects(dbResult);
+    const dbSlugs = new Set(dbResult.map(p => p.slug));
+    const extras = fallbackProjects.filter(p => !dbSlugs.has(p.slug));
+
+    setProjects([...dbResult, ...extras]);
     setLoading(false);
   }, [includeUnpublished]);
 
