@@ -95,8 +95,13 @@ export function useProjects(includeUnpublished = false) {
       images: imagesByProject[p.id] || [],
     }));
 
-    setProjects(dbResult);
+    // Merge static fallback projects (legacy/original) that are not in DB, by slug
+    const dbSlugs = new Set(dbResult.map(p => p.slug));
+    const extras = fallbackProjects.filter(p => !dbSlugs.has(p.slug));
+
+    setProjects([...dbResult, ...extras]);
     setLoading(false);
+
   }, [includeUnpublished]);
 
   useEffect(() => { fetchProjects(); }, [fetchProjects]);
