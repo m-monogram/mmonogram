@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { useNavigation } from "@/hooks/useNavigation";
 import heroImageAsset from "@/assets/hero-main-new.png.asset.json";
+import heroImageMobileAsset from "@/assets/hero-main-mobile.png.asset.json";
 
 interface HeroSectionProps {
   setCurrentView?: (view: string) => void;
@@ -50,17 +51,20 @@ const HeroSection = memo(({ setCurrentView }: HeroSectionProps) => {
       <section className="relative h-full flex flex-col justify-end overflow-hidden w-full z-10">
         {/* Background Image */}
           <div className="absolute inset-0 z-0 bg-premium-black w-full">
-          <img
-            src={heroImageAsset.url}
-            alt="M-Monogram G-Class at private jet terminal"
-            onLoad={() => setImageLoaded(true)}
-            fetchPriority="high"
-            decoding="async"
-            className={`w-full h-full object-cover transition-opacity duration-300 ${
-              imageLoaded ? "opacity-100" : "opacity-0"
-            }`}
-            style={{ objectPosition: imagePosition }}
-          />
+          <picture>
+            <source media="(max-width: 767px)" srcSet={heroImageMobileAsset.url} />
+            <img
+              src={heroImageAsset.url}
+              alt="M-Monogram G-Class at private jet terminal"
+              onLoad={() => setImageLoaded(true)}
+              fetchPriority="high"
+              decoding="async"
+              className={`w-full h-full object-cover transition-opacity duration-300 ${
+                imageLoaded ? "opacity-100" : "opacity-0"
+              }`}
+              style={{ objectPosition: imagePosition }}
+            />
+          </picture>
 
           {/* Gradient overlay - адаптивный */}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent md:from-black md:via-black/30" />
