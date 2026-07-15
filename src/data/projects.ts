@@ -10,22 +10,15 @@ import g3GoldRearSeats from "@/assets/g3-iconic-gold-rearseats.jpg";
 import g3GoldCabin from "@/assets/g3-iconic-gold-cabin.jpg";
 import g3GoldDash from "@/assets/g3-iconic-gold-dash.jpg";
 
-import fusionCover from "@/assets/fusion-cover.jpg";
-import img6694 from "@/assets/IMG_6694.webp";
-import img6695 from "@/assets/IMG_6695.webp";
-import img6696 from "@/assets/IMG_6696.webp";
-import img6697 from "@/assets/IMG_6697.webp";
-import img6698 from "@/assets/IMG_6698.webp";
-import img6699 from "@/assets/IMG_6699.webp";
-import img6700 from "@/assets/IMG_6700.webp";
-import img6701 from "@/assets/IMG_6701.webp";
-import img6702 from "@/assets/IMG_6702.webp";
-import img6703 from "@/assets/IMG_6703.webp";
-import img6704 from "@/assets/IMG_6704.webp";
-import img6705 from "@/assets/IMG_6705.webp";
-import img6706 from "@/assets/IMG_6706.webp";
-import img6707 from "@/assets/IMG_6707.webp";
-import img6708 from "@/assets/IMG_6708.webp";
+import fusion01 from "@/assets/fusion/01-front-3q.jpg.asset.json";
+import fusion02 from "@/assets/fusion/02-front-side.jpg.asset.json";
+import fusion03 from "@/assets/fusion/03-front-passenger.jpg.asset.json";
+import fusion04 from "@/assets/fusion/04-side.jpg.asset.json";
+import fusion05 from "@/assets/fusion/05-rear-top.jpg.asset.json";
+import fusion06 from "@/assets/fusion/06-rear-3q.jpg.asset.json";
+import fusion07 from "@/assets/fusion/07-rear.jpg.asset.json";
+import fusion08 from "@/assets/fusion/08-top.jpg.asset.json";
+import fusion09 from "@/assets/fusion/09-interior-top.jpg.asset.json";
 
 export interface ProjectSpecs {
   exterior: string;
@@ -101,24 +94,17 @@ export const projects: Project[] = [
     duration: "12 weeks",
     package: "Full",
     category: "Bespoke Concept",
-    coverImage: fusionCover,
+    coverImage: fusion01.url,
     images: [
-      { src: fusionCover, title: "Fusion hero" },
-      { src: img6694, title: "Fusion view 1" },
-      { src: img6695, title: "Fusion view 2" },
-      { src: img6696, title: "Fusion view 3" },
-      { src: img6697, title: "Fusion view 4" },
-      { src: img6698, title: "Fusion view 5" },
-      { src: img6699, title: "Fusion view 6" },
-      { src: img6700, title: "Fusion view 7" },
-      { src: img6701, title: "Fusion view 8" },
-      { src: img6702, title: "Fusion view 9" },
-      { src: img6703, title: "Fusion view 10" },
-      { src: img6704, title: "Fusion view 11" },
-      { src: img6705, title: "Fusion view 12" },
-      { src: img6706, title: "Fusion view 13" },
-      { src: img6707, title: "Fusion view 14" },
-      { src: img6708, title: "Fusion view 15" },
+      { src: fusion01.url, title: "Front three-quarter" },
+      { src: fusion02.url, title: "Front side profile" },
+      { src: fusion03.url, title: "Front passenger side" },
+      { src: fusion04.url, title: "Side profile" },
+      { src: fusion05.url, title: "Rear top view" },
+      { src: fusion06.url, title: "Rear three-quarter" },
+      { src: fusion07.url, title: "Rear view" },
+      { src: fusion08.url, title: "Top view" },
+      { src: fusion09.url, title: "Interior overhead" },
     ],
     description: "The Fusion is a modern luxury statement, blending timeless elegance with bold contemporary design. Featuring bespoke exterior elements, a sculpted grille, and a handcrafted open-top interior. A seamless fusion of power, refinement, and future vision.",
     modifications: [
