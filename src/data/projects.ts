@@ -20,6 +20,23 @@ import fusion07 from "@/assets/fusion/07-rear.jpg.asset.json";
 import fusion08 from "@/assets/fusion/08-top.jpg.asset.json";
 import fusion09 from "@/assets/fusion/09-interior-top.jpg.asset.json";
 
+// Original Fusion archive photos
+import img6694 from "@/assets/IMG_6694.webp";
+import img6695 from "@/assets/IMG_6695.webp";
+import img6696 from "@/assets/IMG_6696.webp";
+import img6697 from "@/assets/IMG_6697.webp";
+import img6698 from "@/assets/IMG_6698.webp";
+import img6699 from "@/assets/IMG_6699.webp";
+import img6700 from "@/assets/IMG_6700.webp";
+import img6701 from "@/assets/IMG_6701.webp";
+import img6702 from "@/assets/IMG_6702.webp";
+import img6703 from "@/assets/IMG_6703.webp";
+import img6704 from "@/assets/IMG_6704.webp";
+import img6705 from "@/assets/IMG_6705.webp";
+import img6706 from "@/assets/IMG_6706.webp";
+import img6707 from "@/assets/IMG_6707.webp";
+import img6708 from "@/assets/IMG_6708.webp";
+
 export interface ProjectSpecs {
   exterior: string;
   interior: string;
@@ -105,6 +122,21 @@ export const projects: Project[] = [
       { src: fusion07.url, title: "Rear view" },
       { src: fusion08.url, title: "Top view" },
       { src: fusion09.url, title: "Interior overhead" },
+      { src: img6694, title: "Fusion archive 1" },
+      { src: img6695, title: "Fusion archive 2" },
+      { src: img6696, title: "Fusion archive 3" },
+      { src: img6697, title: "Fusion archive 4" },
+      { src: img6698, title: "Fusion archive 5" },
+      { src: img6699, title: "Fusion archive 6" },
+      { src: img6700, title: "Fusion archive 7" },
+      { src: img6701, title: "Fusion archive 8" },
+      { src: img6702, title: "Fusion archive 9" },
+      { src: img6703, title: "Fusion archive 10" },
+      { src: img6704, title: "Fusion archive 11" },
+      { src: img6705, title: "Fusion archive 12" },
+      { src: img6706, title: "Fusion archive 13" },
+      { src: img6707, title: "Fusion archive 14" },
+      { src: img6708, title: "Fusion archive 15" },
     ],
     description: "The Fusion is a modern luxury statement, blending timeless elegance with bold contemporary design. Featuring bespoke exterior elements, a sculpted grille, and a handcrafted open-top interior. A seamless fusion of power, refinement, and future vision.",
     modifications: [
