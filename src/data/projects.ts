@@ -20,6 +20,23 @@ import fusion07 from "@/assets/fusion/07-rear.jpg.asset.json";
 import fusion08 from "@/assets/fusion/08-top.jpg.asset.json";
 import fusion09 from "@/assets/fusion/09-interior-top.jpg.asset.json";
 
+// Original Fusion archive photos
+import img6694 from "@/assets/IMG_6694.webp";
+import img6695 from "@/assets/IMG_6695.webp";
+import img6696 from "@/assets/IMG_6696.webp";
+import img6697 from "@/assets/IMG_6697.webp";
+import img6698 from "@/assets/IMG_6698.webp";
+import img6699 from "@/assets/IMG_6699.webp";
+import img6700 from "@/assets/IMG_6700.webp";
+import img6701 from "@/assets/IMG_6701.webp";
+import img6702 from "@/assets/IMG_6702.webp";
+import img6703 from "@/assets/IMG_6703.webp";
+import img6704 from "@/assets/IMG_6704.webp";
+import img6705 from "@/assets/IMG_6705.webp";
+import img6706 from "@/assets/IMG_6706.webp";
+import img6707 from "@/assets/IMG_6707.webp";
+import img6708 from "@/assets/IMG_6708.webp";
+
 export interface ProjectSpecs {
   exterior: string;
   interior: string;
