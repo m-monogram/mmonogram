@@ -111,16 +111,11 @@ const HomePage = () => {
               limit={6}
             />
           </Suspense>
-          <Suspense fallback={null}>
-            <AboutUsSection />
-          </Suspense>
           <BrandStrip />
           <Suspense fallback={null}>
             <StatsSection />
           </Suspense>
-          <Suspense fallback={null}>
-            <NewsHighlightSection />
-          </Suspense>
+
           <Suspense fallback={null}>
             <LazyOnVisible minHeight="600px" rootMargin="400px">
               <RepresentativesMapSection />
