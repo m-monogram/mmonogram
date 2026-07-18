@@ -111,7 +111,7 @@ export const projects: Project[] = [
     duration: "12 weeks",
     package: "Full",
     category: "Bespoke Concept",
-    coverImage: fusion01.url,
+    coverImage: "/__l5e/assets-v1/c155766a-938a-4e9c-b4dd-3545cbc5f0ae/02.jpg",
     images: [
       { src: fusion01.url, title: "Front three-quarter" },
       { src: fusion02.url, title: "Front side profile" },
