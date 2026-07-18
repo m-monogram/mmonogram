@@ -1,0 +1,1 @@
+UPDATE public.projects SET cover_image = '/__l5e/assets-v1/8a7f105e-6a52-465e-b5e5-831be121b806/04.jpg' WHERE slug = 'g-class-obsidian-monogram';
