@@ -92,7 +92,7 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
                   <li key={link.labelKey}>
                     <button
                       onClick={() => handleNavClick(link.view)}
-                      className="text-white/60 hover:text-white transition-colors font-display text-caption cursor-pointer"
+                      className="text-white/60 hover:text-white transition-colors font-display text-caption uppercase tracking-widest cursor-pointer"
                     >
                       {t(link.labelKey)}
                     </button>
