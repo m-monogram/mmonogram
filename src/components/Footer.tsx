@@ -129,7 +129,7 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
                 href="https://www.google.com/maps/place/Meta+Garage/@25.1495063,55.226896,17z/data=!3m1!4b1!4m6!3m5!1s0xa27338e445343799:0x4ea888fff25cf0ce!8m2!3d25.1495063!4d55.226896!16s%2Fg%2F11kj97dmh_?hl=en-RU&coh=164777&entry=tt&shorturl=1"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-start gap-2 text-white/60 hover:text-white transition-colors font-display text-caption mb-1"
+                className="flex items-start gap-2 text-white/60 hover:text-white transition-colors font-display text-caption tracking-widest uppercase mb-1"
               >
                 <MapPin className="w-3 h-3 mt-0.5 flex-shrink-0" />
                 <span>
@@ -138,7 +138,7 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
                   Al Quoz, Dubai
                 </span>
               </a>
-              <p className="text-white/40 font-display text-caption pl-5">{t("footer.hours")}</p>
+              <p className="text-white/40 font-display text-caption tracking-widest uppercase pl-5">{t("footer.hours")}</p>
             </div>
 
             {/* Social */}
