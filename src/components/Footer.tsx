@@ -86,13 +86,13 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
           <ScrollReveal delay={0.05} className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-8">
             {/* Quick Links */}
             <div>
-              <h4 className="font-body text-caption uppercase tracking-widest mb-3 text-white/50">{t("nav.home")}</h4>
+              <h4 className="font-display text-caption uppercase tracking-widest mb-3 text-white/50">{t("nav.home")}</h4>
               <ul className="space-y-2">
                 {quickLinks.map((link) => (
                   <li key={link.labelKey}>
                     <button
                       onClick={() => handleNavClick(link.view)}
-                      className="text-white/60 hover:text-white transition-colors font-body text-caption uppercase tracking-widest cursor-pointer"
+                      className="text-white/60 hover:text-white transition-colors font-body text-caption cursor-pointer"
                     >
                       {t(link.labelKey)}
                     </button>
@@ -103,18 +103,18 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
 
             {/* Contact */}
             <div>
-              <h4 className="font-body text-caption uppercase tracking-widest mb-3 text-white/50">{t("nav.contact")}</h4>
+              <h4 className="font-display text-caption uppercase tracking-widest mb-3 text-white/50">{t("nav.contact")}</h4>
               <div className="space-y-2">
                 <a
                   href="tel:+971545077707"
-                  className="flex items-center gap-2 text-white/60 hover:text-white transition-colors font-body text-caption tracking-widest"
+                  className="flex items-center gap-2 text-white/60 hover:text-white transition-colors font-body text-caption"
                 >
                   <Phone className="w-3 h-3" />
                   +971 54 507 7707
                 </a>
                 <a
                   href="mailto:m_monogram@mail.ru"
-                  className="flex items-center gap-2 text-white/60 hover:text-white transition-colors font-body text-caption tracking-widest"
+                  className="flex items-center gap-2 text-white/60 hover:text-white transition-colors font-body text-caption"
                 >
                   <Mail className="w-3 h-3" />
                   m_monogram@mail.ru
@@ -124,12 +124,12 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
 
             {/* Location */}
             <div>
-              <h4 className="font-body text-caption uppercase tracking-widest mb-3 text-white/50">{t("contact.location")}</h4>
+              <h4 className="font-display text-caption uppercase tracking-widest mb-3 text-white/50">{t("contact.location")}</h4>
               <a
                 href="https://www.google.com/maps/place/Meta+Garage/@25.1495063,55.226896,17z/data=!3m1!4b1!4m6!3m5!1s0xa27338e445343799:0x4ea888fff25cf0ce!8m2!3d25.1495063!4d55.226896!16s%2Fg%2F11kj97dmh_?hl=en-RU&coh=164777&entry=tt&shorturl=1"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-start gap-2 text-white/60 hover:text-white transition-colors font-body text-caption tracking-widest uppercase mb-1"
+                className="flex items-start gap-2 text-white/60 hover:text-white transition-colors font-body text-caption mb-1"
               >
                 <MapPin className="w-3 h-3 mt-0.5 flex-shrink-0" />
                 <span>
@@ -138,12 +138,12 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
                   Al Quoz, Dubai
                 </span>
               </a>
-              <p className="text-white/40 font-body text-caption tracking-widest uppercase pl-5">{t("footer.hours")}</p>
+              <p className="text-white/40 font-body text-caption pl-5">{t("footer.hours")}</p>
             </div>
 
             {/* Social */}
             <div>
-              <h4 className="font-body text-caption uppercase tracking-widest mb-3 text-white/50">{t("footer.follow")}</h4>
+              <h4 className="font-display text-caption uppercase tracking-widest mb-3 text-white/50">{t("footer.follow")}</h4>
               <div className="flex gap-2">
                 {socialLinks.map((social, index) => (
                   <a
