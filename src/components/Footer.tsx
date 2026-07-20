@@ -107,14 +107,14 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
               <div className="space-y-2">
                 <a
                   href="tel:+971545077707"
-                  className="flex items-center gap-2 text-white/60 hover:text-white transition-colors font-display text-caption"
+                  className="flex items-center gap-2 text-white/60 hover:text-white transition-colors font-display text-caption tracking-widest"
                 >
                   <Phone className="w-3 h-3" />
                   +971 54 507 7707
                 </a>
                 <a
                   href="mailto:m_monogram@mail.ru"
-                  className="flex items-center gap-2 text-white/60 hover:text-white transition-colors font-display text-caption"
+                  className="flex items-center gap-2 text-white/60 hover:text-white transition-colors font-display text-caption tracking-widest"
                 >
                   <Mail className="w-3 h-3" />
                   m_monogram@mail.ru
