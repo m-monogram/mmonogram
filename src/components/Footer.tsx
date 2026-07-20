@@ -74,7 +74,7 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
               onClick={() => handleNavClick("contact")}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center gap-2 px-6 py-3 sm:px-8 sm:py-3.5 bg-white text-black font-body text-sm sm:text-base uppercase tracking-widest hover:bg-white/90 transition-all duration-300 group cursor-pointer shadow-lg hover:shadow-xl"
+              className="inline-flex items-center gap-2 px-6 py-3 sm:px-8 sm:py-3.5 bg-white text-black font-display text-sm sm:text-base uppercase tracking-widest hover:bg-white/90 transition-all duration-300 group cursor-pointer shadow-lg hover:shadow-xl"
             >
               <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
               {t("hero.bookProject")}
@@ -92,7 +92,7 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
                   <li key={link.labelKey}>
                     <button
                       onClick={() => handleNavClick(link.view)}
-                      className="text-white/60 hover:text-white transition-colors font-body text-caption cursor-pointer"
+                      className="text-white/60 hover:text-white transition-colors font-display text-caption uppercase tracking-widest cursor-pointer"
                     >
                       {t(link.labelKey)}
                     </button>
@@ -107,14 +107,14 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
               <div className="space-y-2">
                 <a
                   href="tel:+971545077707"
-                  className="flex items-center gap-2 text-white/60 hover:text-white transition-colors font-body text-caption"
+                  className="flex items-center gap-2 text-white/60 hover:text-white transition-colors font-display text-caption tracking-widest"
                 >
                   <Phone className="w-3 h-3" />
                   +971 54 507 7707
                 </a>
                 <a
                   href="mailto:m_monogram@mail.ru"
-                  className="flex items-center gap-2 text-white/60 hover:text-white transition-colors font-body text-caption"
+                  className="flex items-center gap-2 text-white/60 hover:text-white transition-colors font-display text-caption tracking-widest"
                 >
                   <Mail className="w-3 h-3" />
                   m_monogram@mail.ru
@@ -129,7 +129,7 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
                 href="https://www.google.com/maps/place/Meta+Garage/@25.1495063,55.226896,17z/data=!3m1!4b1!4m6!3m5!1s0xa27338e445343799:0x4ea888fff25cf0ce!8m2!3d25.1495063!4d55.226896!16s%2Fg%2F11kj97dmh_?hl=en-RU&coh=164777&entry=tt&shorturl=1"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-start gap-2 text-white/60 hover:text-white transition-colors font-body text-caption mb-1"
+                className="flex items-start gap-2 text-white/60 hover:text-white transition-colors font-display text-caption tracking-widest uppercase mb-1"
               >
                 <MapPin className="w-3 h-3 mt-0.5 flex-shrink-0" />
                 <span>
@@ -138,7 +138,7 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
                   Al Quoz, Dubai
                 </span>
               </a>
-              <p className="text-white/40 font-body text-caption pl-5">{t("footer.hours")}</p>
+              <p className="text-white/40 font-display text-caption tracking-widest uppercase pl-5">{t("footer.hours")}</p>
             </div>
 
             {/* Social */}
@@ -187,7 +187,7 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
         {/* Bottom Bar */}
         <div>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 py-3">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-white/30 font-body text-caption uppercase tracking-widest">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-white/30 font-display text-caption uppercase tracking-widest">
               <p>© {new Date().getFullYear()} M-MONOGRAM. {t("footer.rights")}.</p>
               <div className="flex gap-4">
                 <Link to="/privacy-policy" className="hover:text-white/60 transition-colors">
