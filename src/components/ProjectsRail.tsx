@@ -46,8 +46,7 @@ const SlideCard = memo(
         <div
           className={cn(
             "relative w-full overflow-hidden transition-all duration-500",
-            "aspect-[4/5] sm:aspect-[3/4] lg:aspect-[4/5]",
-            "sm:h-auto lg:h-auto",
+            "aspect-square",
             isLight
               ? "bg-white border border-black/8 shadow-[0_12px_30px_rgba(0,0,0,0.08)]"
               : "bg-gradient-to-b from-[#0d0d0f] to-[#050506] border border-white/10 group-hover:border-white/25"
@@ -62,19 +61,6 @@ const SlideCard = memo(
                 )}
               />
             )}
-            {/* Blurred fill so wide photos are never cropped */}
-            <img
-              src={project.cover_image}
-              alt=""
-              aria-hidden
-              loading={index < 2 ? "eager" : "lazy"}
-              className={cn(
-                "absolute inset-0 w-full h-full object-cover scale-125 blur-3xl transition-opacity duration-700",
-                isLight ? "opacity-50" : "opacity-45",
-                loaded ? "" : "opacity-0"
-              )}
-
-            />
             <img
               src={project.cover_image}
               alt={`${project.title} — ${project.subtitle}`}
@@ -84,11 +70,12 @@ const SlideCard = memo(
               onLoad={() => setLoaded(true)}
               className={cn(
                 "absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-105",
-                "object-contain",
+                "object-cover",
                 loaded ? "opacity-100" : "opacity-0"
               )}
               style={{ objectPosition: "center center" }}
             />
+
           </div>
 
 
