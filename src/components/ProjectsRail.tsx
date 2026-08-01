@@ -62,6 +62,19 @@ const SlideCard = memo(
                 )}
               />
             )}
+            {/* Blurred fill so wide photos are never cropped */}
+            <img
+              src={project.cover_image}
+              alt=""
+              aria-hidden
+              loading={index < 2 ? "eager" : "lazy"}
+              className={cn(
+                "absolute inset-0 w-full h-full object-cover scale-125 blur-3xl transition-opacity duration-700",
+                isLight ? "opacity-50" : "opacity-45",
+                loaded ? "" : "opacity-0"
+              )}
+
+            />
             <img
               src={project.cover_image}
               alt={`${project.title} — ${project.subtitle}`}
@@ -71,12 +84,13 @@ const SlideCard = memo(
               onLoad={() => setLoaded(true)}
               className={cn(
                 "absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-105",
-                "object-cover",
+                "object-contain",
                 loaded ? "opacity-100" : "opacity-0"
               )}
-              style={{ objectPosition: "center 55%" }}
+              style={{ objectPosition: "center center" }}
             />
           </div>
+
 
           {/* Premium gradient overlay */}
           <div
