@@ -69,10 +69,11 @@ const SlideCard = memo(
               aria-hidden
               loading={index < 2 ? "eager" : "lazy"}
               className={cn(
-                "absolute inset-0 w-full h-full object-cover scale-110 blur-2xl transition-opacity duration-700",
-                isLight ? "opacity-40" : "opacity-30",
+                "absolute inset-0 w-full h-full object-cover scale-125 blur-3xl transition-opacity duration-700",
+                isLight ? "opacity-50" : "opacity-45",
                 loaded ? "" : "opacity-0"
               )}
+
             />
             <img
               src={project.cover_image}
