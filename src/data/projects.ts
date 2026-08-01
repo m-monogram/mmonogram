@@ -10,6 +10,7 @@ import g3GoldRearSeats from "@/assets/g3-iconic-gold-rearseats.jpg";
 import g3GoldCabin from "@/assets/g3-iconic-gold-cabin.jpg";
 import g3GoldDash from "@/assets/g3-iconic-gold-dash.jpg";
 
+import fusionCover from "@/assets/fusion/cover.jpg.asset.json";
 import fusion01 from "@/assets/fusion/01-front-3q.jpg.asset.json";
 import fusion02 from "@/assets/fusion/02-front-side.jpg.asset.json";
 import fusion03 from "@/assets/fusion/03-front-passenger.jpg.asset.json";
@@ -111,9 +112,10 @@ export const projects: Project[] = [
     duration: "12 weeks",
     package: "Full",
     category: "Bespoke Concept",
-    coverImage: "/__l5e/assets-v1/c155766a-938a-4e9c-b4dd-3545cbc5f0ae/02.jpg",
+    coverImage: fusionCover.url,
     images: [
-      { src: fusion01.url, title: "Front three-quarter" },
+      { src: fusionCover.url, title: "Front three-quarter" },
+      { src: fusion01.url, title: "Front three-quarter alt" },
       { src: fusion02.url, title: "Front side profile" },
       { src: fusion03.url, title: "Front passenger side" },
       { src: fusion04.url, title: "Side profile" },
