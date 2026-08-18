@@ -1,4 +1,5 @@
 // G3.0 M Monogram ICONIC – Gold Edition images
+import g3Cover from "@/assets/g-3.jpg.asset.json";
 import g3GoldFront from "@/assets/g3-iconic-gold-front.jpg";
 import g3GoldSide from "@/assets/g3-iconic-gold-side.jpg";
 import g3GoldRear from "@/assets/g3-iconic-gold-rear.jpg";
