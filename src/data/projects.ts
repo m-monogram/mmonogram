@@ -1,4 +1,5 @@
 // G3.0 M Monogram ICONIC – Gold Edition images
+import g3Cover from "@/assets/g-3.jpg.asset.json";
 import g3GoldFront from "@/assets/g3-iconic-gold-front.jpg";
 import g3GoldSide from "@/assets/g3-iconic-gold-side.jpg";
 import g3GoldRear from "@/assets/g3-iconic-gold-rear.jpg";
@@ -72,9 +73,9 @@ export const projects: Project[] = [
     duration: "12 weeks",
     package: "Ultra-Limited",
     category: "G-Class",
-    coverImage: g3GoldFront,
+    coverImage: g3Cover.url,
     images: [
-      { src: g3GoldFront, title: "Front view" },
+      { src: g3Cover.url, title: "Front view" },
       { src: g3GoldSide, title: "Side profile" },
       { src: g3GoldRear, title: "Rear view" },
       { src: g3GoldDetail, title: "Hood & wheel detail" },
