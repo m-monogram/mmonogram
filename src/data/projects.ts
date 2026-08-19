@@ -139,7 +139,7 @@ export const projects: Project[] = [
       { src: img6695, title: "Azure — rear overhead" },
       // Colour studies — Arctic White
       { src: img6696, title: "Arctic White — overhead" },
-      { src: img6706, title: "Arctic White — side profile" },
+      { src: img6706, title: "Arctic White — overhead alt" },
       // Colour studies — Amethyst
       { src: img6703, title: "Amethyst — side profile" },
       { src: img6704, title: "Amethyst — overhead" },
