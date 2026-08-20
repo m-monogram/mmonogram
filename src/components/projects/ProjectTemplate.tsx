@@ -15,6 +15,7 @@ export interface ProjectTemplateSpec {
 export interface ProjectTemplateGalleryImage {
   src: string;
   alt?: string;
+  group?: string;
 }
 export interface ProjectTemplateNavItem {
   slug: string;
@@ -65,36 +66,61 @@ function ProjectGallery({
     };
   }, [selectedIdx, close, goPrev, goNext]);
 
+  // Group images into labelled chapters while keeping a flat index for the lightbox
+  const chapters: { label?: string; items: { img: ProjectTemplateGalleryImage; index: number }[] }[] = [];
+  images.forEach((img, index) => {
+    const label = img.group;
+    const last = chapters[chapters.length - 1];
+    if (last && last.label === label) last.items.push({ img, index });
+    else chapters.push({ label, items: [{ img, index }] });
+  });
+
   return (
     <>
       <section className="relative bg-black px-4 sm:px-6 md:px-8 lg:px-12 pb-16 md:pb-24">
-        <div className="max-w-[1600px] mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
-            {images.map((img, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.6, delay: i * 0.08 }}
-                className="relative overflow-hidden group cursor-pointer"
-                onClick={() => setSelectedIdx(i)}
-              >
-                <div className="relative aspect-square md:aspect-[4/3] overflow-hidden bg-black rounded-none border border-white/10 md:group-hover:border-white/30 transition-all duration-500 shadow-lg md:group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
-                  <img
-                    src={img.src}
-                    alt={img.alt ?? ""}
-                    loading={i < 4 ? "eager" : "lazy"}
-                    decoding={i < 4 ? "sync" : "async"}
-                    className="w-full h-full object-cover object-center transition-transform duration-700 md:group-hover:scale-[1.02]"
-                  />
-                  <div className="absolute inset-0 opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-t from-black/30 via-transparent to-transparent" aria-hidden />
+        <div className="max-w-[1600px] mx-auto space-y-14 md:space-y-20">
+          {chapters.map((chapter, ci) => (
+            <div key={ci}>
+              {chapter.label && (
+                <div className="mb-6 md:mb-10 flex items-center gap-4">
+                  <span className="font-body text-[10px] sm:text-xs tracking-[0.3em] uppercase text-foreground/60">
+                    {chapter.label}
+                  </span>
+                  <span className="h-px flex-1 bg-foreground/10" aria-hidden />
+                  <span className="font-body text-[10px] sm:text-xs tracking-[0.25em] text-foreground/30">
+                    {String(chapter.items.length).padStart(2, "0")}
+                  </span>
                 </div>
-              </motion.div>
-            ))}
-          </div>
+              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
+                {chapter.items.map(({ img, index }, i) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-80px" }}
+                    transition={{ duration: 0.6, delay: Math.min(i, 4) * 0.08 }}
+                    className="relative overflow-hidden group cursor-pointer"
+                    onClick={() => setSelectedIdx(index)}
+                  >
+                    <div className="relative aspect-square md:aspect-[4/3] overflow-hidden bg-black rounded-none border border-white/10 md:group-hover:border-white/30 transition-all duration-500 shadow-lg md:group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
+                      <img
+                        src={img.src}
+                        alt={img.alt ?? ""}
+                        loading={index < 4 ? "eager" : "lazy"}
+                        decoding={index < 4 ? "sync" : "async"}
+                        className="w-full h-full object-cover object-center transition-transform duration-700 md:group-hover:scale-[1.02]"
+                      />
+                      <div className="absolute inset-0 opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-t from-black/30 via-transparent to-transparent" aria-hidden />
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
+
 
       {/* 3D Lightbox Modal */}
       <AnimatePresence>

@@ -33,10 +33,18 @@ function projectToTemplateProps(
   const parts = project.description.split(".").map((s) => s.trim()).filter(Boolean).slice(0, 2);
   const statement = parts.length ? parts.join(". ").trim() + "." : project.description;
 
-  const galleryImages: ProjectTemplateGalleryImage[] = (project.images || []).map((img) => ({
-    src: img.src,
-    alt: img.title,
-  }));
+  const galleryImages: ProjectTemplateGalleryImage[] = (project.images || []).map((img) => {
+    const title = img.title || "";
+    let group: string | undefined;
+    if (title.includes("—")) {
+      group = title.split("—")[0].trim();
+    } else if (/cabin|interior|cockpit|dash|seat/i.test(title)) {
+      group = "Interior";
+    } else {
+      group = "Exterior";
+    }
+    return { src: img.src, alt: title, group };
+  });
 
   const specs: ProjectTemplateSpec[] = Object.keys(SPEC_LABELS).map(
     (key) => ({ label: SPEC_LABELS[key], value: (project.specs as Record<string, string>)?.[key] || "—" })
