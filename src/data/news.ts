@@ -1,8 +1,8 @@
 import cover from "@/assets/news/m-monogram-g-iconic/01-cover.jpeg";
-import iksAerial from "@/assets/news/iksanov-review/01-aerial.png";
-import iksSide from "@/assets/news/iksanov-review/02-side.png";
-import iksRear from "@/assets/news/iksanov-review/03-rear.png";
-import iksFront from "@/assets/news/iksanov-review/04-front-driving.png";
+import iksAerial from "@/assets/news/iksanov-review/01-aerial.webp";
+import iksSide from "@/assets/news/iksanov-review/02-side.webp";
+import iksRear from "@/assets/news/iksanov-review/03-rear.webp";
+import iksFront from "@/assets/news/iksanov-review/04-front-driving.webp";
 import frontGrille from "@/assets/news/m-monogram-g-iconic/02-front-grille.jpeg";
 import binz1950 from "@/assets/news/m-monogram-g-iconic/03-binz-1950.jpeg";
 import amgBase from "@/assets/news/m-monogram-g-iconic/04-amg-base.jpeg";
@@ -11,11 +11,11 @@ import aero from "@/assets/news/m-monogram-g-iconic/06-aero.jpeg";
 import fiftyUnits from "@/assets/news/m-monogram-g-iconic/07-50-units.jpeg";
 import price from "@/assets/news/m-monogram-g-iconic/08-price.jpeg";
 import frontBlack from "@/assets/news/m-monogram-g-iconic/09-front-black.jpeg";
-import dtFront from "@/assets/news/dubai-tuner-700k/01-front.png";
-import dtAerial from "@/assets/news/dubai-tuner-700k/02-aerial.png";
-import dtSide from "@/assets/news/dubai-tuner-700k/03-side.png";
-import dtWheel from "@/assets/news/dubai-tuner-700k/04-wheel.png";
-import dtEmblem from "@/assets/news/dubai-tuner-700k/05-emblem.png";
+import dtFront from "@/assets/news/dubai-tuner-700k/01-front.webp";
+import dtAerial from "@/assets/news/dubai-tuner-700k/02-aerial.webp";
+import dtSide from "@/assets/news/dubai-tuner-700k/03-side.webp";
+import dtWheel from "@/assets/news/dubai-tuner-700k/04-wheel.webp";
+import dtEmblem from "@/assets/news/dubai-tuner-700k/05-emblem.webp";
 
 export type NewsCategory = "news" | "event" | "press";
 
