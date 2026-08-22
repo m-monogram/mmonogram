@@ -15,7 +15,6 @@ export interface ProjectTemplateSpec {
 export interface ProjectTemplateGalleryImage {
   src: string;
   alt?: string;
-  group?: string;
 }
 export interface ProjectTemplateNavItem {
   slug: string;
