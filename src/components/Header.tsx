@@ -10,7 +10,7 @@ import { AuroraBackground } from "@/components/ui/aurora-background";
 // Menu images - themed for each section
 import menuHome from "@/assets/menu/menu-home.webp";
 import menuBrand from "@/assets/menu/menu-brand.webp";
-import menuProjects from "@/assets/menu/menu-projects.webp";
+import menuProjects from "@/assets/g63-quarter-new.webp";
 import menuModifications from "@/assets/commission-hero-final.webp";
 import menuVerify from "@/assets/menu/menu-verify.webp";
 import menuContact from "@/assets/menu/menu-contact-new.jpg.webp";
