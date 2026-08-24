@@ -258,7 +258,7 @@ const Header = ({
           behavior: "instant"
         });
       }} className="cursor-pointer touch-target flex items-center justify-center" type="button">
-        <img src={logoWhite} alt="M-Monogram" width={320} height={75} fetchPriority="high" decoding="sync" className="h-12 sm:h-14 md:h-16 w-auto" />
+        <img src={logoWhite} alt="M-Monogram" width={479} height={113} fetchPriority="high" decoding="sync" className="h-10 sm:h-12 md:h-14 w-auto max-w-[11rem] sm:max-w-[13rem] object-contain object-left" />
       </button>
     </div>}
 
@@ -314,7 +314,7 @@ const Header = ({
               navigate("/");
               closeMenu();
             }} className="cursor-pointer touch-target">
-              <img src={logoWhite} alt="M-Monogram" className="h-12 sm:h-14 md:h-16 w-auto" />
+              <img src={logoWhite} alt="M-Monogram" width={479} height={113} className="h-10 sm:h-12 md:h-14 w-auto max-w-[11rem] sm:max-w-[13rem] object-contain object-left" />
             </motion.button>
 
             {/* Right controls */}

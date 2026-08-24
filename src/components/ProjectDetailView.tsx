@@ -7,9 +7,9 @@ import ProjectTemplate from "@/components/projects/ProjectTemplate";
 import ProjectEditionGrid from "@/components/ProjectEditionGrid";
 import type { ProjectTemplateSpec, ProjectTemplateGalleryImage, ProjectTemplateNavItem } from "@/components/projects/ProjectTemplate";
 import {
-  getGWagenEditionsFrom,
+  getEditionsOf,
   getListingProjects,
-  isGWagenHubId,
+  isHubProject,
   projectKey,
 } from "@/data/projects";
 
@@ -82,9 +82,12 @@ const ProjectDetailView = memo(function ProjectDetailView({
 }: ProjectDetailViewProps) {
   const navigate = useNavigate();
   const { navigateToView } = useNavigation({ setCurrentView });
-  const editions = useMemo(() => getGWagenEditionsFrom(allProjects), [allProjects]);
+  const editions = useMemo(
+    () => getEditionsOf(project.editionOf || projectKey(project), allProjects),
+    [allProjects, project]
+  );
   const listing = useMemo(() => getListingProjects(allProjects), [allProjects]);
-  const isHub = project.isHub || isGWagenHubId(projectKey(project));
+  const isHub = isHubProject(project);
 
   const handleBack = () => {
     if (project.editionOf) {
@@ -105,15 +108,15 @@ const ProjectDetailView = memo(function ProjectDetailView({
         <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-10">
           <button
             type="button"
-            onClick={() => navigateToView("projects")}
+            onClick={() => navigate("/")}
             className="mb-10 sm:mb-14 flex items-center gap-2 text-black/55 hover:text-black transition-colors font-body text-xs sm:text-sm uppercase tracking-widest cursor-pointer"
-            aria-label="Back to projects"
+            aria-label="Back"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back</span>
           </button>
 
-          <h1 className="font-display text-center text-lg sm:text-2xl md:text-3xl tracking-widest uppercase text-black mb-10 sm:mb-14">
+          <h1 className="font-display text-center font-bold uppercase tracking-[0.18em] text-lg sm:text-2xl md:text-3xl text-black mb-10 sm:mb-14">
             {project.title}
           </h1>
 

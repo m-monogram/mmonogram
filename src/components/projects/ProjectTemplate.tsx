@@ -181,41 +181,18 @@ const ProjectTemplate = memo(function ProjectTemplate({
   modifications
 }: ProjectTemplateProps) {
   const navigate = useNavigate();
-  const [imagePosition, setImagePosition] = useState("center center");
   useEffect(() => {
     window.scrollTo({
       top: 0,
       behavior: "instant"
     });
-
-    // Set image position based on screen size - car positioned higher
-    const updatePosition = () => {
-      if (window.innerWidth >= 1024) {
-        setImagePosition("center 45%");
-      } else if (window.innerWidth >= 768) {
-        setImagePosition("center 40%");
-      } else {
-        setImagePosition("center 38%");
-      }
-    };
-    updatePosition();
-    window.addEventListener("resize", updatePosition);
-    return () => window.removeEventListener("resize", updatePosition);
   }, [title]);
   return <div className="min-h-screen relative z-10 bg-black">
       {/* ——— A) HERO ——— Premium cinematic hero with car positioned higher ——— */}
-      <header className="relative min-h-[60vh] md:min-h-[90vh] w-full flex flex-col justify-end overflow-hidden bg-black">
+      <header className="relative h-[100dvh] min-h-[100dvh] w-full overflow-hidden bg-black">
         <div className="absolute inset-0 bg-black">
-          <img src={heroImage} alt={title} loading="eager" decoding="sync" fetchPriority="high" className="w-full h-full object-contain md:object-cover" style={{
-          objectPosition: imagePosition
-        }} />
+          <img src={heroImage} alt={title} loading="eager" decoding="sync" fetchPriority="high" className="w-full h-full object-cover object-center" />
         </div>
-        {/* Premium gradient overlay - protects text, adjusted for higher car position */}
-        <div className="absolute inset-0 pointer-events-none" aria-hidden style={{
-        background: `
-              linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.25) 40%, rgba(0,0,0,0.45) 60%, rgba(0,0,0,0.7) 80%, rgba(0,0,0,0.85) 100%)
-            `
-      }} />
         {/* Subtle spotlight effect */}
         <div className="absolute inset-0 pointer-events-none opacity-30" aria-hidden>
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white/5 rounded-none blur-3xl" />
@@ -232,27 +209,10 @@ const ProjectTemplate = memo(function ProjectTemplate({
             <span className="sm:hidden">Back</span>
           </button>
         </div>
-
-        {/* Text in safe zone - bottom third with proper spacing */}
-        <div className="relative z-10 px-4 sm:px-8 md:px-12 lg:px-16 pb-12 sm:pb-16 md:pb-20">
-          <motion.div initial={{
-          opacity: 0,
-          y: 20
-        }} animate={{
-          opacity: 1,
-          y: 0
-        }} transition={{
-          duration: 0.5,
-          delay: 0.15
-        }} className="max-w-4xl">
-            
-            
-          </motion.div>
-        </div>
       </header>
 
       {/* ——— B) STATEMENT ——— Enhanced with decorative elements ——— */}
-      <section className="relative bg-black py-20 sm:py-24 md:py-32">
+      <section className="relative z-10 bg-black pb-20 sm:pb-24 md:pb-32 pt-2">
         {/* Decorative line above */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         

@@ -1,6 +1,10 @@
 // G3.0 M Monogram ICONIC – edition covers
-import g3Black from "@/assets/g-1.jpg";
-import g3BlackAlt from "@/assets/g-2.jpg";
+import g3Black from "@/assets/g-2.jpg";
+import g3BlackAlt from "@/assets/g3-black-04.jpg";
+import g3BlackHood from "@/assets/g3-black-01.jpg";
+import g3BlackOverhead from "@/assets/g3-black-02.jpg";
+import g3BlackRear from "@/assets/g3-black-07.jpg";
+import g3BlackSide from "@/assets/g3-black-03.jpg";
 import g3GoldCover from "@/assets/g-3.jpg";
 import g3GoldFront from "@/assets/g3-iconic-gold-front.jpg";
 import greyCover from "@/assets/g3-grey-cover.jpg";
@@ -28,6 +32,12 @@ import fusion06 from "@/assets/fusion/06-rear-3q.jpg";
 import fusion07 from "@/assets/fusion/07-rear.jpg";
 import fusion08 from "@/assets/fusion/08-top.jpg";
 import fusion09 from "@/assets/fusion/09-interior-top.jpg";
+
+import fusionCrimsonStudio from "@/assets/fusion-editions/crimson.jpg";
+import fusionTurquoiseStudio from "@/assets/fusion-editions/turquoise.jpg";
+import fusionAzureStudio from "@/assets/fusion-editions/azure.jpg";
+import fusionArcticStudio from "@/assets/fusion-editions/arctic.jpg";
+import fusionAmethystStudio from "@/assets/fusion-editions/amethyst.jpg";
 
 // Original Fusion archive photos
 import img6694 from "@/assets/IMG_6694.webp";
@@ -74,12 +84,28 @@ export interface Project {
 }
 
 export const GWAGEN_HUB_ID = "g3-iconic";
+export const FUSION_HUB_ID = "rolls-royce-fusion";
 
 export const GWAGEN_EDITION_ORDER = [
   "g3-iconic-black",
-  "g3-iconic-gold",
   "g3-iconic-grey",
+  "g3-iconic-gold",
 ] as const;
+
+export const FUSION_EDITION_ORDER = [
+  "fusion-crimson",
+  "fusion-turquoise",
+  "fusion-azure",
+  "fusion-arctic",
+  "fusion-amethyst",
+] as const;
+
+export const STATIC_FAMILY_SLUGS = new Set<string>([
+  GWAGEN_HUB_ID,
+  FUSION_HUB_ID,
+  ...GWAGEN_EDITION_ORDER,
+  ...FUSION_EDITION_ORDER,
+]);
 
 export function projectKey(project: { id: string; slug?: string }) {
   return project.slug ?? project.id;
@@ -89,26 +115,52 @@ export function isGWagenHubId(id: string) {
   return id === GWAGEN_HUB_ID;
 }
 
-export function isGWagenEditionId(id: string) {
-  return (GWAGEN_EDITION_ORDER as readonly string[]).includes(id);
+export function isFusionHubId(id: string) {
+  return id === FUSION_HUB_ID;
+}
+
+export function isHubProject(project: { id: string; slug?: string; isHub?: boolean }) {
+  const id = projectKey(project);
+  return Boolean(project.isHub) || isGWagenHubId(id) || isFusionHubId(id);
+}
+
+export function getEditionsOf<T extends { id: string; slug?: string; editionOf?: string }>(
+  hubId: string,
+  projects: T[]
+): T[] {
+  const order =
+    hubId === GWAGEN_HUB_ID
+      ? GWAGEN_EDITION_ORDER
+      : hubId === FUSION_HUB_ID
+        ? FUSION_EDITION_ORDER
+        : null;
+  const map = new Map(projects.map((p) => [projectKey(p), p]));
+  if (order) {
+    return order.map((id) => map.get(id)).filter((p): p is T => Boolean(p));
+  }
+  return projects.filter((p) => p.editionOf === hubId);
 }
 
 export function getGWagenEditionsFrom<T extends { id: string; slug?: string }>(projects: T[]): T[] {
+  return getEditionsOf(GWAGEN_HUB_ID, projects);
+}
+
+export function getLatestAdditionHubs<T extends { id: string; slug?: string }>(projects: T[]): T[] {
   const map = new Map(projects.map((p) => [projectKey(p), p]));
-  return GWAGEN_EDITION_ORDER.map((id) => map.get(id)).filter((p): p is T => Boolean(p));
+  return [GWAGEN_HUB_ID, FUSION_HUB_ID].map((id) => map.get(id)).filter((p): p is T => Boolean(p));
 }
 
 export function getListingProjects<T extends { id: string; slug?: string; editionOf?: string }>(
   projects: T[]
 ): T[] {
-  return projects.filter((p) => !isGWagenEditionId(projectKey(p)) && !p.editionOf);
+  return projects.filter((p) => !p.editionOf);
 }
 
 export const projects: Project[] = [
   {
     id: "g3-iconic",
-    title: "G3.0 M Monogram ICONIC",
-    subtitle: "G-Class",
+    title: "G-Wagen",
+    subtitle: "Black Edition",
     year: "2024",
     duration: "12 weeks",
     package: "Ultra-Limited",
@@ -142,23 +194,25 @@ export const projects: Project[] = [
     coverImage: g3Black,
     images: [
       { src: g3Black, title: "Front three-quarter" },
-      { src: g3BlackAlt, title: "Stealth front view" },
-      { src: greyStudio, title: "Studio high angle" },
-      { src: greyRear, title: "Rear three-quarter" },
+      { src: g3BlackAlt, title: "Stealth studio three-quarter" },
+      { src: g3BlackOverhead, title: "Overhead" },
+      { src: g3BlackHood, title: "Hood overhead" },
+      { src: g3BlackSide, title: "Side profile" },
+      { src: g3BlackRear, title: "Rear three-quarter" },
     ],
     description: "Black Edition — a pure dark signature. Discreet, aggressive and uncompromising, with a commanding collector-level presence.",
     modifications: [
       "M Monogram exterior identity package",
-      "Gloss black body with chrome grille",
+      "Full stealth black-out: grille, trim and wheels",
       "Illuminated star air intakes",
-      "24'' forged turbine wheels",
+      "24'' forged black turbine wheels",
     ],
     specs: {
-      exterior: "Obsidian Black",
+      exterior: "Obsidian Black stealth",
       interior: "Black Nappa",
       carbon: "Gloss black carbon",
       spoilers: "Integrated roof spoiler",
-      wheels: "24'' Forged chrome turbine",
+      wheels: "24'' Forged black turbine",
       aeroKit: "M Monogram ICONIC bodykit",
     },
   },
@@ -244,10 +298,71 @@ export const projects: Project[] = [
     duration: "12 weeks",
     package: "Full",
     category: "Bespoke Concept",
-    coverImage: fusionCover,
+    coverImage: fusionCrimsonStudio,
+    isHub: true,
+    images: [{ src: fusionCrimsonStudio, title: "Crimson edition" }],
+    description: "The Fusion is a modern luxury statement in exclusive colourways — Crimson, Turquoise, Azure, Arctic and Amethyst.",
+    modifications: [
+      "Bespoke exterior design elements",
+      "Sculpted signature grille",
+      "Handcrafted open-top interior",
+      "Five exclusive colour editions",
+    ],
+    specs: {
+      exterior: "Five exclusive finishes",
+      interior: "Bespoke handcrafted leather",
+      carbon: "Carbon fiber hood accents",
+      spoilers: "Integrated rear diffuser",
+      wheels: "22'' Forged dark finish",
+      aeroKit: "Custom open-top conversion",
+    },
+  },
+  {
+    id: "fusion-crimson",
+    editionOf: "rolls-royce-fusion",
+    title: "Crimson",
+    subtitle: "The Fusion",
+    year: "2024",
+    duration: "12 weeks",
+    package: "Full",
+    category: "Bespoke Concept",
+    coverImage: fusionCrimsonStudio,
     images: [
-      { src: fusionCover, title: "Front three-quarter" },
-      { src: fusion01, title: "Front three-quarter alt" },
+      { src: fusionCrimsonStudio, title: "Studio front three-quarter" },
+      { src: fusionCover, title: "Studio front three-quarter alt" },
+      { src: img6708, title: "Street front three-quarter" },
+      { src: img6694, title: "Side profile" },
+      { src: img6700, title: "Rear three-quarter" },
+    ],
+    description: "Crimson Edition — a deep ruby-red body with a black hood. A bold, nocturnal presence for the open-top Fusion.",
+    modifications: [
+      "Bespoke crimson metallic body",
+      "Gloss black hood and lower body",
+      "Sculpted signature grille",
+      "Handcrafted open-top cabin",
+    ],
+    specs: {
+      exterior: "Crimson metallic with black hood",
+      interior: "Burgundy leather",
+      carbon: "Carbon fiber hood accents",
+      spoilers: "Integrated rear diffuser",
+      wheels: "22'' Forged dark finish",
+      aeroKit: "Custom open-top conversion",
+    },
+  },
+  {
+    id: "fusion-turquoise",
+    editionOf: "rolls-royce-fusion",
+    title: "Turquoise",
+    subtitle: "The Fusion",
+    year: "2024",
+    duration: "12 weeks",
+    package: "Full",
+    category: "Bespoke Concept",
+    coverImage: fusion01,
+    images: [
+      { src: fusion01, title: "Front three-quarter" },
+      { src: fusionTurquoiseStudio, title: "Studio front three-quarter" },
       { src: fusion02, title: "Front side profile" },
       { src: fusion03, title: "Front passenger side" },
       { src: fusion04, title: "Side profile" },
@@ -256,41 +371,145 @@ export const projects: Project[] = [
       { src: fusion07, title: "Rear view" },
       { src: fusion08, title: "Top view" },
       { src: fusion09, title: "Interior overhead" },
-      // Colour studies — Crimson
-      { src: img6708, title: "Crimson — front three-quarter" },
-      { src: img6694, title: "Crimson — side profile" },
-      { src: img6700, title: "Crimson — rear three-quarter" },
-      // Colour studies — Bronze
-      { src: img6701, title: "Bronze — front three-quarter" },
-      { src: img6698, title: "Bronze — overhead" },
-      { src: img6699, title: "Bronze — rear three-quarter" },
-      // Colour studies — Azure
-      { src: img6697, title: "Azure — front three-quarter" },
-      { src: img6705, title: "Azure — side profile" },
-      { src: img6695, title: "Azure — rear overhead" },
-      // Colour studies — Arctic White
-      { src: img6696, title: "Arctic White — overhead" },
-      { src: img6706, title: "Arctic White — overhead alt" },
-      // Colour studies — Amethyst
-      { src: img6703, title: "Amethyst — side profile" },
-      { src: img6704, title: "Amethyst — overhead" },
-      // Interiors
-      { src: img6702, title: "Cabin — blue leather" },
-      { src: img6707, title: "Cabin — tan leather" },
-
     ],
-    description: "The Fusion is a modern luxury statement, blending timeless elegance with bold contemporary design. Featuring bespoke exterior elements, a sculpted grille, and a handcrafted open-top interior. A seamless fusion of power, refinement, and future vision.",
+    description: "Turquoise Edition — a deep teal body with a matte black hood. The signature studio colourway of The Fusion.",
     modifications: [
-      "Bespoke exterior design elements",
+      "Bespoke turquoise metallic body",
+      "Matte black hood",
       "Sculpted signature grille",
       "Handcrafted open-top interior",
-      "Custom Navy Blue metallic finish",
-      "Exclusive white leather interior",
       "22'' forged wheels with dark finish",
     ],
     specs: {
-      exterior: "Navy Blue Metallic Bespoke",
-      interior: "Arctic White handcrafted leather",
+      exterior: "Turquoise metallic with black hood",
+      interior: "White / grey leather",
+      carbon: "Carbon fiber hood accents",
+      spoilers: "Integrated rear diffuser",
+      wheels: "22'' Forged dark finish",
+      aeroKit: "Custom open-top conversion",
+    },
+  },
+  {
+    id: "fusion-bronze",
+    editionOf: "rolls-royce-fusion",
+    title: "Fusion Bronze",
+    subtitle: "The Fusion",
+    year: "2024",
+    duration: "12 weeks",
+    package: "Full",
+    category: "Bespoke Concept",
+    coverImage: img6701,
+    images: [
+      { src: img6701, title: "Front three-quarter" },
+      { src: img6698, title: "Overhead" },
+      { src: img6699, title: "Rear three-quarter" },
+    ],
+    description: "Bronze Edition — warm metallic bronze and champagne, with a yacht-inspired teak rear deck.",
+    modifications: [
+      "Bespoke bronze metallic body",
+      "Champagne hood contrast",
+      "Teak rear deck",
+      "Handcrafted cognac cabin",
+    ],
+    specs: {
+      exterior: "Bronze metallic with champagne hood",
+      interior: "Cognac and cream leather",
+      carbon: "Carbon fiber hood accents",
+      spoilers: "Integrated rear diffuser",
+      wheels: "22'' Forged dark finish",
+      aeroKit: "Custom open-top conversion",
+    },
+  },
+  {
+    id: "fusion-azure",
+    editionOf: "rolls-royce-fusion",
+    title: "Azure",
+    subtitle: "The Fusion",
+    year: "2024",
+    duration: "12 weeks",
+    package: "Full",
+    category: "Bespoke Concept",
+    coverImage: fusionAzureStudio,
+    images: [
+      { src: fusionAzureStudio, title: "Studio front three-quarter" },
+      { src: img6697, title: "Front three-quarter" },
+      { src: img6705, title: "Side profile" },
+      { src: img6695, title: "Rear overhead" },
+      { src: img6702, title: "Cabin — blue leather" },
+    ],
+    description: "Azure Edition — a cool cornflower-blue body with a black hood and a matching blue cabin.",
+    modifications: [
+      "Bespoke azure metallic body",
+      "Gloss black hood",
+      "Blue leather cabin",
+      "Sculpted signature grille",
+    ],
+    specs: {
+      exterior: "Azure metallic with black hood",
+      interior: "Cornflower blue and grey leather",
+      carbon: "Carbon fiber hood accents",
+      spoilers: "Integrated rear diffuser",
+      wheels: "22'' Forged dark finish",
+      aeroKit: "Custom open-top conversion",
+    },
+  },
+  {
+    id: "fusion-arctic",
+    editionOf: "rolls-royce-fusion",
+    title: "Arctic",
+    subtitle: "The Fusion",
+    year: "2024",
+    duration: "12 weeks",
+    package: "Full",
+    category: "Bespoke Concept",
+    coverImage: fusionArcticStudio,
+    images: [
+      { src: fusionArcticStudio, title: "Studio front three-quarter" },
+      { src: img6696, title: "Overhead" },
+      { src: img6706, title: "Overhead alt" },
+      { src: img6707, title: "Cabin — tan leather" },
+    ],
+    description: "Arctic Edition — pearlescent silver-white with a black hood and a white / saddle-brown cabin.",
+    modifications: [
+      "Bespoke arctic white metallic body",
+      "Gloss black hood",
+      "Teak rear deck",
+      "White and tan leather cabin",
+    ],
+    specs: {
+      exterior: "Arctic white with black hood",
+      interior: "Arctic white and saddle-brown leather",
+      carbon: "Carbon fiber hood accents",
+      spoilers: "Integrated rear diffuser",
+      wheels: "22'' Forged dark finish",
+      aeroKit: "Custom open-top conversion",
+    },
+  },
+  {
+    id: "fusion-amethyst",
+    editionOf: "rolls-royce-fusion",
+    title: "Amethyst",
+    subtitle: "The Fusion",
+    year: "2024",
+    duration: "12 weeks",
+    package: "Full",
+    category: "Bespoke Concept",
+    coverImage: fusionAmethystStudio,
+    images: [
+      { src: fusionAmethystStudio, title: "Studio front three-quarter" },
+      { src: img6703, title: "Side profile" },
+      { src: img6704, title: "Overhead" },
+    ],
+    description: "Amethyst Edition — a muted plum body with a yacht deck and a cream-and-purple cabin.",
+    modifications: [
+      "Bespoke amethyst metallic body",
+      "Teak rear deck",
+      "Cream and plum leather cabin",
+      "Sculpted signature grille",
+    ],
+    specs: {
+      exterior: "Amethyst metallic",
+      interior: "Cream and plum leather",
       carbon: "Carbon fiber hood accents",
       spoilers: "Integrated rear diffuser",
       wheels: "22'' Forged dark finish",

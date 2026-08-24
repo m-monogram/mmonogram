@@ -7,6 +7,7 @@ import { BlurText } from"@/components/ui/blur-text";
 import { useNavigation } from"@/hooks/useNavigation";
 import { CardContainer, CardBody, CardItem } from"@/components/ui/3d-card";
 import { useLanguage } from"@/contexts/LanguageContext";
+import MediaEdgeFade from"@/components/MediaEdgeFade";
 interface ModificationDetailProps {
   category: ModificationCategory;
   onClose: () => void;
@@ -104,7 +105,8 @@ const ModificationDetail = ({
         </div>
         
         {/* Clean gradient overlay - bottom only */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+        <MediaEdgeFade edges="both" />
         
         {/* Back Button - Inside hero, positioned below header */}
         <div className="absolute top-24 sm:top-28 left-4 sm:left-6 md:left-12 z-20">

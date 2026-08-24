@@ -6,6 +6,8 @@ interface LazyOnVisibleProps {
   minHeight?: string;
   /** Root margin for the IntersectionObserver */
   rootMargin?: string;
+  /** Render immediately (e.g. when scrolling to this section from another page) */
+  force?: boolean;
 }
 
 /**
@@ -16,9 +18,14 @@ const LazyOnVisible = ({
   children,
   minHeight = "400px",
   rootMargin = "600px",
+  force = false,
 }: LazyOnVisibleProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(force);
+
+  useEffect(() => {
+    if (force) setVisible(true);
+  }, [force]);
 
   useEffect(() => {
     if (visible) return;

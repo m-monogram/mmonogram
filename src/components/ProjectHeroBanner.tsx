@@ -2,6 +2,7 @@ import { memo, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { DBProject } from "@/hooks/useProjects";
+import MediaEdgeFade from "@/components/MediaEdgeFade";
 
 interface ProjectHeroBannerProps {
   project: DBProject;
@@ -65,8 +66,9 @@ const ProjectHeroBanner = memo(({
         </div>
 
         {/* Premium gradient overlays - luxury aesthetic */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-transparent to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/15 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-black/20" />
+        <MediaEdgeFade edges="bottom" />
         {/* Subtle vignette for focus */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.3)_100%)] pointer-events-none" />
 

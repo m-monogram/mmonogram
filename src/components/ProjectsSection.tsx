@@ -130,8 +130,6 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
 
         {/* Projects Carousel */}
         <LatestAdditionsCarousel
-          variant="dark"
-          skipAurora
           onProjectClick={onProjectClick}
           className="pt-8 sm:pt-12"
         />

@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import NewsCard from "@/components/news/NewsCard";
+import MediaEdgeFade from "@/components/MediaEdgeFade";
 import { getAllNews, NewsCategory } from "@/data/news";
 import { useLanguage } from "@/contexts/LanguageContext";
 import heroBg from "@/assets/hero-main-new.webp";
@@ -74,7 +75,8 @@ const NewsPage = () => {
           decoding="async"
           className="absolute inset-0 w-full h-full object-cover object-[center_45%]"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-premium-black" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-transparent" />
+        <MediaEdgeFade edges="bottom" />
         <div className="relative z-10 h-full flex flex-col justify-end pb-12 sm:pb-16 px-4 sm:px-8 lg:px-12 max-w-[1600px] mx-auto">
           <motion.button
             type="button"

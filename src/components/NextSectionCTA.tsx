@@ -2,6 +2,7 @@ import { memo } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import MediaEdgeFade from "@/components/MediaEdgeFade";
 
 interface NextSectionCTAProps {
   label: string;
@@ -42,7 +43,7 @@ const NextSectionCTA = memo(({
             />
           </div>
           <div className="absolute inset-0 bg-black/40 z-0" />
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/80 to-transparent z-0" />
+          <MediaEdgeFade edges="both" />
         </>
       )}
 

@@ -14,8 +14,9 @@ import { PillarsCarousel } from "@/components/PillarsCarousel";
 const ProjectModal = lazy(() => import("@/components/ProjectModal"));
 import NextSectionCTA from "@/components/NextSectionCTA";
 import LatestAdditionsCarousel from "@/components/sections/latest-additions-carousel";
+import MediaEdgeFade, { mediaFadeMask } from "@/components/MediaEdgeFade";
 import { useProjects, DBProject } from "@/hooks/useProjects";
-import { getGWagenEditionsFrom } from "@/data/projects";
+import { getListingProjects } from "@/data/projects";
 
 // Hero video configuration
 const BRAND_HERO_VIDEO = "/videos/brand-hero-video.mp4";
@@ -46,8 +47,8 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
     });
   }, []);
 
-  const editions = useMemo(() => getGWagenEditionsFrom(projects), [projects]);
-  const pillarProjectMapping = editions;
+  const listing = useMemo(() => getListingProjects(projects), [projects]);
+  const pillarProjectMapping = listing;
   const handlePillarClick = useCallback((index: number) => {
     const project = pillarProjectMapping[index];
     if (project) {
@@ -94,11 +95,12 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
   return <div ref={ref} className="min-h-screen relative z-10 luxury-bg">
 
     {/* Hero Section with Video - Compact Letterbox */}
-    <section className="w-full bg-premium-black pt-20 sm:pt-24 md:pt-28 lg:pt-32 pb-6 sm:pb-8 md:pb-10 lg:pb-12">
+    <section className="w-full bg-premium-black pt-20 sm:pt-24 md:pt-28 lg:pt-32 pb-0">
       {/* Video Container - Wider Aspect Ratio */}
       <div className="relative w-full aspect-[16/9] sm:aspect-[16/8] md:aspect-[21/9] lg:aspect-[21/9] overflow-hidden">
         <video src={BRAND_HERO_VIDEO} autoPlay loop muted playsInline preload="metadata" className="w-full h-full object-cover" style={{
-          objectPosition: "center center"
+          objectPosition: "center center",
+          ...mediaFadeMask,
         }} onError={e => {
           // Fallback: if video fails to load, show image
           const target = e.currentTarget;
@@ -112,6 +114,7 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
             parent.appendChild(img);
           }
         }} />
+        <MediaEdgeFade edges="bottom" />
       </div>
     </section>
 
@@ -296,20 +299,8 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
     </section>
 
     {/* Latest Additions - Projects Section with Emphasis */}
-    <section id="projects-section" className="py-12 sm:py-16 bg-background">
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-10">
-        {/* Section Header with emphasis */}
-        <div className="mb-4 sm:mb-6">
-
-        </div>
-      </div>
-
-      <LatestAdditionsCarousel
-        layout="editions"
-        variant="light"
-        onProjectClick={handleProjectClick}
-        className="pt-0 pb-0"
-      />
+    <section id="projects-section" className="bg-white">
+      <LatestAdditionsCarousel onProjectClick={handleProjectClick} />
     </section>
 
     {/* Next Section CTA: Modifications (Commission) */}

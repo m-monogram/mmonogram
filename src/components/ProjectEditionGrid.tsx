@@ -7,6 +7,7 @@ export interface ProjectEditionGridProps {
   projects: DBProject[];
   onProjectClick?: (projectId: string) => void;
   className?: string;
+  columns?: 2 | 3;
 }
 
 const EditionCard = memo(function EditionCard({
@@ -28,7 +29,7 @@ const EditionCard = memo(function EditionCard({
       viewport={{ once: true }}
       transition={{ duration: 0.45, delay: index * 0.08 }}
       onClick={onClick}
-      className="group w-full text-center cursor-pointer bg-transparent border-0 p-0"
+      className="group w-full text-center cursor-pointer bg-white border-0 p-0"
     >
       <div className="relative w-full overflow-hidden bg-neutral-200 aspect-[5/4]">
         {!loaded && <div className="absolute inset-0 animate-pulse bg-neutral-100" />}
@@ -45,7 +46,7 @@ const EditionCard = memo(function EditionCard({
           )}
         />
       </div>
-      <p className="mt-4 sm:mt-5 font-display text-[11px] sm:text-sm md:text-base font-bold uppercase tracking-[0.14em] text-black">
+      <p className="mt-4 sm:mt-5 font-display text-[11px] sm:text-sm md:text-base font-bold uppercase tracking-[0.16em] text-black">
         {project.title}
       </p>
     </motion.button>
@@ -56,9 +57,16 @@ const ProjectEditionGrid = memo(function ProjectEditionGrid({
   projects,
   onProjectClick,
   className,
+  columns = 3,
 }: ProjectEditionGridProps) {
   return (
-    <div className={cn("grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6 lg:gap-10", className)}>
+    <div
+      className={cn(
+        "grid grid-cols-1 gap-8 sm:gap-6 lg:gap-10",
+        columns === 2 ? "sm:grid-cols-2 max-w-[1100px] mx-auto" : "sm:grid-cols-3",
+        className
+      )}
+    >
       {projects.map((project, index) => (
         <EditionCard
           key={project.slug || project.id}

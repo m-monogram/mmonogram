@@ -5,6 +5,7 @@ import logoMmonogram from "@/assets/logo-mmonogram.webp";
 import ScrollReveal from "./ScrollReveal";
 
 import { useLanguage } from "@/contexts/LanguageContext";
+import { navigateToRepresentatives } from "@/lib/representativesNav";
 
 interface FooterProps {
   setCurrentView?: (view: string) => void;
@@ -24,16 +25,14 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
     { labelKey: "nav.projects", view: "projects" },
     { labelKey: "nav.modifications", view: "modifications" },
     { labelKey: "nav.brand", view: "brand" },
+    { labelKey: "nav.representatives", view: "representatives" },
     { labelKey: "nav.press", view: "press" },
     { labelKey: "nav.contact", view: "contact" },
   ];
 
   const handleNavClick = (view: string) => {
     if (view === "representatives") {
-      navigate("/");
-      setTimeout(() => {
-        document.getElementById("representatives")?.scrollIntoView({ behavior: "smooth" });
-      }, 50);
+      navigateToRepresentatives(navigate);
       return;
     }
     if (propSetCurrentView) {
@@ -63,8 +62,18 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
       <div className="relative z-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 md:py-8">
           {/* Top: Logo + CTA */}
-          <ScrollReveal className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 pb-6 border-b border-white/10">
-            <img src={logoMmonogram} alt="M-Monogram" className="h-9 w-auto" loading="lazy" decoding="async" />
+          <ScrollReveal className="flex flex-col items-start md:flex-row md:items-center md:justify-between gap-4 mb-6 pb-6 border-b border-white/10">
+            <div className="h-10 sm:h-11 w-[10.6rem] sm:w-[11.7rem] max-w-full shrink-0 self-start">
+              <img
+                src={logoMmonogram}
+                alt="M-Monogram"
+                width={900}
+                height={212}
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-contain object-left"
+              />
+            </div>
             <motion.button
               onClick={() => handleNavClick("contact")}
               whileHover={{ scale: 1.02 }}

@@ -2,12 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import {
   projects as staticProjects,
-  GWAGEN_HUB_ID,
-  GWAGEN_EDITION_ORDER,
+  STATIC_FAMILY_SLUGS,
 } from '@/data/projects';
 import { mediaUrl } from '@/lib/mediaUrl';
-
-const GWAGEN_SLUGS = new Set<string>([GWAGEN_HUB_ID, ...GWAGEN_EDITION_ORDER]);
 
 export interface DBProject {
   id: string;
@@ -110,11 +107,11 @@ export function useProjects(includeUnpublished = false) {
       })),
     }));
 
-    // G-Wagen family always comes from static data (black hub + 3 editions)
-    const fromDb = dbResult.filter((p) => !GWAGEN_SLUGS.has(p.slug));
+    // G-Wagen and Fusion families always come from static data (hubs + editions)
+    const fromDb = dbResult.filter((p) => !STATIC_FAMILY_SLUGS.has(p.slug));
     const dbSlugs = new Set(fromDb.map((p) => p.slug));
-    const gwagen = fallbackProjects.filter((p) => GWAGEN_SLUGS.has(p.slug));
-    const extras = fallbackProjects.filter((p) => !GWAGEN_SLUGS.has(p.slug) && !dbSlugs.has(p.slug));
+    const gwagen = fallbackProjects.filter((p) => STATIC_FAMILY_SLUGS.has(p.slug));
+    const extras = fallbackProjects.filter((p) => !STATIC_FAMILY_SLUGS.has(p.slug) && !dbSlugs.has(p.slug));
 
     setProjects([...gwagen, ...fromDb, ...extras]);
     } catch {

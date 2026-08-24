@@ -5,6 +5,7 @@ import { AuroraBackground } from "@/components/ui/aurora-background";
 import { useNavigation } from "@/hooks/useNavigation";
 import heroImage from "@/assets/hero-main-new.webp";
 import heroImageMobile from "@/assets/hero-main-mobile.webp";
+import MediaEdgeFade, { mediaFadeMask } from "@/components/MediaEdgeFade";
 
 interface HeroSectionProps {
   setCurrentView?: (view: string) => void;
@@ -62,12 +63,13 @@ const HeroSection = memo(({ setCurrentView }: HeroSectionProps) => {
               className={`w-full h-full object-cover transition-opacity duration-300 ${
                 imageLoaded ? "opacity-100" : "opacity-0"
               }`}
-              style={{ objectPosition: imagePosition }}
+              style={{ objectPosition: imagePosition, ...mediaFadeMask }}
             />
           </picture>
 
           {/* Gradient overlay - адаптивный */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent md:from-black md:via-black/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent md:from-black/25" />
+          <MediaEdgeFade edges="bottom" />
         </div>
 
         {/* Buttons - подняты выше на мобильных для видимости без скролла */}

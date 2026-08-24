@@ -27,6 +27,7 @@ import {
   representatives,
 } from "@/data/representatives";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { navigateToRepresentatives } from "@/lib/representativesNav";
 
 const formatCoord = (value: number, posLabel: string, negLabel: string) => {
   const abs = Math.abs(value);
@@ -64,10 +65,7 @@ const RepresentativeDetailPage = () => {
   const [copied, setCopied] = useState(false);
 
   const goBackToMap = () => {
-    navigate("/");
-    setTimeout(() => {
-      document.getElementById("representatives")?.scrollIntoView({ behavior: "smooth" });
-    }, 50);
+    navigateToRepresentatives(navigate);
   };
 
   const tz = rep ? getRepresentativeTimezone(rep) : "UTC";
@@ -91,7 +89,7 @@ const RepresentativeDetailPage = () => {
     );
   }
 
-  const others = representatives.filter((r) => r.id !== rep.id && r.region === rep.region).slice(0, 3);
+  const others = representatives.filter((r) => r.id !== rep.id).slice(0, 3);
   const socials = getRepresentativeSocials(rep);
 
   const [lng, lat] = rep.coordinates;
@@ -378,6 +376,7 @@ const RepresentativeDetailPage = () => {
                   </a>
                 )}
                 <button
+                  type="button"
                   onClick={() => navigate("/contact")}
                   className="group relative w-full inline-flex items-center justify-center gap-2 bg-foreground text-background hover:bg-foreground/90 px-6 py-4 text-[11px] tracking-[0.3em] uppercase transition-all overflow-hidden"
                 >
@@ -398,7 +397,7 @@ const RepresentativeDetailPage = () => {
                   {t("representatives.continueExploring")}
                 </span>
                 <h3 className="h-display-3 mt-2 uppercase">
-                  {t("representatives.alsoIn")} {rep.region}
+                  {t("representatives.otherLocations")}
                 </h3>
               </div>
             </div>
@@ -409,7 +408,7 @@ const RepresentativeDetailPage = () => {
                   type="button"
                   onClick={() => {
                     navigate(`/representatives/${o.id}`);
-                    window.scrollTo({ top: 0, behavior: "instant" });
+                    window.scrollTo({ top: 0, behavior: "auto" });
                   }}
                   className="group relative text-left bg-slate-900/30 backdrop-blur-xl border border-white/10 hover:border-white/30 p-5 sm:p-6 transition-all duration-300"
                   style={{ boxShadow: "inset 0 0 30px rgba(255,255,255,0.02)" }}

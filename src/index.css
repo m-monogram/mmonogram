@@ -54,7 +54,7 @@
        2. ЦВЕТ И КОНТРАСТ (Colors)
        Решаем проблему "плохо читается на черном"
     ========================================= */
-    --color-bg-main: #0a0a0a; /* Глубокий, богатый черный цвет */
+    --color-bg-main: #000000;
     --color-text-primary: #f5f5f5; /* Мягкий белый (не 100% белый, чтобы не резало глаза) */
     --color-text-secondary: #a0a0a0; /* Светло-серый, но с достаточным контрастом */
     --color-border: #333333; /* Тонкие, еле заметные линии разделителей */
@@ -93,10 +93,10 @@
     --space-xl: 8rem;    /* 128px: Огромные отступы между большими разделами сайта */
 
     /* M-MONOGRAM Ultra Premium Black Design System - UNIFIED Base Compatibility */
-    --background: 0 0% 4%; /* Matches #0a0a0a */
+    --background: 0 0% 0%;
     --foreground: 0 0% 96%; /* Matches #f5f5f5 */
 
-    --card: 0 0% 4%;
+    --card: 0 0% 0%;
     --card-foreground: 0 0% 100%;
 
     --popover: 0 0% 3%;

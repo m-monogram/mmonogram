@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import NewsContentRenderer from "@/components/news/NewsContentRenderer";
+import MediaEdgeFade from "@/components/MediaEdgeFade";
 import NewsCard from "@/components/news/NewsCard";
 import { getNewsBySlug, getRelatedNews } from "@/data/news";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -170,9 +171,7 @@ const NewsDetailPage = () => {
               decoding="async"
               className="absolute inset-0 w-full h-full object-cover object-center"
             />
-            {/* Soft top fade for header legibility + strong bottom fade into page */}
-            <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-premium-black via-premium-black/70 to-transparent" />
+            <MediaEdgeFade edges="both" />
           </section>
 
           {/* Editorial title block — sits BELOW the image, no overlap */}

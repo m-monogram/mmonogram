@@ -25,12 +25,12 @@ const LoadingScreen = memo(({ onComplete }: LoadingScreenProps) => {
       <img
         src={logoMmonogram}
         alt="M-Monogram"
-        width={400}
-        height={400}
+        width={900}
+        height={212}
         loading="eager"
         decoding="sync"
         fetchPriority="high"
-        className="w-64 sm:w-80 md:w-96 lg:w-[28rem] max-w-[78vw] opacity-95 animate-logo-pulse will-change-[opacity,transform]"
+        className="w-64 sm:w-80 md:w-96 lg:w-[28rem] max-w-[78vw] h-auto object-contain opacity-95 animate-logo-pulse will-change-[opacity,transform]"
       />
     </motion.div>
   );

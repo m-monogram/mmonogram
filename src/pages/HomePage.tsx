@@ -11,6 +11,7 @@ import SEOHead from "@/components/SEOHead";
 import LazyOnVisible from "@/components/LazyOnVisible";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { REPRESENTATIVES_SECTION_ID } from "@/lib/representativesNav";
 
 // Lazy load below-the-fold sections for faster initial render
 const ParticleBackground = lazy(() => import("@/components/ParticleBackground"));
@@ -21,28 +22,61 @@ const RepresentativesMapSection = lazy(() => import("@/components/sections/Repre
 const NewsHighlightSection = lazy(() => import("@/components/sections/NewsHighlightSection"));
 const Footer = lazy(() => import("@/components/Footer"));
 
+const wantsRepresentatives = (state: unknown) =>
+  !!state &&
+  typeof state === "object" &&
+  "scrollTo" in state &&
+  (state as { scrollTo?: string }).scrollTo === REPRESENTATIVES_SECTION_ID;
+
 const HomePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLanguage();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => {
+    try {
+      return !sessionStorage.getItem("hasVisited");
+    } catch {
+      return true;
+    }
+  });
+  const scrollToRepresentatives = wantsRepresentatives(location.state);
 
   // Only show loading screen on initial page load (not on navigation)
   useEffect(() => {
-    const hasVisited = sessionStorage.getItem('hasVisited');
-    if (hasVisited) {
-      setIsLoading(false);
-    } else {
-      sessionStorage.setItem('hasVisited', 'true');
+    try {
+      if (!sessionStorage.getItem("hasVisited")) {
+        sessionStorage.setItem("hasVisited", "true");
+      }
+    } catch {
+      /* private mode */
     }
   }, []);
 
   useEffect(() => {
-    // Reset loading when navigating to home from other pages
-    if (location.pathname === "/" && !isLoading) {
-      setIsLoading(false);
-    }
-  }, [location.pathname, isLoading]);
+    if (!scrollToRepresentatives || isLoading) return;
+
+    let cancelled = false;
+    let attempts = 0;
+    let retry: number | undefined;
+
+    const tryScroll = () => {
+      if (cancelled) return;
+      const el = document.getElementById(REPRESENTATIVES_SECTION_ID);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        navigate("/", { replace: true, state: {} });
+        return;
+      }
+      attempts += 1;
+      if (attempts < 25) retry = window.setTimeout(tryScroll, 80);
+    };
+    const timer = window.setTimeout(tryScroll, 40);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      if (retry !== undefined) window.clearTimeout(retry);
+    };
+  }, [isLoading, scrollToRepresentatives, navigate]);
 
   const handleLoadingComplete = useCallback(() => {
     setIsLoading(false);
@@ -108,8 +142,6 @@ const HomePage = () => {
           <Suspense fallback={null}>
             <LatestAdditionsCarousel
               onProjectClick={handleProjectClick}
-              layout="editions"
-              variant="light"
             />
           </Suspense>
           <BrandStrip />
@@ -117,11 +149,13 @@ const HomePage = () => {
             <StatsSection />
           </Suspense>
 
-          <Suspense fallback={null}>
-            <LazyOnVisible minHeight="600px" rootMargin="400px">
-              <RepresentativesMapSection />
-            </LazyOnVisible>
-          </Suspense>
+          <div id={REPRESENTATIVES_SECTION_ID} className="scroll-mt-24 md:scroll-mt-28">
+            <Suspense fallback={<div className="min-h-[720px] bg-premium-black" />}>
+              <LazyOnVisible minHeight="720px" rootMargin="500px" force={scrollToRepresentatives}>
+                <RepresentativesMapSection />
+              </LazyOnVisible>
+            </Suspense>
+          </div>
           <NextSectionCTA
             label={t("homeNextCta.label")}
             nextLabel={t("homeNextCta.next")}

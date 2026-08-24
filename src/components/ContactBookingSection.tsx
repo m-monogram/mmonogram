@@ -6,6 +6,7 @@ import { useNavigation } from "@/hooks/useNavigation";
 
 import { safeCall } from "@/lib/validation";
 import contactBuildingImage from "@/assets/menu/menu-contact-new.jpg.webp";
+import MediaEdgeFade, { mediaFadeMask } from "@/components/MediaEdgeFade";
 
 interface ContactBookingSectionProps {
   setCurrentView?: (view: string) => void;
@@ -152,18 +153,11 @@ const ContactBookingSection = memo(({ setCurrentView, prefilledModel }: ContactB
             fetchPriority="high"
             decoding="sync"
             className="w-full h-full object-cover brightness-110 contrast-110"
-            style={{ objectPosition: imagePosition }}
+            style={{ objectPosition: imagePosition, ...mediaFadeMask }}
           />
 
-          {/* Subtle gradient overlay - photo visible, text readable */}
-          <div 
-            className="absolute inset-0"
-            style={{
-              background: `
-                linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.12) 50%, rgba(0,0,0,0.35) 75%, rgba(0,0,0,0.65) 90%, rgba(0,0,0,0.8) 100%)
-              `
-            }}
-          />
+          {/* Fade photo into the black page */}
+          <MediaEdgeFade edges="both" />
 
         {/* Decorative Lines */}
         <div className="absolute inset-y-0 left-8 sm:left-16 w-px bg-white/10">
