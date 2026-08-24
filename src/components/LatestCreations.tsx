@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, memo, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useProjects } from "@/hooks/useProjects";
+import { getListingProjects } from "@/data/projects";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 
@@ -17,7 +18,7 @@ const LatestCreations = memo(({ onProjectClick }: LatestCreationsProps) => {
   const { t } = useLanguage();
   const { projects: dbProjects } = useProjects();
 
-  const carouselProjects = dbProjects.map((p) => ({
+  const carouselProjects = getListingProjects(dbProjects).map((p) => ({
     id: p.slug,
     title: p.title,
     subtitle: p.subtitle,
@@ -37,7 +38,7 @@ const LatestCreations = memo(({ onProjectClick }: LatestCreationsProps) => {
       if (next >= carouselProjects.length) next = 0;
       return next;
     });
-  }, []);
+  }, [carouselProjects.length]);
 
   // Auto-advance every 5s
   useEffect(() => {
@@ -86,7 +87,7 @@ const LatestCreations = memo(({ onProjectClick }: LatestCreationsProps) => {
           <div className="flex items-center justify-between mb-6">
             <div>
               <p className="font-body text-white/40 text-xs tracking-widest uppercase mb-2">[ OUR PROJECTS ]</p>
-              <h2 className="font-display text-2xl sm:text-3xl md:text-4xl tracking-widest text-white uppercase font-light">
+              <h2 className="font-display text-2xl sm:text-3xl md:text-4xl tracking-widest text-white uppercase font-bold">
                 LATEST CREATIONS
               </h2>
             </div>
@@ -143,7 +144,7 @@ const LatestCreations = memo(({ onProjectClick }: LatestCreationsProps) => {
                 <p className="font-body text-white/50 text-xs tracking-widest uppercase mb-1">
                   {currentProject.category}
                 </p>
-                <h3 className="font-display text-white text-xl sm:text-2xl tracking-widest uppercase font-light">
+                <h3 className="font-display text-white text-xl sm:text-2xl tracking-widest uppercase font-bold">
                   {currentProject.title}
                 </h3>
                 <p className="font-body text-white/70 text-sm sm:text-base mt-1">

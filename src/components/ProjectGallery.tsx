@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProjects, DBProject } from "@/hooks/useProjects";
+import { getListingProjects } from "@/data/projects";
 import ProjectCard from "./ProjectCard";
 import ProjectDetail from "./ProjectDetail";
 
@@ -9,6 +10,7 @@ const ProjectGallery = () => {
   const { t } = useLanguage();
   const { projects, loading } = useProjects();
   const [selectedProject, setSelectedProject] = useState<DBProject | null>(null);
+  const listing = getListingProjects(projects);
 
   return (
     <section className="min-h-screen py-24 sm:py-32 px-4 sm:px-6">
@@ -39,7 +41,7 @@ const ProjectGallery = () => {
 
         {/* Projects Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-          {projects.map((project, index) => (
+          {listing.map((project, index) => (
             <ProjectCard
               key={project.id}
               project={project}

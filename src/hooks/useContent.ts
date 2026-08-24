@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { defaultContent } from '@/lib/defaultContent';
 import { queryTable } from '@/lib/supabase-admin';
+import { rewriteMediaInValue } from '@/lib/mediaUrl';
 
 export function useContent(sectionId: string) {
   const [content, setContent] = useState<Record<string, unknown> | null>(null);
@@ -24,7 +25,7 @@ export function useContent(sectionId: string) {
           setContent(defaultContent[sectionId] ?? null);
           setIsVisible(true);
         } else {
-          setContent(data.content as Record<string, unknown>);
+          setContent(rewriteMediaInValue(data.content) as Record<string, unknown>);
           setIsVisible(data.is_visible ?? true);
         }
       } catch {
@@ -49,7 +50,7 @@ export function useContent(sectionId: string) {
       }, (payload: any) => {
         const row = payload.new;
         if (row?.content) {
-          setContent(row.content as Record<string, unknown>);
+          setContent(rewriteMediaInValue(row.content) as Record<string, unknown>);
           if ('is_visible' in row) {
             setIsVisible(row.is_visible as boolean);
           }

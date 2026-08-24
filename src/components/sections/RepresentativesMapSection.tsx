@@ -261,7 +261,7 @@ const RepresentativesMapSection = () => {
                     />
                   </div>
 
-                  <div className="font-display text-lg sm:text-xl tracking-widest uppercase text-foreground font-extralight leading-tight">
+                  <div className="font-display text-lg sm:text-xl tracking-widest uppercase text-foreground font-bold leading-tight">
                     {rep.city}
                   </div>
                   <div className="mt-1 text-[11px] sm:text-xs text-foreground/50 tracking-wide">

@@ -52,7 +52,7 @@ const AboutUsSection = () => {
           </motion.div>
 
           {/* Title */}
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-[0.15em] text-foreground uppercase font-extralight leading-[1.15] mb-8 max-w-3xl">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tight text-foreground uppercase font-bold leading-[1.05] mb-8 max-w-3xl">
             {t("about.titleShort")}
           </h2>
 
@@ -64,7 +64,7 @@ const AboutUsSection = () => {
           </div>
 
           {/* Tagline */}
-          <p className="font-body text-base sm:text-lg text-foreground/60 tracking-wide max-w-xl leading-relaxed font-light">
+          <p className="font-body text-base sm:text-lg text-foreground/60 tracking-normal max-w-xl leading-relaxed font-semibold">
             {t("about.tagline")}
           </p>
 

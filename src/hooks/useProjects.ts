@@ -1,33 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { projects as staticProjects } from '@/data/projects';
+import {
+  projects as staticProjects,
+  GWAGEN_HUB_ID,
+  GWAGEN_EDITION_ORDER,
+} from '@/data/projects';
+import { mediaUrl } from '@/lib/mediaUrl';
 
-const fallbackProjects: DBProject[] = staticProjects.map((p, idx) => ({
-  id: p.id,
-  slug: p.id,
-  title: p.title,
-  subtitle: p.subtitle,
-  year: p.year,
-  duration: p.duration,
-  package: p.package,
-  category: p.category,
-  cover_image: p.coverImage,
-  description: p.description,
-  modifications: p.modifications,
-  specs: p.specs as unknown as Record<string, string>,
-  video_url: p.videoUrl ?? null,
-  sort_order: idx,
-  is_published: true,
-  created_at: '',
-  updated_at: '',
-  images: p.images.map((img, i) => ({
-    id: `${p.id}-${i}`,
-    project_id: p.id,
-    src: img.src,
-    title: img.title,
-    sort_order: i,
-  })),
-}));
+const GWAGEN_SLUGS = new Set<string>([GWAGEN_HUB_ID, ...GWAGEN_EDITION_ORDER]);
 
 export interface DBProject {
   id: string;
@@ -48,6 +28,8 @@ export interface DBProject {
   created_at: string;
   updated_at: string;
   images?: DBProjectImage[];
+  isHub?: boolean;
+  editionOf?: string;
 }
 
 export interface DBProjectImage {
@@ -58,12 +40,42 @@ export interface DBProjectImage {
   sort_order: number;
 }
 
+const fallbackProjects: DBProject[] = staticProjects.map((p, idx) => ({
+  id: p.id,
+  slug: p.id,
+  title: p.title,
+  subtitle: p.subtitle,
+  year: p.year,
+  duration: p.duration,
+  package: p.package,
+  category: p.category,
+  cover_image: p.coverImage,
+  description: p.description,
+  modifications: p.modifications,
+  specs: p.specs as unknown as Record<string, string>,
+  video_url: p.videoUrl ?? null,
+  sort_order: idx,
+  is_published: true,
+  created_at: '',
+  updated_at: '',
+  isHub: p.isHub,
+  editionOf: p.editionOf,
+  images: p.images.map((img, i) => ({
+    id: `${p.id}-${i}`,
+    project_id: p.id,
+    src: img.src,
+    title: img.title,
+    sort_order: i,
+  })),
+}));
+
 export function useProjects(includeUnpublished = false) {
   const [projects, setProjects] = useState<DBProject[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchProjects = useCallback(async () => {
     setLoading(true);
+    try {
     // Use queryTable to bypass type restrictions
     const client = supabase as any;
     let query = client.from('projects').select('*').order('sort_order');
@@ -74,7 +86,6 @@ export function useProjects(includeUnpublished = false) {
     
     if (!projectsData?.length) {
       setProjects(fallbackProjects);
-      setLoading(false);
       return;
     }
 
@@ -92,16 +103,25 @@ export function useProjects(includeUnpublished = false) {
 
     const dbResult = (projectsData as DBProject[]).map(p => ({
       ...p,
-      images: imagesByProject[p.id] || [],
+      cover_image: mediaUrl(p.cover_image),
+      images: (imagesByProject[p.id] || []).map((img) => ({
+        ...img,
+        src: mediaUrl(img.src),
+      })),
     }));
 
-    // Merge static fallback projects (legacy/original) that are not in DB, by slug
-    const dbSlugs = new Set(dbResult.map(p => p.slug));
-    const extras = fallbackProjects.filter(p => !dbSlugs.has(p.slug));
+    // G-Wagen family always comes from static data (black hub + 3 editions)
+    const fromDb = dbResult.filter((p) => !GWAGEN_SLUGS.has(p.slug));
+    const dbSlugs = new Set(fromDb.map((p) => p.slug));
+    const gwagen = fallbackProjects.filter((p) => GWAGEN_SLUGS.has(p.slug));
+    const extras = fallbackProjects.filter((p) => !GWAGEN_SLUGS.has(p.slug) && !dbSlugs.has(p.slug));
 
-    setProjects([...dbResult, ...extras]);
-    setLoading(false);
-
+    setProjects([...gwagen, ...fromDb, ...extras]);
+    } catch {
+      setProjects(fallbackProjects);
+    } finally {
+      setLoading(false);
+    }
   }, [includeUnpublished]);
 
   useEffect(() => { fetchProjects(); }, [fetchProjects]);

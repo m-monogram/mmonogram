@@ -3,8 +3,8 @@ import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { useNavigation } from "@/hooks/useNavigation";
-import heroImageAsset from "@/assets/hero-main-new.webp.asset.json";
-import heroImageMobileAsset from "@/assets/hero-main-mobile.webp.asset.json";
+import heroImage from "@/assets/hero-main-new.webp";
+import heroImageMobile from "@/assets/hero-main-mobile.webp";
 
 interface HeroSectionProps {
   setCurrentView?: (view: string) => void;
@@ -52,9 +52,9 @@ const HeroSection = memo(({ setCurrentView }: HeroSectionProps) => {
         {/* Background Image */}
           <div className="absolute inset-0 z-0 bg-premium-black w-full">
           <picture>
-            <source media="(max-width: 767px)" srcSet={heroImageMobileAsset.url} />
+            <source media="(max-width: 767px)" srcSet={heroImageMobile} />
             <img
-              src={heroImageAsset.url}
+              src={heroImage}
               alt="M-Monogram G-Class at private jet terminal"
               onLoad={() => setImageLoaded(true)}
               fetchPriority="high"

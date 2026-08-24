@@ -15,6 +15,7 @@ const ProjectModal = lazy(() => import("@/components/ProjectModal"));
 import NextSectionCTA from "@/components/NextSectionCTA";
 import LatestAdditionsCarousel from "@/components/sections/latest-additions-carousel";
 import { useProjects, DBProject } from "@/hooks/useProjects";
+import { getGWagenEditionsFrom } from "@/data/projects";
 
 // Hero video configuration
 const BRAND_HERO_VIDEO = "/videos/brand-hero-video.mp4";
@@ -45,8 +46,8 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
     });
   }, []);
 
-  // Map pillars to actual projects for modal display
-  const pillarProjectMapping = useMemo(() => [projects[0], projects[1], projects[2]], [projects]);
+  const editions = useMemo(() => getGWagenEditionsFrom(projects), [projects]);
+  const pillarProjectMapping = editions;
   const handlePillarClick = useCallback((index: number) => {
     const project = pillarProjectMapping[index];
     if (project) {
@@ -137,7 +138,7 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
               <span className="inline-block w-8 h-px bg-white/20" />
               Est. 2018 — Dubai
             </p>
-            <p className="font-body text-lg sm:text-xl md:text-2xl text-white/65 leading-[1.8] font-light max-w-xl">
+            <p className="font-body text-lg sm:text-xl md:text-2xl text-white/65 leading-[1.45] font-semibold max-w-xl">
               {t('brand.transformDescription').split('\n\n')[0]}
             </p>
           </motion.div>
@@ -152,7 +153,7 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
             aria-hidden
           >
             <span
-              className="font-display text-[9rem] lg:text-[11rem] font-extralight text-white leading-none tracking-tighter"
+              className="font-display text-[9rem] lg:text-[11rem] font-bold text-white leading-none tracking-tighter"
               style={{ WebkitTextStroke: '1px rgba(255,255,255,0.4)', color: 'transparent' }}
             >
               2018
@@ -178,7 +179,7 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
           className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden"
         >
           <span
-            className="font-display text-[5rem] sm:text-[8rem] md:text-[10rem] lg:text-[13rem] font-extralight leading-none tracking-tight uppercase whitespace-nowrap"
+            className="font-display text-[5rem] sm:text-[8rem] md:text-[10rem] lg:text-[13rem] font-bold leading-none tracking-tight uppercase whitespace-nowrap"
             style={{ WebkitTextStroke: '1px rgba(255,255,255,0.03)', color: 'transparent' }}
           >
             ATELIER
@@ -201,7 +202,7 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
 
           <div className="max-w-5xl mx-auto space-y-8">
             <h2 
-              className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white uppercase tracking-[0.3em] font-extralight leading-[1.2]"
+              className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white uppercase tracking-tight font-bold leading-[1.05]"
               style={{ textShadow: '0 0 60px rgba(255,255,255,0.08)' }}
             >
               Mastering the Art
@@ -213,7 +214,7 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
 
             <div className="w-12 h-px bg-white/20 mx-auto" />
 
-            <p className="font-body text-sm sm:text-base md:text-lg text-white/50 tracking-[0.2em] uppercase max-w-2xl mx-auto leading-relaxed font-light">
+            <p className="font-body text-sm sm:text-base md:text-lg text-white/50 tracking-normal max-w-2xl mx-auto leading-relaxed font-semibold">
               Crafted for presidents,
               <br />
               industry magnates & celebrities.
@@ -246,7 +247,7 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
         transition={{ duration: 0.9, delay: 0.1 }}
         className="max-w-7xl mx-auto px-6 sm:px-10 md:px-16 py-16 sm:py-20 md:py-24 text-center"
       >
-        <p className="font-display text-base sm:text-lg md:text-xl lg:text-2xl tracking-widest uppercase text-white/50 font-light">
+        <p className="font-display text-base sm:text-lg md:text-xl lg:text-2xl tracking-widest uppercase text-white/50 font-bold">
           {t('brand.transformDescription').split('\n\n')[2]}
         </p>
       </motion.div>
@@ -303,7 +304,12 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
         </div>
       </div>
 
-      <LatestAdditionsCarousel variant="dark" skipAurora onProjectClick={handleProjectClick} className="pt-0 pb-0" />
+      <LatestAdditionsCarousel
+        layout="editions"
+        variant="light"
+        onProjectClick={handleProjectClick}
+        className="pt-0 pb-0"
+      />
     </section>
 
     {/* Next Section CTA: Modifications (Commission) */}

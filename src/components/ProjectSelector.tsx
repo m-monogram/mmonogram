@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, memo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useProjects, DBProject } from "@/hooks/useProjects";
+import { getListingProjects } from "@/data/projects";
 
 interface ProjectSelectorProps {
   onSelect?: (project: DBProject) => void;
@@ -15,7 +16,8 @@ interface ProjectSelectorProps {
 const ProjectSelector = memo(({ onSelect }: ProjectSelectorProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const { projects } = useProjects();
+  const { projects: allProjects } = useProjects();
+  const projects = getListingProjects(allProjects);
 
   // Touch/swipe handling
   const touchStartX = useRef<number>(0);

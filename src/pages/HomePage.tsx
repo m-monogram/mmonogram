@@ -108,7 +108,8 @@ const HomePage = () => {
           <Suspense fallback={null}>
             <LatestAdditionsCarousel
               onProjectClick={handleProjectClick}
-              limit={6}
+              layout="editions"
+              variant="light"
             />
           </Suspense>
           <BrandStrip />

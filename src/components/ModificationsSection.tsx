@@ -133,7 +133,7 @@ const ModificationsSection = ({
                   <div className="flex items-center gap-3">
 
                     <div>
-                      <h3 className="font-display text-xl sm:text-2xl tracking-widest text-white uppercase font-light" style={{
+                      <h3 className="font-display text-xl sm:text-2xl tracking-widest text-white uppercase font-bold" style={{
                         textShadow: '0 2px 10px rgba(0,0,0,0.9)'
                       }}>
                         {category.title}

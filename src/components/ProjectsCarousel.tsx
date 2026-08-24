@@ -6,6 +6,7 @@ import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
 import { useProjects, DBProject } from "@/hooks/useProjects";
+import { getListingProjects } from "@/data/projects";
 import { cn } from "@/lib/utils";
 
 interface ProjectsCarouselProps {
@@ -22,7 +23,8 @@ const ProjectsCarousel = memo(({ onProjectClick, className }: ProjectsCarouselPr
   const [current, setCurrent] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const { projects } = useProjects();
+  const { projects: allProjects } = useProjects();
+  const projects = getListingProjects(allProjects);
 
   // Detect mobile and reduced motion
   useEffect(() => {

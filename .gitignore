@@ -28,3 +28,7 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Lovable/L5e runtime asset cache — not source of truth
+public/__l5e
+src/assets/**/*.asset.json

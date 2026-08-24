@@ -6,44 +6,34 @@
 
 @layer base {
   @font-face {
-    font-family: 'Riviera Nights';
-    src: url('/riviera-font-family/RivieraNightsTrial-Ultralight.woff2') format('woff2');
-    font-weight: 200;
-    font-style: normal;
-    font-display: swap;
-  }
-  @font-face {
-    font-family: 'Riviera Nights';
-    src: url('/riviera-font-family/RivieraNightsTrial-Light.woff2') format('woff2');
-    font-weight: 300;
-    font-style: normal;
-    font-display: swap;
-  }
-  @font-face {
-    font-family: 'Riviera Nights';
-    src: url('/riviera-font-family/RivieraNightsTrial-Regular.woff2') format('woff2');
+    font-family: 'Avenir Next';
+    src: local('Avenir Next Regular'), local('AvenirNext-Regular'),
+         url('/fonts/avenir-next/AvenirNext-Regular.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
   }
   @font-face {
-    font-family: 'Riviera Nights';
-    src: url('/riviera-font-family/RivieraNightsTrial-Medium.woff2') format('woff2');
+    font-family: 'Avenir Next';
+    src: local('Avenir Next Medium'), local('AvenirNext-Medium'),
+         url('/fonts/avenir-next/AvenirNext-Medium.woff2') format('woff2');
     font-weight: 500;
     font-style: normal;
     font-display: swap;
   }
   @font-face {
-    font-family: 'Riviera Nights';
-    src: url('/riviera-font-family/RivieraNightsTrial-Bold.woff2') format('woff2');
-    font-weight: 700;
+    font-family: 'Avenir Next';
+    src: local('Avenir Next Demi Bold'), local('AvenirNext-DemiBold'),
+         url('/fonts/avenir-next/AvenirNext-DemiBold.woff2') format('woff2');
+    font-weight: 600;
     font-style: normal;
     font-display: swap;
   }
   @font-face {
-    font-family: 'Riviera Nights';
-    src: url('/riviera-font-family/RivieraNightsTrial-Black.woff2') format('woff2');
-    font-weight: 900;
+    font-family: 'Avenir Next';
+    src: local('Avenir Next Bold'), local('AvenirNext-Bold'),
+         url('/fonts/avenir-next/AvenirNext-Bold.woff2') format('woff2');
+    font-weight: 700;
     font-style: normal;
     font-display: swap;
   }
@@ -51,12 +41,14 @@
   :root {
     /* =========================================
        1. ШРИФТ И ВЕС (Typography & Weight)
+       Avenir Next Bold / Demi Bold — as in the reference
     ========================================= */
-    --font-family-primary: 'Riviera Nights', sans-serif;
-    --font-family-body: 'Riviera Nights', sans-serif;
+    --font-family-primary: 'Avenir Next', 'AvenirNext-Bold', sans-serif;
+    --font-family-body: 'Avenir Next', 'AvenirNext-DemiBold', sans-serif;
     
-    --weight-light: 300; /* Основной вес для роскошного вида */
-    --weight-regular: 400; /* Для длинных читаемых текстов */
+    --weight-light: 600; /* Demi Bold — основной текст как на референсе */
+    --weight-regular: 600;
+    --weight-bold: 700; /* Avenir Next Bold — заголовки */
 
     /* =========================================
        2. ЦВЕТ И КОНТРАСТ (Colors)
@@ -79,16 +71,16 @@
        4. МЕЖБУКВЕННЫЕ ИНТЕРВАЛЫ (Letter Spacing)
        Секрет "дорогой" типографики
     ========================================= */
-    --ls-hero: -0.01em;    /* Огромные заголовки чуть сдвигаем для монолитности */
-    --ls-section: 0.05em;  /* Заголовки секций слегка разряжаем */
-    --ls-body: 0;          /* Обычный текст оставляем как есть для читаемости */
-    --ls-caps: 0.15em;     /* НАВИГАЦИЯ И ПОДПИСИ КАПСОМ сильно разряжаем */
+    --ls-hero: -0.02em;   /* Плотные капс-заголовки как на референсе */
+    --ls-section: 0.01em;
+    --ls-body: 0;
+    --ls-caps: 0.04em;
 
     /* =========================================
        5. МЕЖСТРОЧНЫЙ ИНТЕРВАЛ (Line Height)
     ========================================= */
-    --lh-heading: 1.1; /* Плотный интервал для заголовков */
-    --lh-body: 1.6;    /* Просторный интервал для основного текста */
+    --lh-heading: 1.05;
+    --lh-body: 1.45;
 
     /* =========================================
        6. СИСТЕМА ОТСТУПОВ (Spacing System)
@@ -163,18 +155,19 @@
     @apply antialiased;
     color: var(--color-text-primary);
     font-family: var(--font-family-body);
-    font-weight: var(--weight-light);
+    font-weight: var(--weight-regular);
     font-size: var(--text-body);
     line-height: var(--lh-body);
     background-color: var(--color-bg-main);
     min-height: 100vh;
     min-height: 100dvh; /* Use dynamic viewport height for mobile */
     text-rendering: optimizeLegibility;
+    font-synthesis: none;
   }
 
   /* Arabic language font override */
   [dir="rtl"] body {
-    font-family: 'Noto Sans Arabic', 'Riviera Nights', sans-serif;
+    font-family: 'Noto Sans Arabic', 'Avenir Next', sans-serif;
   }
 
   /* Luxury Wave Background */
@@ -189,7 +182,7 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-family-primary);
     text-transform: uppercase;
-    font-weight: var(--weight-light);
+    font-weight: var(--weight-bold);
     line-height: var(--lh-heading);
     color: var(--color-text-primary);
   }
@@ -212,7 +205,7 @@
   h4 {
     font-size: var(--text-caption);
     letter-spacing: var(--ls-caps);
-    font-weight: var(--weight-light);
+    font-weight: var(--weight-bold);
   }
 
   /* Body/Paragraph - Highly Readable */
@@ -232,7 +225,7 @@
   .font-display {
     font-family: var(--font-family-primary);
     text-transform: uppercase;
-    font-weight: var(--weight-light);
+    font-weight: var(--weight-bold);
     line-height: var(--lh-heading);
   }
 
@@ -249,7 +242,7 @@
   .h-display-1 {
     font-family: var(--font-family-primary);
     text-transform: uppercase;
-    font-weight: var(--weight-light);
+    font-weight: var(--weight-bold);
     line-height: var(--lh-heading);
     font-size: var(--text-hero);
     letter-spacing: var(--ls-hero);
@@ -258,7 +251,7 @@
   .h-display-2 {
     font-family: var(--font-family-primary);
     text-transform: uppercase;
-    font-weight: var(--weight-light);
+    font-weight: var(--weight-bold);
     line-height: var(--lh-heading);
     font-size: var(--text-section);
     letter-spacing: var(--ls-section);
@@ -267,7 +260,7 @@
   .h-display-3 {
     font-family: var(--font-family-primary);
     text-transform: uppercase;
-    font-weight: var(--weight-light);
+    font-weight: var(--weight-bold);
     line-height: 1.2;
     font-size: 1.25rem;
     letter-spacing: 0.1em;
@@ -276,7 +269,7 @@
   .text-eyebrow {
     font-family: var(--font-family-primary);
     text-transform: uppercase;
-    font-weight: var(--weight-light);
+    font-weight: var(--weight-bold);
     font-size: var(--text-caption);
     letter-spacing: var(--ls-caps);
     color: var(--color-text-secondary);
@@ -286,7 +279,7 @@
   /* Tagline - Hero Subtitle Style */
   .text-tagline {
     font-family: var(--font-family-primary);
-    font-weight: var(--weight-light);
+    font-weight: var(--weight-bold);
     font-size: var(--text-caption);
     line-height: var(--lh-body);
     letter-spacing: var(--ls-caps);
@@ -781,4 +774,21 @@
 
 .animate-logo-pulse {
   animation: logo-pulse 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Map leftover thin Tailwind weights onto Avenir Next Demi Bold / Bold */
+.font-thin,
+.font-extralight,
+.font-light {
+  font-weight: 600;
+}
+.font-normal,
+.font-medium {
+  font-weight: 600;
+}
+.font-semibold,
+.font-bold,
+.font-extrabold,
+.font-black {
+  font-weight: 700;
 }

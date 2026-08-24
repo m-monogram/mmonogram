@@ -64,12 +64,7 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 md:py-8">
           {/* Top: Logo + CTA */}
           <ScrollReveal className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 pb-6 border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <img src={logoMmonogram} alt="M-Monogram" className="h-9 w-auto" loading="lazy" decoding="async" />
-              <div>
-                <p className="text-white font-display text-subtitle tracking-widest">M-MONOGRAM</p>
-              </div>
-            </div>
+            <img src={logoMmonogram} alt="M-Monogram" className="h-9 w-auto" loading="lazy" decoding="async" />
             <motion.button
               onClick={() => handleNavClick("contact")}
               whileHover={{ scale: 1.02 }}
