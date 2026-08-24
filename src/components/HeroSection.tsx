@@ -3,8 +3,8 @@ import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { useNavigation } from "@/hooks/useNavigation";
-import heroImageAsset from "@/assets/hero-main-new.png.asset.json";
-import heroImageMobileAsset from "@/assets/hero-main-mobile.png.asset.json";
+import heroImageAsset from "@/assets/hero-main-new.webp.asset.json";
+import heroImageMobileAsset from "@/assets/hero-main-mobile.webp.asset.json";
 
 interface HeroSectionProps {
   setCurrentView?: (view: string) => void;
