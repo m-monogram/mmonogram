@@ -191,7 +191,7 @@ const ProjectTemplate = memo(function ProjectTemplate({
       {/* ——— A) HERO ——— Premium cinematic hero with car positioned higher ——— */}
       <header className="relative h-[100dvh] min-h-[100dvh] w-full overflow-hidden bg-black">
         <div className="absolute inset-0 bg-black">
-          <img src={heroImage} alt={title} loading="eager" decoding="sync" fetchPriority="high" className="w-full h-full object-cover object-center" />
+          <img src={heroImage} alt={title} loading="eager" decoding="sync" fetchpriority="high" className="w-full h-full object-cover object-center" />
         </div>
         {/* Subtle spotlight effect */}
         <div className="absolute inset-0 pointer-events-none opacity-30" aria-hidden>

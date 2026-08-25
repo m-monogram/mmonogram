@@ -71,11 +71,13 @@ const NewsPage = () => {
         <img
           src={heroBg}
           alt=""
-          fetchPriority="high"
+          fetchpriority="high"
           decoding="async"
           className="absolute inset-0 w-full h-full object-cover object-[center_45%]"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-transparent" />
+        {/* Нижний градиент — текст хиро расположен внизу, поверх светлой части фото */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
         <MediaEdgeFade edges="bottom" />
         <div className="relative z-10 h-full flex flex-col justify-end pb-12 sm:pb-16 px-4 sm:px-8 lg:px-12 max-w-[1600px] mx-auto">
           <motion.button
@@ -165,9 +167,9 @@ const NewsPage = () => {
                       <img
                         src={featured.cover}
                         alt={featured.title[language]}
-                        fetchPriority="high"
+                        fetchpriority="high"
                         decoding="async"
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-[1.04]"
+                        className="absolute inset-0 w-full h-full object-cover transition-transform [transition-duration:900ms] group-hover:scale-[1.04]"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-black/30" />
                       <div className="absolute top-5 left-5 px-3 py-1 bg-white text-black font-display text-[10px] uppercase tracking-[0.25em]">

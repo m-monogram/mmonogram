@@ -58,7 +58,7 @@ const HeroSection = memo(({ setCurrentView }: HeroSectionProps) => {
               src={heroImage}
               alt="M-Monogram G-Class at private jet terminal"
               onLoad={() => setImageLoaded(true)}
-              fetchPriority="high"
+              fetchpriority="high"
               decoding="async"
               className={`w-full h-full object-cover transition-opacity duration-300 ${
                 imageLoaded ? "opacity-100" : "opacity-0"

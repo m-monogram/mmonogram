@@ -3,6 +3,7 @@ import { Menu, X, Calendar } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 import logoWhite from "@/assets/logo-white.webp";
+import logoBlack from "@/assets/logo-black.webp";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { AuroraBackground } from "@/components/ui/aurora-background";
@@ -15,9 +16,12 @@ import menuModifications from "@/assets/commission-hero-final.webp";
 import menuVerify from "@/assets/menu/menu-verify.webp";
 import menuContact from "@/assets/menu/menu-contact-new.jpg.webp";
 import menuNews from "@/assets/hero-main-new.webp";
+import menuConfigurator from "@/assets/g63-wheel.webp";
 interface HeaderProps {
   currentView?: string;
   setCurrentView?: (view: string) => void;
+  /* "light" — для страниц со светлым фоном: тёмный логотип и тёмные контролы */
+  variant?: "dark" | "light";
 }
 interface MenuCardProps {
   item: {
@@ -86,7 +90,7 @@ const MenuCard = ({
 
     {/* Background - Video or Image */}
     <div className="absolute inset-0 overflow-hidden z-0">
-      {item.video ? <video src={item.video} autoPlay muted loop playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover transition-all duration-700 will-change-transform group-hover:scale-105" /> : <img src={item.image} alt={t(item.labelKey)} loading="lazy" decoding="async" fetchPriority="low" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 will-change-transform group-hover:scale-110 group-hover:brightness-110 ${item.view === "brand" ? "object-[50%_70%]" : item.view === "contact" ? "object-[50%_52%] sm:object-[50%_60%]" : item.view === "verify" ? "object-[50%_65%]" : item.view === "home" ? "object-[50%_55%]" : "object-center"}`} />}
+      {item.video ? <video src={item.video} autoPlay muted loop playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover transition-all duration-700 will-change-transform group-hover:scale-105" /> : <img src={item.image} alt={t(item.labelKey)} loading="lazy" decoding="async" fetchpriority="low" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 will-change-transform group-hover:scale-110 group-hover:brightness-110 ${item.view === "brand" ? "object-[50%_70%]" : item.view === "contact" ? "object-[50%_52%] sm:object-[50%_60%]" : item.view === "verify" ? "object-[50%_65%]" : item.view === "home" ? "object-[50%_55%]" : "object-center"}`} />}
 
       {/* Light gradient overlay - minimal to show car */}
       <div className={`absolute inset-0 bg-gradient-to-t transition-all duration-500 ${item.video ? "from-black/50 via-black/15 to-transparent group-hover:from-black/40" : "from-black/50 via-black/20 to-transparent group-hover:from-black/40 group-hover:via-black/15"}`} />
@@ -161,7 +165,8 @@ const MenuCard = ({
 };
 const Header = ({
   currentView: propCurrentView,
-  setCurrentView: propSetCurrentView
+  setCurrentView: propSetCurrentView,
+  variant = "dark"
 }: HeaderProps) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -191,6 +196,11 @@ const Header = ({
     image: menuModifications,
     descKey: 'nav.modificationsDesc'
   }, {
+    labelKey: 'nav.configurator',
+    view: 'configurator',
+    image: menuConfigurator,
+    descKey: 'nav.configuratorDesc'
+  }, {
     labelKey: 'nav.verify',
     view: 'verify',
     image: menuVerify,
@@ -212,6 +222,7 @@ const Header = ({
     "brand": "/brand",
     "projects": "/projects",
     "modifications": "/commission",
+    "configurator": "/configurator",
     "verify": "/verify",
     "contact": "/contact",
     "booking": "/booking",
@@ -222,6 +233,7 @@ const Header = ({
     if (path === "/brand") return "brand";
     if (path === "/projects") return "projects";
     if (path === "/commission") return "modifications";
+    if (path === "/configurator") return "configurator";
     if (path === "/verify") return "verify";
     if (path === "/contact") return "contact";
     if (path === "/booking") return "booking";
@@ -258,7 +270,7 @@ const Header = ({
           behavior: "instant"
         });
       }} className="cursor-pointer touch-target flex items-center justify-center" type="button">
-        <img src={logoWhite} alt="M-Monogram" width={479} height={113} fetchPriority="high" decoding="sync" className="h-10 sm:h-12 md:h-14 w-auto max-w-[11rem] sm:max-w-[13rem] object-contain object-left" />
+        <img src={variant === "light" ? logoBlack : logoWhite} alt="M-Monogram" width={479} height={113} fetchpriority="high" decoding="sync" className="h-10 sm:h-12 md:h-14 w-auto max-w-[11rem] sm:max-w-[13rem] object-contain object-left" />
       </button>
     </div>}
 
@@ -270,10 +282,10 @@ const Header = ({
         {/* Book a Project Button - Primary CTA */}
 
 
-        <LanguageSwitcher />
+        <LanguageSwitcher variant={variant} />
 
-        <button onClick={openMenu} className="relative w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center transition-all duration-300 cursor-pointer touch-target border border-transparent hover:border-foreground/30 hover:bg-foreground/5" aria-label="Open menu" type="button">
-          <Menu className="w-7 h-7 sm:w-8 sm:h-8 text-foreground" strokeWidth={1.5} />
+        <button onClick={openMenu} className={`relative w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center transition-all duration-300 cursor-pointer touch-target border border-transparent ${variant === "light" ? "hover:border-black/30 hover:bg-black/5" : "hover:border-foreground/30 hover:bg-foreground/5"}`} aria-label="Open menu" type="button">
+          <Menu className={`w-7 h-7 sm:w-8 sm:h-8 ${variant === "light" ? "text-black" : "text-foreground"}`} strokeWidth={1.5} />
         </button>
       </div>
     </header>}

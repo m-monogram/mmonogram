@@ -5,7 +5,7 @@
  */
 import { supabase } from '@/integrations/supabase/client';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 type AnyClient = any;
 
 function getClient(): AnyClient {

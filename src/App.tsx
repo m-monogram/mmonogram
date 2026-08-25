@@ -16,7 +16,7 @@ const PageLoader = () => (
       width={900}
       height={212}
       decoding="async"
-      fetchPriority="high"
+      fetchpriority="high"
       className="w-56 sm:w-72 md:w-80 lg:w-96 max-w-[70vw] h-auto object-contain opacity-95 animate-logo-pulse will-change-[opacity,transform]"
     />
   </div>
@@ -28,6 +28,7 @@ const BrandPage = lazy(() => import("./pages/BrandPage"));
 const ProjectsPage = lazy(() => import("./pages/ProjectsPage"));
 const ProjectDetailPage = lazy(() => import("./pages/ProjectDetailPage"));
 const ModificationsPage = lazy(() => import("./pages/ModificationsPage"));
+const ConfiguratorPage = lazy(() => import("./pages/ConfiguratorPage"));
 const VerifyPage = lazy(() => import("./pages/VerifyPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
 const BookingPage = lazy(() => import("./pages/BookingPage"));
@@ -67,6 +68,7 @@ const App = () => (
               <Route path="/projects/:id" element={<ProjectDetailPage />} />
               <Route path="/commission" element={<ModificationsPage />} />
               <Route path="/modifications" element={<ModificationsPage />} />
+              <Route path="/configurator" element={<ConfiguratorPage />} />
               <Route path="/verify" element={<VerifyPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/booking" element={<BookingPage />} />

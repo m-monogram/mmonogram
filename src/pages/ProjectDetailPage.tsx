@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
 import { useProjects, DBProject } from "@/hooks/useProjects";
+import { isHubProject } from "@/data/projects";
 
 const ProjectDetailView = lazy(() => import("@/components/ProjectDetailView"));
 const ParticleBackground = lazy(() => import("@/components/ParticleBackground"));
@@ -48,8 +49,9 @@ const ProjectDetailPage = () => {
         </div>
       </Suspense>
 
-      <Header />
-      
+      {/* Страницы-хабы (выбор издания) имеют белый фон — шапке нужен тёмный вариант логотипа и контролов */}
+      <Header variant={isHubProject(selectedProject) ? "light" : "dark"} />
+
       <SEOHead
         title={`${selectedProject.title} ${selectedProject.subtitle} - M-Monogram`}
         description={(selectedProject.description || `Explore ${selectedProject.title} ${selectedProject.subtitle} - a bespoke automotive transformation by M-Monogram.`).slice(0, 160)}

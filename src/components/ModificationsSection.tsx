@@ -124,7 +124,7 @@ const ModificationsSection = ({
                   objectPosition: "center center"
                 } : category.id === "protection" ? {
                   objectPosition: "center 20%"
-                } : undefined} loading={index < 2 ? "eager" : "lazy"} decoding={index < 2 ? "sync" : "async"} fetchPriority={index < 2 ? "high" : "auto"} sizes="(max-width: 640px) 100vw, 50vw" />
+                } : undefined} loading={index < 2 ? "eager" : "lazy"} decoding={index < 2 ? "sync" : "async"} fetchpriority={index < 2 ? "high" : "auto"} sizes="(max-width: 640px) 100vw, 50vw" />
                 {/* Lighter gradient for text visibility - only at bottom */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent pointer-events-none" />
 
