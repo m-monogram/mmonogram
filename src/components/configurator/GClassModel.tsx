@@ -364,6 +364,24 @@ export default function GClassModel({ config }: { config: BuildConfig }) {
         ))
       )}
 
+      {/* Швы дверей — тонкие тёмные линии по борту */}
+      {[0.78, -0.12, -1.02].map((x) =>
+        [0.943, -0.943].map((z) => (
+          <mesh key={`seam${x}${z}`} material={TRIM} position={[x, 0.8, z]}>
+            <boxGeometry args={[0.014, 0.72, 0.012]} />
+          </mesh>
+        ))
+      )}
+
+      {/* Защитный молдинг по борту — фирменная горизонталь G-Class */}
+      {[1, -1].map((side) => (
+        <group key={side}>
+          <RoundedBox args={[1.7, 0.07, 0.035]} radius={0.012} position={[0, 0.82, side * 0.945]} material={TRIM} />
+          <RoundedBox args={[0.32, 0.07, 0.035]} radius={0.012} position={[2.24, 0.82, side * 0.945]} material={TRIM} />
+          <RoundedBox args={[0.32, 0.07, 0.035]} radius={0.012} position={[-2.24, 0.82, side * 0.945]} material={TRIM} />
+        </group>
+      ))}
+
       {/* Колёса — внутри арок */}
       <Wheel position={[WHEEL_X, WHEEL_Y, WHEEL_Z]} design={config.rim} finishIdx={config.rimFinish} />
       <Wheel position={[WHEEL_X, WHEEL_Y, -WHEEL_Z]} design={config.rim} finishIdx={config.rimFinish} />
