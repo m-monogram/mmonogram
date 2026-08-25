@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { BuildConfig, PAINTS, RIM_DESIGNS, RIM_FINISHES, encodeConfig } from "./config";
+import { BuildConfig, GRILLE_FINISHES, PAINTS, RIM_DESIGNS, RIM_FINISHES, encodeConfig } from "./config";
 
 /* Превью опций — кадры реальной 3D-модели (§ ТЗ: картинки вместо кружков).
    Генерируются скриптом скриншотов по ?c=...&v=... */
@@ -190,7 +190,7 @@ export default function ConfigPanel({ config, onChange, onSectionChange, onInter
   };
 
   const rootItems: { id: Section; icon: React.ReactNode; label: string; value: string }[] = [
-    { id: "exterior", icon: <Palette className="w-[18px] h-[18px]" />, label: t("config.exterior"), value: PAINTS[config.paint].name },
+    { id: "exterior", icon: <Palette className="w-[18px] h-[18px]" />, label: t("config.exterior"), value: `${PAINTS[config.paint].name} · ${GRILLE_FINISHES[config.grille].name}` },
     { id: "wheels", icon: <WheelIcon design={config.rim} className="w-5 h-5" />, label: t("config.rims"), value: RIM_DESIGNS[config.rim].name },
     { id: "kit", icon: <Car className="w-[18px] h-[18px]" />, label: t("config.kit"), value: config.kit ? t("config.kitMM") : t("config.kitStandard") },
     { id: "carbon", icon: <Hexagon className="w-[18px] h-[18px]" />, label: t("config.carbon"), value: config.carbon ? t("config.carbonOn") : t("config.carbonOff") },
@@ -291,6 +291,16 @@ export default function ConfigPanel({ config, onChange, onSectionChange, onInter
                       onClick={() => set({ paint: i })}
                       preview={<Thumb src={PAINT_PREVIEWS[i]} alt={p.name} fallback={p.color} />}
                       label={p.name}
+                    />
+                  ))}
+                  <GroupTitle>{t("config.grille")}</GroupTitle>
+                  {GRILLE_FINISHES.map((g, i) => (
+                    <OptionRow
+                      key={g.id}
+                      selected={config.grille === i}
+                      onClick={() => set({ grille: i })}
+                      preview={<Thumb src={undefined} alt={g.name} fallback={g.color} />}
+                      label={g.name}
                     />
                   ))}
                 </>

@@ -39,7 +39,7 @@ export type PartRole =
   | "glass"     // остекление
   | "taillight" // красные рассеиватели фонарей
   | "light"     // светящиеся элементы фар
-  | "chrome"
+  | "brightwork"  // декоративный металл: у G63 Iconic он золотой, не хром
   | "carbon"
   | "cabinLeather" // основная обивка салона
   | "cabinAccent"  // бордовая кожа передней панели
@@ -60,7 +60,7 @@ export const MATERIAL_RULES: ReadonlyArray<{ test: RegExp; role: PartRole }> = [
   { test: /glass/i, role: "glass" },
   { test: /rolls\s*royce\s*car\s*paint/i, role: "wheel" },
   { test: /car\s*paint|painted\s*plastic/i, role: "body" },
-  { test: /chrome/i, role: "chrome" },
+  { test: /chrome/i, role: "brightwork" },
   { test: /carbon/i, role: "carbon" },
   { test: /leather/i, role: "cabinLeather" },
   { test: /piano/i, role: "trim" },
@@ -74,7 +74,7 @@ export const MATERIAL_RULES: ReadonlyArray<{ test: RegExp; role: PartRole }> = [
 export const MESH_RULES: ReadonlyArray<{ test: RegExp; role: PartRole }> = [
   { test: /\d+x\d+_ET\d+|_5x130_/i, role: "wheel" },
   // Корпус проверяется раньше самих диодов: в его имени есть и то и другое
-  { test: /корпус/i, role: "chrome" },
+  { test: /корпус/i, role: "brightwork" },
   { test: /диод/i, role: "light" },
 ];
 
@@ -138,6 +138,14 @@ export const WHEEL_ACCENT_MIN_LUMA = 0.5;
  * у них крошечный.
  */
 export const DEBRIS = {
+  /**
+   * Меш из пары треугольников выбрасывается всегда. Осмысленной геометрии
+   * такого размера в модели машины нет — это либо остаток схлопнутой детали,
+   * либо служебная плоскость, и в кадре она висит лоскутом. Настоящие мелкие
+   * детали начинаются от шести треугольников: полоса стоп-сигнала, диодные
+   * рамки, молдинги.
+   */
+  alwaysHideAtOrBelow: 2,
   maxTriangles: 8,
   /** Метры: порог по среднему из трёх габаритов. */
   minSpan: 0.3,
@@ -156,7 +164,7 @@ export const ROLE_DEBUG_COLORS: Record<PartRole, string> = {
   glass: "#25d0c0",
   taillight: "#ff2d2d",
   light: "#ffffff",
-  chrome: "#c0c8d0",
+  brightwork: "#d9b25a",
   carbon: "#ff8a2b",
   cabinLeather: "#2ecc71",
   cabinAccent: "#e056a0",

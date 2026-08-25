@@ -46,6 +46,21 @@ export const RIM_FINISHES: RimFinish[] = [
   { id: "gold", name: "Champagne Gold", color: "#9c7c45", metalness: 1.0, roughness: 0.28 },
 ];
 
+/** Отделка решётки и декоративного металла: у G63 Iconic он золотой. */
+export interface GrilleFinish {
+  id: string;
+  name: string;
+  color: string;
+  metalness: number;
+  roughness: number;
+}
+
+export const GRILLE_FINISHES: GrilleFinish[] = [
+  { id: "gold", name: "Brushed Gold", color: "#a58a5e", metalness: 1, roughness: 0.19 },
+  { id: "silver", name: "Polished Silver", color: "#cfd3d6", metalness: 1, roughness: 0.1 },
+  { id: "black", name: "Gloss Black", color: "#101113", metalness: 0.9, roughness: 0.16 },
+];
+
 export interface BuildConfig {
   paint: number;
   rim: number;
@@ -54,6 +69,7 @@ export interface BuildConfig {
   carbon: boolean;
   lights: boolean;
   night: boolean;
+  grille: number;
 }
 
 /** Camera presets tied to config panel sections */
@@ -76,22 +92,27 @@ export const DEFAULT_CONFIG: BuildConfig = {
   carbon: true,
   lights: true,
   night: true,
+  grille: 0,
 };
 
 /* Первый сегмент — версия схемы: старые ссылки не ломаются при добавлении опций */
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 export function encodeConfig(c: BuildConfig): string {
-  return [SCHEMA_VERSION, c.paint, c.rim, c.rimFinish, +c.kit, +c.carbon, +c.lights, +c.night].join("-");
+  return [SCHEMA_VERSION, c.paint, c.rim, c.rimFinish, +c.kit, +c.carbon, +c.lights, +c.night, c.grille].join("-");
 }
 
 export function decodeConfig(raw: string | null): BuildConfig {
   if (!raw) return DEFAULT_CONFIG;
-  let p = raw.split("-").map((n) => parseInt(n, 10));
-  if (p.some((n) => Number.isNaN(n))) return DEFAULT_CONFIG;
-  // Версионированный код: первый сегмент — версия; 7 сегментов — легаси-ссылки без версии
-  if (p.length === 8 && p[0] === 1) p = p.slice(1);
-  if (p.length !== 7) return DEFAULT_CONFIG;
+  const parts = raw.split("-").map((n) => parseInt(n, 10));
+  if (parts.some((n) => Number.isNaN(n))) return DEFAULT_CONFIG;
+
+  /* Три поколения ссылок: 7 сегментов без версии, 8 с версией 1,
+     9 с версией 2 и отделкой решётки. Недостающее берётся из умолчаний. */
+  let p = parts;
+  if ((p.length === 9 && p[0] === 2) || (p.length === 8 && p[0] === 1)) p = p.slice(1);
+  if (p.length !== 7 && p.length !== 8) return DEFAULT_CONFIG;
+
   const clamp = (v: number, max: number) => Math.min(Math.max(v, 0), max);
   return {
     paint: clamp(p[0], PAINTS.length - 1),
@@ -101,5 +122,6 @@ export function decodeConfig(raw: string | null): BuildConfig {
     carbon: p[4] === 1,
     lights: p[5] === 1,
     night: p[6] === 1,
+    grille: clamp(p[7] ?? DEFAULT_CONFIG.grille, GRILLE_FINISHES.length - 1),
   };
 }

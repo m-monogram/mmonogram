@@ -326,7 +326,7 @@ function WarmUpFrames() {
  */
 function SceneEnvironment({ night, isMobile }: { night: boolean; isMobile: boolean }) {
   return (
-    <Environment resolution={night || isMobile ? 256 : 384} frames={1}>
+    <Environment resolution={isMobile ? 256 : 512} frames={1}>
       <color attach="background" args={[night ? "#08090a" : "#3a3d40"]} />
       {night ? (
         <>
@@ -372,7 +372,7 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
     <Canvas
       shadows={!isMobile}
       frameloop="demand"
-      dpr={isMobile ? [1, 1.2] : [1, 1.5]}
+      dpr={isMobile ? [1, 1.2] : [1, 2]}
       performance={{ min: 0.55 }}
       gl={{
         antialias: !isMobile,
@@ -425,22 +425,22 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
           scale={11}
           blur={2.6}
           far={2.8}
-          resolution={isMobile ? 192 : 384}
+          resolution={isMobile ? 192 : 512}
           frames={1}
         />
 
         {/* «Дорогая картинка» по пресету MANSORY — Quality: SAO в стыках,
             аккуратный bloom только на бликах, лёгкая студийная десатурация.
             На мобильных AO в половинном разрешении (ТЗ 6.9). */}
-        {enableHeavyEffects && <EffectComposer multisampling={2}>
+        {enableHeavyEffects && <EffectComposer multisampling={isMobile ? 2 : 4}>
           {/* В салоне радиус AO меньше: с «уличными» 0.5 м вся кабина попадает
               в затенение и уходит в чёрное. */}
           <N8AO
             aoRadius={interior ? 0.14 : 0.5}
             intensity={interior ? 1.35 : 2.8}
             distanceFalloff={1}
-            quality="medium"
-            halfRes
+            quality={isMobile ? "medium" : "high"}
+            halfRes={isMobile}
           />
           <Bloom intensity={0.11} luminanceThreshold={1.05} luminanceSmoothing={0.25} mipmapBlur />
           <BrightnessContrast contrast={-0.01} />

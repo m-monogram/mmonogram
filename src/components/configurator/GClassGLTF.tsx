@@ -2,7 +2,7 @@ import { Component, Suspense, useCallback, useLayoutEffect, useMemo, useState, t
 import { useGLTF } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { BuildConfig, PAINTS, RIM_FINISHES } from "./config";
+import { BuildConfig, GRILLE_FINISHES, PAINTS, RIM_FINISHES } from "./config";
 import { DRACO_PATH, MODEL_FILES, ROLE_DEBUG_COLORS, type FileRole, type PartRole } from "./models";
 import { classifyCabin, classifyPart, computeFit, describeMaterial, isDebris, type Fit } from "./fitModel";
 
@@ -53,7 +53,7 @@ function Parts({
 
     const byRole: Record<PartRole, THREE.Mesh[]> = {
       body: [], wheel: [], wheelAccent: [], tire: [], glass: [], taillight: [],
-      light: [], chrome: [], carbon: [], cabinLeather: [], cabinAccent: [],
+      light: [], brightwork: [], carbon: [], cabinLeather: [], cabinAccent: [],
       cabinFloor: [], cabinRoof: [], trim: [],
     };
 
@@ -141,6 +141,7 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
 
     const paint = PAINTS[config.paint];
     const finish = RIM_FINISHES[config.rimFinish];
+    const grille = GRILLE_FINISHES[config.grille];
     return {
       body: new THREE.MeshPhysicalMaterial({
         color: paint.color,
@@ -162,7 +163,7 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
         metalness: finish.metalness,
         roughness: finish.roughness,
       }),
-      tire: new THREE.MeshStandardMaterial({ color: "#202427", metalness: 0, roughness: 0.92 }),
+      tire: new THREE.MeshStandardMaterial({ color: "#2a2d31", metalness: 0, roughness: 0.9 }),
       glass: new THREE.MeshPhysicalMaterial({
         color: "#10151a",
         metalness: 0.25,
@@ -183,7 +184,14 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
         emissive: "#dfe8ff",
         emissiveIntensity: config.lights ? 1.6 : 0.05,
       }),
-      chrome: new THREE.MeshStandardMaterial({ color: "#cfd3d6", metalness: 1, roughness: 0.08 }),
+      /* Решётка, кант по борту и вставки порогов идут одной отделкой. Золото
+         по умолчанию: на g3-iconic-gold-front.jpg весь декоративный металл
+         машины золотой, тёплая латунь, а не хром. */
+      brightwork: new THREE.MeshStandardMaterial({
+        color: grille.color,
+        metalness: grille.metalness,
+        roughness: grille.roughness,
+      }),
       // Выключенный карбон-пакет означает «в цвет кузова» — так и в панели
       carbon: config.carbon
         ? new THREE.MeshPhysicalMaterial({
@@ -205,23 +213,23 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
          чёрная кожа сидений #231e1d, коньячные панели #4e2a26…#613c36,
          тёмный потолок #0f0c0d. */
       cabinLeather: new THREE.MeshPhysicalMaterial({
-        color: "#231e1d",
+        color: "#1a1615",
         metalness: 0.02,
-        roughness: 0.5,
-        clearcoat: 0.35,
-        clearcoatRoughness: 0.5,
+        roughness: 0.62,
+        clearcoat: 0.2,
+        clearcoatRoughness: 0.7,
       }),
       cabinAccent: new THREE.MeshPhysicalMaterial({
-        color: "#5a3630",
-        metalness: 0.03,
-        roughness: 0.45,
-        clearcoat: 0.5,
-        clearcoatRoughness: 0.4,
+        color: "#43241f",
+        metalness: 0.02,
+        roughness: 0.58,
+        clearcoat: 0.25,
+        clearcoatRoughness: 0.65,
       }),
       cabinFloor: new THREE.MeshStandardMaterial({ color: "#100d0e", metalness: 0, roughness: 0.95 }),
       cabinRoof: new THREE.MeshStandardMaterial({ color: "#131011", metalness: 0, roughness: 0.94 }),
     };
-  }, [debugRoles, config.paint, config.rimFinish, config.carbon, config.lights]);
+  }, [debugRoles, config.paint, config.rimFinish, config.grille, config.carbon, config.lights]);
 
   useLayoutEffect(() => () => Object.values(materials).forEach((m) => m.dispose()), [materials]);
 

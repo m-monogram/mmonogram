@@ -134,7 +134,7 @@ export function classifyPart(
     if (rule && (!isLight(rule.role) || atEnd)) return refineWheel(rule.role, material);
 
     if (material.metalness >= CHROME_PROPS.minMetalness && material.roughness <= CHROME_PROPS.maxRoughness) {
-      return "chrome";
+      return "brightwork";
     }
     if (material.opacity < GLASS_ALPHA_THRESHOLD) return "glass";
   }
@@ -171,7 +171,9 @@ export function classifyCabin(center: THREE.Vector3, cabin: THREE.Box3): PartRol
 export function isDebris(mesh: THREE.Mesh, box: THREE.Box3): boolean {
   const index = mesh.geometry.getIndex();
   const count = index ? index.count : (mesh.geometry.getAttribute("position")?.count ?? 0);
-  if (count / 3 > DEBRIS.maxTriangles) return false;
+  const tris = count / 3;
+  if (tris <= DEBRIS.alwaysHideAtOrBelow) return true;
+  if (tris > DEBRIS.maxTriangles) return false;
 
   const size = box.getSize(new THREE.Vector3());
   const [, median] = [size.x, size.y, size.z].sort((a, b) => a - b);

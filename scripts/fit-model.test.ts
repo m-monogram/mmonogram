@@ -78,8 +78,8 @@ const cases: [string, MaterialDesc | null, number, string, PartRole][] = [
   ["тонированное стекло",     mat("Glass dark.001", { opacity: 0.55, metalness: 1 }),      1.1, "Mesh.031",  "glass"],
   ["красный рассеиватель",    mat("glass_0.001", { luma: 0.2 }),                           0.7, "Mesh.020",  "taillight"],
   ["фара",                    mat("light on _1.001", { luma: 1 }),                         0.8, "Group_13",  "light"],
-  ["хром по имени",           mat("chrome.001"),                                           0.9, "Mesh.007",  "chrome"],
-  ["хром по свойствам",       mat("Material.016", { metalness: 1, roughness: 0.09 }),      0.9, "Mesh.027",  "chrome"],
+  ["металл по имени",         mat("chrome.001"),                                           0.9, "Mesh.007",  "brightwork"],
+  ["металл по свойствам",     mat("Material.016", { metalness: 1, roughness: 0.09 }),      0.9, "Mesh.027",  "brightwork"],
   ["карбон",                  mat("carbono1_001.001"),                                     0.9, "Mesh.5747", "carbon"],
   ["покрышка",                mat("Material.014", { metalness: 0.71, roughness: 0.58, luma: 0 }), 0.3, "Mesh.010", "tire"],
   ["чёрный пластик",          mat("mat_2.001"),                                            0.9, "Mesh.006",  "trim"],
@@ -111,7 +111,7 @@ check(
 check(
   "корпус диодов решётки",
   classifyPart(mat("Material.016", { metalness: 1, roughness: 0.09 }), at(0.7, 0.3, 2.1), CAR_SIZE, "корпус_диодов_решетки"),
-  "chrome",
+  "brightwork",
 );
 
 // Порог лежит на высоте колеса, но тянется вдоль всей машины — не колесо
@@ -140,6 +140,7 @@ const scrap = (tris: number, [x, y, z]: [number, number, number]) => {
 console.log("\nотсев обломков прореживания:");
 const debrisCases: [string, number, [number, number, number], boolean][] = [
   ["схлопнутый фонарь, плоский лоскут", 2, [1.54, 0.74, 2.65], true],
+  ["огрызок в салоне, два треугольника", 2, [0.28, 0.01, 0.18], true],
   ["молдинг по борту",                  6, [1.58, 0.01, 0.01], false],
   ["полоса стоп-сигнала",               6, [0.53, 0.03, 0.01], false],
   ["нормальная деталь",              1200, [1.50, 0.70, 2.60], false],
