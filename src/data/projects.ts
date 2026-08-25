@@ -33,6 +33,8 @@ import fusion07 from "@/assets/fusion/07-rear.jpg";
 import fusion08 from "@/assets/fusion/08-top.jpg";
 import fusion09 from "@/assets/fusion/09-interior-top.jpg";
 
+const fusionTurquoiseCoverUrl = "/__l5e/assets-v1/8970a228-257e-40e6-8477-ea6d545d805b/03-_1.jpg";
+
 import fusionCrimsonStudio from "@/assets/fusion-editions/crimson.jpg";
 import fusionTurquoiseStudio from "@/assets/fusion-editions/turquoise.jpg";
 import fusionAzureStudio from "@/assets/fusion-editions/azure.jpg";
@@ -359,7 +361,7 @@ export const projects: Project[] = [
     duration: "12 weeks",
     package: "Full",
     category: "Bespoke Concept",
-    coverImage: fusion01,
+    coverImage: fusionTurquoiseCoverUrl,
     images: [
       { src: fusion01, title: "Front three-quarter" },
       { src: fusionTurquoiseStudio, title: "Studio front three-quarter" },

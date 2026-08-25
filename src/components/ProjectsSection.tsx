@@ -131,7 +131,6 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
         {/* Projects Carousel */}
         <LatestAdditionsCarousel
           onProjectClick={onProjectClick}
-          className="pt-8 sm:pt-12"
         />
 
         {/* CTA Section - Enhanced */}

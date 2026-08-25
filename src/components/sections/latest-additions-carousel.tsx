@@ -28,8 +28,8 @@ const LatestAdditionsCarousel = memo(
     );
 
     return (
-      <section className={cn("relative z-10 bg-white", className)}>
-        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-10 py-16 sm:py-20 md:py-24">
+      <section className={cn("relative z-10 section-flow-light", className)}>
+        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-10 pt-48 pb-48 sm:pt-56 sm:pb-56 md:pt-64 md:pb-64">
           <motion.h2
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
