@@ -7,8 +7,11 @@
 |---|---|
 | `stock-body.glb` | стоковый кузов |
 | `body-kit-wheels.glb` | обвес M-Monogram и колёса |
-| `custom-interior.glb` | интерьер |
-| `steering-wheel.glb` | руль |
+| `custom-interior.glb` | интерьер, вместе с рулём |
+
+Отдельного файла с рулём нет намеренно: он уже стоит в салоне. Выгрузка
+`4) руль.fbx` — та же деталь без прореживания, 135 682 треугольника против
+6 600 в салоне, и при загрузке поверх давала два руля друг в друге.
 
 Пока файлов нет, конфигуратор работает на процедурной заглушке
 (`GClassModel.tsx`) — сцена не ломается.
@@ -16,9 +19,13 @@
 Исходные FBX конвертируются так:
 
 ```
-npm install fbx2gltf
-./node_modules/fbx2gltf/bin/Darwin/FBX2glTF -i "исходник.fbx" -o "models/имя" -b -d
+/Applications/Blender.app/Contents/MacOS/Blender --background \
+    --python scripts/fbx-to-glb.py -- <папка-с-fbx> public/models --max-tris 250000
 ```
+
+Прореживать надо до сжатия, а не после: чтобы прорезать готовый GLB,
+`gltf-transform` распаковывает Draco в WebAssembly, и на сотне мегабайт
+сжатой геометрии этот модуль падает независимо от размера heap у Node.
 
 Структуру готового GLB — меши, полигоны, материалы, габариты — показывает
 `node scripts/inspect-glb.mjs public/models/*.glb`.

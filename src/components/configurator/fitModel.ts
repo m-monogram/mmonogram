@@ -1,11 +1,16 @@
 import * as THREE from "three";
 import {
+  CABIN_ZONES,
   CHROME_PROPS,
+  DEBRIS,
+  LIGHT_ZONE_FROM_CENTER,
   GLASS_ALPHA_THRESHOLD,
   MATERIAL_RULES,
   MESH_RULES,
   TARGET_LENGTH,
   TIRE_MAX_LUMA,
+  WHEEL_ACCENT_MIN_LUMA,
+  WHEEL_MAX_SPAN,
   WHEEL_ZONE_TOP,
   type PartRole,
 } from "./models";
@@ -89,6 +94,17 @@ export function describeMaterial(material: THREE.Material | null | undefined): M
   };
 }
 
+/** Роли, которые бывают только на торцах машины. */
+function isLight(role: PartRole): boolean {
+  return role === "light" || role === "taillight";
+}
+
+/** Внутри колеса светлые детали — спицы и турбина, тёмные — поле диска. */
+function refineWheel(role: PartRole, material: MaterialDesc | null): PartRole {
+  if (role !== "wheel" || !material) return role;
+  return material.luma >= WHEEL_ACCENT_MIN_LUMA ? "wheelAccent" : "wheel";
+}
+
 /**
  * Роль части сборки.
  *
@@ -100,16 +116,22 @@ export function describeMaterial(material: THREE.Material | null | undefined): M
  */
 export function classifyPart(
   material: MaterialDesc | null,
-  centerY: number,
-  carHeight: number,
+  box: THREE.Box3,
+  carSize: THREE.Vector3,
   meshName = "",
 ): PartRole {
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  /** Насколько деталь смещена к носу или корме: 0 — середина, 1 — торец. */
+  const alongCar = carSize.x > 0 ? Math.abs(center.x) / (carSize.x / 2) : 0;
+  const atEnd = alongCar > LIGHT_ZONE_FROM_CENTER;
+
   const byName = MESH_RULES.find((r) => r.test.test(meshName));
-  if (byName) return byName.role;
+  if (byName) return refineWheel(byName.role, material);
 
   if (material) {
     const rule = MATERIAL_RULES.find((r) => r.test.test(material.name));
-    if (rule) return rule.role;
+    if (rule && (!isLight(rule.role) || atEnd)) return refineWheel(rule.role, material);
 
     if (material.metalness >= CHROME_PROPS.minMetalness && material.roughness <= CHROME_PROPS.maxRoughness) {
       return "chrome";
@@ -117,8 +139,41 @@ export function classifyPart(
     if (material.opacity < GLASS_ALPHA_THRESHOLD) return "glass";
   }
 
-  if (carHeight > 0 && centerY / carHeight < WHEEL_ZONE_TOP) {
-    return !material || material.luma < TIRE_MAX_LUMA ? "tire" : "wheel";
+  const low = carSize.y > 0 && center.y / carSize.y < WHEEL_ZONE_TOP;
+  const compact = Math.max(size.x, size.z) < WHEEL_MAX_SPAN;
+
+  if (low && compact) {
+    return !material || material.luma < TIRE_MAX_LUMA ? "tire" : refineWheel("wheel", material);
   }
   return "trim";
+}
+
+/**
+ * Роль детали салона по её месту в габарите кабины.
+ *
+ * Материалов в модели салона нет, имена мешей достались от Blender
+ * (Куб.006, Плоскость.007), поэтому делим по зонам: низ — ковролин,
+ * верх — потолок, передняя часть — панель, остальное — обивка.
+ * Ось X направлена вдоль машины, нос в плюс.
+ */
+export function classifyCabin(center: THREE.Vector3, cabin: THREE.Box3): PartRole {
+  const size = cabin.getSize(new THREE.Vector3());
+  const up = size.y > 0 ? (center.y - cabin.min.y) / size.y : 0.5;
+  const front = size.x > 0 ? (center.x - cabin.min.x) / size.x : 0.5;
+
+  if (up < CABIN_ZONES.floorTop) return "cabinFloor";
+  if (up > CABIN_ZONES.roofBottom) return "cabinRoof";
+  if (front > CABIN_ZONES.dashFront) return "cabinAccent";
+  return "cabinLeather";
+}
+
+/** Схлопнутый прореживанием меш: пара треугольников на объёмный габарит. */
+export function isDebris(mesh: THREE.Mesh, box: THREE.Box3): boolean {
+  const index = mesh.geometry.getIndex();
+  const count = index ? index.count : (mesh.geometry.getAttribute("position")?.count ?? 0);
+  if (count / 3 > DEBRIS.maxTriangles) return false;
+
+  const size = box.getSize(new THREE.Vector3());
+  const [, median] = [size.x, size.y, size.z].sort((a, b) => a - b);
+  return median > DEBRIS.minSpan;
 }

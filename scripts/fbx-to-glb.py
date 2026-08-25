@@ -19,6 +19,12 @@ import bpy
 
 DEFAULT_MAX_TRIS = 300_000
 
+# Мелкие детали не прореживаются: на бюджет они почти не влияют, а вот
+# схлопнуть их легко — от меша остаётся пара треугольников, растянутых на
+# весь исходный габарит, и в сцене это выглядит плоским лоскутом поперёк
+# машины. Ровно так пропал задний фонарь в первой выгрузке.
+MIN_TRIS_TO_DECIMATE = 400
+
 TRANSLIT = {
     "а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "е": "e", "ё": "e",
     "ж": "zh", "з": "z", "и": "i", "й": "i", "к": "k", "л": "l", "м": "m",
@@ -80,17 +86,19 @@ def reset_scene():
 
 
 def scene_tris():
-    total = 0
-    for obj in bpy.data.objects:
-        if obj.type == "MESH":
-            total += sum(len(p.vertices) - 2 for p in obj.data.polygons)
-    return total
+    return sum(mesh_tris(o) for o in bpy.data.objects if o.type == "MESH")
+
+
+def mesh_tris(obj):
+    return sum(len(p.vertices) - 2 for p in obj.data.polygons)
 
 
 def decimate(ratio):
-    """Схлопывает геометрию всех мешей до заданной доли от исходной."""
+    """Схлопывает геометрию крупных мешей до заданной доли от исходной."""
     for obj in bpy.data.objects:
         if obj.type != "MESH" or not obj.data.polygons:
+            continue
+        if mesh_tris(obj) < MIN_TRIS_TO_DECIMATE:
             continue
         mod = obj.modifiers.new(name="ccr_decimate", type="DECIMATE")
         mod.decimate_type = "COLLAPSE"

@@ -5,6 +5,7 @@ import { Bloom, BrightnessContrast, EffectComposer, HueSaturation, N8AO } from "
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import CarModel from "./CarModel";
+import { CABIN_MID_X, CABIN_ROOF_Y } from "./cabin";
 import Showroom from "./Showroom";
 import { BuildConfig, isInteriorFocus, type CameraFocus } from "./config";
 
@@ -405,6 +406,16 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
           shadow-camera-bottom={-6}
         />
         <CarModel config={config} />
+
+        {/* Мягкий плафон в салоне: зальный свет внутрь кабины не попадает,
+            и без него интерьер через стёкла читается чёрной дырой. */}
+        <pointLight
+          position={[CABIN_MID_X, CABIN_ROOF_Y - 0.18, 0]}
+          intensity={1.1}
+          distance={4.2}
+          decay={1.8}
+          color="#fff3e8"
+        />
 
         <Showroom key={config.night ? "night" : "day"} night={config.night} />
         <WarmUpFrames />

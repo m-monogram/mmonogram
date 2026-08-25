@@ -3,8 +3,8 @@ import { useGLTF } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { BuildConfig, PAINTS, RIM_FINISHES } from "./config";
-import { DRACO_PATH, MODEL_FILES, type FileRole, type PartRole } from "./models";
-import { classifyPart, computeFit, describeMaterial, type Fit } from "./fitModel";
+import { DRACO_PATH, MODEL_FILES, ROLE_DEBUG_COLORS, type FileRole, type PartRole } from "./models";
+import { classifyCabin, classifyPart, computeFit, describeMaterial, isDebris, type Fit } from "./fitModel";
 
 /**
  * Оцифрованная сборка G63 вместо процедурной заглушки.
@@ -52,10 +52,12 @@ function Parts({
     root.updateMatrixWorld(true);
 
     const byRole: Record<PartRole, THREE.Mesh[]> = {
-      body: [], wheel: [], tire: [], glass: [], taillight: [],
-      light: [], chrome: [], carbon: [], interior: [], trim: [],
+      body: [], wheel: [], wheelAccent: [], tire: [], glass: [], taillight: [],
+      light: [], chrome: [], carbon: [], cabinLeather: [], cabinAccent: [],
+      cabinFloor: [], cabinRoof: [], trim: [],
     };
 
+    const cabin = kind === "interior" ? new THREE.Box3().setFromObject(root) : null;
     const box = new THREE.Box3();
     root.traverse((node) => {
       const mesh = node as THREE.Mesh;
@@ -63,20 +65,31 @@ function Parts({
       mesh.castShadow = true;
       mesh.receiveShadow = true;
 
-      if (kind === "interior") {
-        // Салон не разбираем: красить его кузовной краской нельзя,
-        // а переключаемых частей внутри нет.
-        byRole.interior.push(mesh);
+      box.setFromObject(mesh);
+      if (isDebris(mesh, box)) {
+        mesh.visible = false;
+        return;
+      }
+      if (cabin) {
+        const center = box.getCenter(new THREE.Vector3());
+        byRole[classifyCabin(center, cabin)].push(mesh);
         return;
       }
 
       const source = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
-      const centerY = box.setFromObject(mesh).getCenter(new THREE.Vector3()).y;
-      byRole[classifyPart(describeMaterial(source), centerY, fit.carSize.y, mesh.name)].push(mesh);
+      byRole[classifyPart(describeMaterial(source), box, fit.carSize, mesh.name)].push(mesh);
     });
 
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("parts")) {
+      for (const [role, meshes] of Object.entries(byRole)) {
+        if (meshes.length) {
+          console.info(`[${url.split("/").pop()}] ${role}:`, meshes.map((m) => m.name).join(", "));
+        }
+      }
+    }
+
     return { root, byRole, fit, minY: new THREE.Box3().setFromObject(root).min.y };
-  }, [scene, shared, kind]);
+  }, [scene, shared, kind, url]);
 
   useLayoutEffect(() => {
     onGround?.(url, prepared.minY);
@@ -112,7 +125,20 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
   const body = useGLTF(MODEL_FILES.body, DRACO_PATH);
   const fit = useMemo(() => computeFit(body.scene.clone(true)), [body.scene]);
 
+  const debugRoles = useMemo(
+    () => typeof window !== "undefined" && new URLSearchParams(window.location.search).has("parts"),
+    [],
+  );
+
   const materials = useMemo<Materials>(() => {
+    if (debugRoles) {
+      const debug = {} as Materials;
+      for (const [role, color] of Object.entries(ROLE_DEBUG_COLORS)) {
+        debug[role as PartRole] = new THREE.MeshBasicMaterial({ color });
+      }
+      return debug;
+    }
+
     const paint = PAINTS[config.paint];
     const finish = RIM_FINISHES[config.rimFinish];
     return {
@@ -123,12 +149,20 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
         clearcoat: 1,
         clearcoatRoughness: 0.05,
       }),
-      wheel: new THREE.MeshStandardMaterial({
+      // Поле диска у G63 Iconic глянцево-чёрное, отделкой красятся спицы
+      wheel: new THREE.MeshPhysicalMaterial({
+        color: "#0a0a0b",
+        metalness: 0.6,
+        roughness: 0.14,
+        clearcoat: 1,
+        clearcoatRoughness: 0.06,
+      }),
+      wheelAccent: new THREE.MeshStandardMaterial({
         color: finish.color,
         metalness: finish.metalness,
         roughness: finish.roughness,
       }),
-      tire: new THREE.MeshStandardMaterial({ color: "#0e0e0e", metalness: 0, roughness: 0.95 }),
+      tire: new THREE.MeshStandardMaterial({ color: "#202427", metalness: 0, roughness: 0.92 }),
       glass: new THREE.MeshPhysicalMaterial({
         color: "#10151a",
         metalness: 0.25,
@@ -150,19 +184,44 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
         emissiveIntensity: config.lights ? 1.6 : 0.05,
       }),
       chrome: new THREE.MeshStandardMaterial({ color: "#cfd3d6", metalness: 1, roughness: 0.08 }),
-      carbon: new THREE.MeshPhysicalMaterial({
-        color: "#1a1b1f",
-        metalness: 0.55,
-        roughness: 0.4,
-        clearcoat: 1,
-        clearcoatRoughness: 0.1,
-      }),
+      // Выключенный карбон-пакет означает «в цвет кузова» — так и в панели
+      carbon: config.carbon
+        ? new THREE.MeshPhysicalMaterial({
+            color: "#1a1b1f",
+            metalness: 0.55,
+            roughness: 0.4,
+            clearcoat: 1,
+            clearcoatRoughness: 0.1,
+          })
+        : new THREE.MeshPhysicalMaterial({
+            color: paint.color,
+            metalness: paint.metalness,
+            roughness: paint.roughness,
+            clearcoat: 1,
+            clearcoatRoughness: 0.05,
+          }),
       trim: new THREE.MeshStandardMaterial({ color: "#141414", metalness: 0.4, roughness: 0.6 }),
-      interior: config.carbon
-        ? new THREE.MeshPhysicalMaterial({ color: "#1a1b1f", metalness: 0.5, roughness: 0.42, clearcoat: 0.8 })
-        : new THREE.MeshStandardMaterial({ color: "#26221f", metalness: 0.15, roughness: 0.72 }),
+      /* Палитра салона снята с фотографий проекта (g3-iconic-gold-rearseats):
+         чёрная кожа сидений #231e1d, коньячные панели #4e2a26…#613c36,
+         тёмный потолок #0f0c0d. */
+      cabinLeather: new THREE.MeshPhysicalMaterial({
+        color: "#231e1d",
+        metalness: 0.02,
+        roughness: 0.5,
+        clearcoat: 0.35,
+        clearcoatRoughness: 0.5,
+      }),
+      cabinAccent: new THREE.MeshPhysicalMaterial({
+        color: "#5a3630",
+        metalness: 0.03,
+        roughness: 0.45,
+        clearcoat: 0.5,
+        clearcoatRoughness: 0.4,
+      }),
+      cabinFloor: new THREE.MeshStandardMaterial({ color: "#100d0e", metalness: 0, roughness: 0.95 }),
+      cabinRoof: new THREE.MeshStandardMaterial({ color: "#131011", metalness: 0, roughness: 0.94 }),
     };
-  }, [config.paint, config.rimFinish, config.carbon, config.lights]);
+  }, [debugRoles, config.paint, config.rimFinish, config.carbon, config.lights]);
 
   useLayoutEffect(() => () => Object.values(materials).forEach((m) => m.dispose()), [materials]);
 
@@ -203,10 +262,6 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
 
       <OptionalBoundary label="интерьер">
         <Parts url={MODEL_FILES.interior} fit={fit} kind="interior" materials={materials} />
-      </OptionalBoundary>
-
-      <OptionalBoundary label="руль">
-        <Parts url={MODEL_FILES.wheel} fit={fit} kind="interior" materials={materials} />
       </OptionalBoundary>
     </group>
   );
