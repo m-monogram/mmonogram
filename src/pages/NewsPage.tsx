@@ -75,9 +75,17 @@ const NewsPage = () => {
           decoding="async"
           className="absolute inset-0 w-full h-full object-cover object-[center_45%]"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-transparent" />
-        {/* Нижний градиент — текст хиро расположен внизу, поверх светлой части фото */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+        {/* Dark scrim focused where the copy sits — bottom + left */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `
+              linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.72) 42%, rgba(0,0,0,0.45) 72%, rgba(0,0,0,0.55) 100%),
+              linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 45%, transparent 75%)
+            `,
+          }}
+          aria-hidden
+        />
         <MediaEdgeFade edges="bottom" />
         <div className="relative z-10 h-full flex flex-col justify-end pb-12 sm:pb-16 px-4 sm:px-8 lg:px-12 max-w-[1600px] mx-auto">
           <motion.button
@@ -86,7 +94,7 @@ const NewsPage = () => {
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 mb-6 text-white/60 hover:text-white transition-colors self-start"
+            className="inline-flex items-center gap-2 mb-6 text-white/85 hover:text-white transition-colors self-start drop-shadow-[0_1px_8px_rgba(0,0,0,0.85)]"
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="font-display text-[11px] uppercase tracking-[0.25em]">
@@ -97,7 +105,7 @@ const NewsPage = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="block font-display text-[11px] uppercase tracking-[0.35em] text-white/55 mb-4"
+            className="block font-display text-[11px] uppercase tracking-[0.35em] text-white/75 mb-4 drop-shadow-[0_1px_8px_rgba(0,0,0,0.85)]"
           >
             {t("news.eyebrow")}
           </motion.span>
@@ -105,7 +113,7 @@ const NewsPage = () => {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15 }}
-            className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-[88px] text-white tracking-tight leading-[1.02]"
+            className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-[88px] text-white tracking-tight leading-[1.02] drop-shadow-[0_2px_18px_rgba(0,0,0,0.75)]"
           >
             {t("news.title")}
           </motion.h1>
@@ -113,7 +121,7 @@ const NewsPage = () => {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.25 }}
-            className="mt-4 sm:mt-6 max-w-2xl font-body text-sm sm:text-base text-white/65 leading-relaxed"
+            className="mt-4 sm:mt-6 max-w-2xl font-body text-sm sm:text-base text-white/80 leading-relaxed drop-shadow-[0_1px_10px_rgba(0,0,0,0.8)]"
           >
             {t("news.subtitle")}
           </motion.p>

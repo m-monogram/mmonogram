@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, X, Calendar } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -6,7 +6,6 @@ import logoWhite from "@/assets/logo-white.webp";
 import logoBlack from "@/assets/logo-black.webp";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSwitcher from "./LanguageSwitcher";
-import { AuroraBackground } from "@/components/ui/aurora-background";
 
 // Menu images - themed for each section
 import menuHome from "@/assets/menu/menu-home.webp";
@@ -15,7 +14,7 @@ import menuProjects from "@/assets/g63-quarter-new.webp";
 import menuModifications from "@/assets/commission-hero-final.webp";
 import menuVerify from "@/assets/menu/menu-verify.webp";
 import menuContact from "@/assets/menu/menu-contact-new.jpg.webp";
-import menuNews from "@/assets/hero-main-new.webp";
+import menuNews from "@/assets/news/m-monogram-g-iconic/01-cover.jpeg";
 interface HeaderProps {
   currentView?: string;
   setCurrentView?: (view: string) => void;
@@ -184,6 +183,16 @@ const Header = ({
     setMenuClosing(true);
     setMenuOpen(false);
   };
+
+  // Opaque menu must freeze the page behind it
+  useEffect(() => {
+    if (!menuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [menuOpen]);
   const navItems = [{
     labelKey: 'nav.brand',
     view: 'brand',
@@ -292,14 +301,21 @@ const Header = ({
       }} exit={{
         opacity: 0
       }} transition={{
-        duration: 0.4,
+        duration: 0.35,
         ease: "easeOut"
-      }} className="fixed inset-0 z-[200] overflow-y-auto">
-        {/* Premium Aurora Background */}
-        <AuroraBackground className="absolute inset-0" intensity="subtle" showRadialGradient={true}>
-          {/* Children required by AuroraBackground */}
-          <div className="absolute inset-0 bg-premium-black/50" />
-        </AuroraBackground>
+      }} className="fixed inset-0 z-[200] overflow-y-auto bg-black" style={{
+        backgroundColor: "#000"
+      }}>
+        {/* Solid black stage — page behind must never show through */}
+        <div className="fixed inset-0 z-0 bg-black" aria-hidden />
+        <div
+          className="pointer-events-none fixed inset-0 z-[1]"
+          style={{
+            background:
+              "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255,255,255,0.05), transparent 55%)",
+          }}
+          aria-hidden
+        />
 
         {/* Menu Header with Logo, Language, and Close */}
         <div className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6" style={{
