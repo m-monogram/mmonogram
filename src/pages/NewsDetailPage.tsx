@@ -6,7 +6,6 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import NewsContentRenderer from "@/components/news/NewsContentRenderer";
-import MediaEdgeFade from "@/components/MediaEdgeFade";
 import NewsCard from "@/components/news/NewsCard";
 import { getNewsBySlug, getRelatedNews } from "@/data/news";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -163,15 +162,17 @@ const NewsDetailPage = () => {
       {/* Hero — editorial cinematic */}
       <article>
         <header>
-          <section className="relative w-full h-[58vh] min-h-[420px] max-h-[680px] overflow-hidden">
+          <section className="relative w-full overflow-hidden bg-black">
             <img
               src={item.cover}
               alt={title}
               fetchpriority="high"
               decoding="async"
-              className="absolute inset-0 w-full h-full object-cover object-center"
+              className="block w-full h-auto"
             />
-            <MediaEdgeFade edges="both" />
+            {/* Soft top for header + bottom fade into title block (as before MediaEdgeFade) */}
+            <div className="absolute inset-x-0 top-0 h-24 sm:h-28 bg-gradient-to-b from-black/50 to-transparent pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-premium-black via-premium-black/65 to-transparent pointer-events-none" />
           </section>
 
           {/* Editorial title block — sits BELOW the image, no overlap */}
