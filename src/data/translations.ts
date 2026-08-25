@@ -57,6 +57,8 @@ export const translations: Record<Language, any> = {
       eyebrow: 'Interactive Experience',
       overview: 'Overview',
       launch: 'Launch 3D Studio',
+      openMenu: 'Open Configuration Menu',
+      closeMenu: 'Close menu',
     },
     hero: {
       title: 'M-Monogram',
@@ -413,6 +415,8 @@ export const translations: Record<Language, any> = {
       eyebrow: 'Интерактивный опыт',
       overview: 'Обзор сборки',
       launch: 'Открыть 3D студию',
+      openMenu: 'Открыть меню конфигурации',
+      closeMenu: 'Закрыть меню',
     },
     hero: {
       title: 'M-Monogram',
@@ -769,6 +773,8 @@ export const translations: Record<Language, any> = {
       eyebrow: 'تجربة تفاعلية',
       overview: 'ملخص التصميم',
       launch: 'افتح الاستوديو ثلاثي الأبعاد',
+      openMenu: 'فتح قائمة التكوين',
+      closeMenu: 'إغلاق القائمة',
     },
     hero: {
       title: 'M-Monogram',

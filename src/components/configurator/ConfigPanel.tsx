@@ -181,7 +181,7 @@ export default function ConfigPanel({ config, onChange, onSectionChange }: Confi
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -24, opacity: 0 }}
             transition={{ duration: 0.22, ease: "easeOut" }}
-            className="flex flex-col p-2.5"
+            className="flex flex-col p-2"
           >
             <div className="flex flex-col divide-y divide-white/[0.06]">
               {rootItems.map((item) => (
@@ -189,7 +189,7 @@ export default function ConfigPanel({ config, onChange, onSectionChange }: Confi
                   key={item.id}
                   type="button"
                   onClick={() => setSection(item.id)}
-                  className="group flex items-center gap-3.5 px-3 py-[15px] hover:bg-white/[0.04] transition-colors cursor-pointer text-left"
+                  className="group flex items-center gap-3 px-3 py-3 hover:bg-white/[0.04] transition-colors cursor-pointer text-left"
                 >
                   <span className="text-white/50 group-hover:text-white/80 transition-colors shrink-0">{item.icon}</span>
                   <span className="font-body text-sm text-white/90">{item.label}</span>
@@ -204,7 +204,7 @@ export default function ConfigPanel({ config, onChange, onSectionChange }: Confi
               <button
                 type="button"
                 onClick={handleShare}
-                className="group flex items-center gap-3.5 px-3 py-[15px] hover:bg-white/[0.04] transition-colors cursor-pointer text-left"
+                className="group flex items-center gap-3 px-3 py-3 hover:bg-white/[0.04] transition-colors cursor-pointer text-left"
               >
                 <span className="text-white/50 group-hover:text-white/80 transition-colors shrink-0">
                   {copied ? <Check className="w-[18px] h-[18px]" /> : <Link2 className="w-[18px] h-[18px]" />}
@@ -214,7 +214,7 @@ export default function ConfigPanel({ config, onChange, onSectionChange }: Confi
               <button
                 type="button"
                 onClick={handleScreenshot}
-                className="group flex items-center gap-3.5 px-3 py-[15px] hover:bg-white/[0.04] transition-colors cursor-pointer text-left"
+                className="group flex items-center gap-3 px-3 py-3 hover:bg-white/[0.04] transition-colors cursor-pointer text-left"
               >
                 <span className="text-white/50 group-hover:text-white/80 transition-colors shrink-0">
                   <Camera className="w-[18px] h-[18px]" />

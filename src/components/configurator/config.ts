@@ -56,6 +56,9 @@ export interface BuildConfig {
   night: boolean;
 }
 
+/** Camera presets tied to config panel sections */
+export type CameraFocus = "default" | "exterior" | "wheels" | "kit" | "carbon" | "lights" | "env";
+
 export const DEFAULT_CONFIG: BuildConfig = {
   paint: 0,
   rim: 1,

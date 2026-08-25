@@ -1,11 +1,18 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { BuildConfig, decodeConfig, encodeConfig } from "@/components/configurator/config";
+import {
+  BuildConfig,
+  decodeConfig,
+  encodeConfig,
+  type CameraFocus,
+} from "@/components/configurator/config";
 import ConfigPanel from "@/components/configurator/ConfigPanel";
-import type { CameraFocus } from "@/components/configurator/Scene";
+import SceneErrorBoundary from "@/components/configurator/SceneErrorBoundary";
 
 // three.js подтягивается только на этой странице — остальной сайт не тяжелеет
 const ConfiguratorScene = lazy(() => import("@/components/configurator/Scene"));
@@ -15,8 +22,9 @@ const ConfiguratorPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [config, setConfig] = useState<BuildConfig>(() => decodeConfig(searchParams.get("c")));
   const [focus, setFocus] = useState<CameraFocus>("default");
+  // Меню скрыто по умолчанию — машина видна целиком, открывается стрелкой
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  // Конфигурация живёт в URL — ссылкой можно делиться, как у Mansory
   const handleChange = useCallback(
     (next: BuildConfig) => {
       setConfig(next);
@@ -29,6 +37,11 @@ const ConfiguratorPage = () => {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, []);
 
+  const closeMenu = useCallback(() => {
+    setMenuOpen(false);
+    setFocus("default");
+  }, []);
+
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden bg-premium-black">
       <SEOHead
@@ -36,30 +49,33 @@ const ConfiguratorPage = () => {
         description="Configure your bespoke M-Monogram G-Class in real-time 3D: body colors, forged wheels, carbon packages and the M-Monogram body kit."
         path="/configurator"
       />
-      {/* Студийный фон светлый — шапке нужен тёмный вариант; ночью наоборот */}
       <Header variant={config.night ? "dark" : "light"} />
 
-      {/* 3D-сцена */}
       <div id="configurator-canvas" className="absolute inset-0">
-        <Suspense
-          fallback={
-            <div className="w-full h-full flex items-center justify-center">
-              <p className="font-display text-xs uppercase tracking-[0.3em] text-foreground/40 animate-pulse">
-                {t("hero.loading")}...
-              </p>
-            </div>
-          }
-        >
-          <ConfiguratorScene config={config} focus={focus} />
-        </Suspense>
+        <SceneErrorBoundary>
+          <Suspense
+            fallback={
+              <div className="w-full h-full flex items-center justify-center">
+                <p className="font-display text-xs uppercase tracking-[0.3em] text-foreground/40 animate-pulse">
+                  {t("hero.loading")}...
+                </p>
+              </div>
+            }
+          >
+            <ConfiguratorScene config={config} focus={focus} />
+          </Suspense>
+        </SceneErrorBoundary>
       </div>
 
-      {/* Заголовок */}
       <div
         className={`absolute left-4 sm:left-6 md:left-12 z-20 pointer-events-none ${config.night ? "text-white" : "text-black"}`}
         style={{ top: `calc(env(safe-area-inset-top, 0px) + 6rem)` }}
       >
-        <h1 className={`font-display text-xl sm:text-2xl md:text-3xl uppercase tracking-[0.18em] ${config.night ? "text-white" : "text-black"}`}>
+        <h1
+          className={`font-display text-xl sm:text-2xl md:text-3xl uppercase tracking-[0.18em] ${
+            config.night ? "text-white" : "text-black"
+          }`}
+        >
           {t("config.title")}
         </h1>
         <p className={`mt-1 font-body text-[11px] sm:text-xs ${config.night ? "text-white/50" : "text-black/60"}`}>
@@ -67,7 +83,6 @@ const ConfiguratorPage = () => {
         </p>
       </div>
 
-      {/* Подсказка и пометка о демо-модели */}
       <div
         className={`absolute left-4 sm:left-6 md:left-12 bottom-4 z-20 pointer-events-none hidden md:block ${
           config.night ? "text-white/40" : "text-black/40"
@@ -77,14 +92,99 @@ const ConfiguratorPage = () => {
         <p className="font-body text-[10px] mt-1 opacity-70">{t("config.demoNote")}</p>
       </div>
 
-      {/* Панель настроек: справа на десктопе, нижний лист на мобильном */}
-      <aside className="absolute z-30 md:right-6 md:top-1/2 md:-translate-y-1/2 md:w-[300px] md:max-h-[86vh] inset-x-0 bottom-0 max-h-[52vh] md:inset-x-auto md:bottom-auto overflow-y-auto bg-[#101010]/90 backdrop-blur-2xl border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.55)]">
-        <ConfigPanel
-          config={config}
-          onChange={handleChange}
-          onSectionChange={(s) => setFocus(s && s !== "overview" ? s : "default")}
-        />
-      </aside>
+      {/* Стрелка открытия — справа, как в референсе Mansory */}
+      <AnimatePresence>
+        {!menuOpen && (
+          <motion.div
+            key="open-toggle"
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 12 }}
+            transition={{ duration: 0.25 }}
+            className="absolute z-40 right-3 sm:right-5 top-[max(6.75rem,18%)] flex flex-col items-center gap-2"
+          >
+            <button
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              aria-label={t("config.openMenu")}
+              className={`group relative flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-md shadow-lg transition-transform hover:scale-[1.04] active:scale-[0.98] cursor-pointer ${
+                config.night
+                  ? "bg-white text-black hover:bg-white/90"
+                  : "bg-[#ececec] text-black hover:bg-white border border-black/10"
+              }`}
+            >
+              <ChevronLeft className="w-5 h-5" strokeWidth={2.25} />
+            </button>
+            <span
+              className={`pointer-events-none hidden sm:block max-w-[7.5rem] text-center font-body text-[9px] uppercase tracking-[0.14em] leading-tight px-2 py-1.5 rounded-sm ${
+                config.night ? "bg-black/70 text-white/85" : "bg-[#1a1a1a]/85 text-white/90"
+              }`}
+            >
+              {t("config.openMenu")}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Выезжающая панель конфигурации */}
+      <AnimatePresence>
+        {menuOpen && (
+          <>
+            {/* Лёгкий затемняющий слой только на мобиле */}
+            <motion.button
+              type="button"
+              tabIndex={-1}
+              aria-label={t("config.closeMenu")}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeMenu}
+              className="absolute inset-0 z-30 bg-black/35 md:bg-transparent md:pointer-events-none cursor-pointer md:cursor-default"
+            />
+
+            <motion.aside
+              initial={{ x: "110%", opacity: 0.6 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "110%", opacity: 0.6 }}
+              transition={{ type: "spring", stiffness: 380, damping: 36 }}
+              className="absolute z-40 flex flex-col gap-2.5
+                right-3 sm:right-5
+                top-[max(5.5rem,env(safe-area-inset-top)+4.5rem)]
+                bottom-[max(1rem,env(safe-area-inset-bottom))]
+                w-[min(292px,calc(100vw-1.5rem))]
+                md:top-1/2 md:bottom-auto md:-translate-y-1/2 md:max-h-[min(78vh,640px)]"
+            >
+              <div className="relative flex-1 min-h-0 overflow-y-auto rounded-xl border border-white/12 bg-[#121212]/92 backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.55)]">
+                {/* Кнопка свернуть на краю панели */}
+                <button
+                  type="button"
+                  onClick={closeMenu}
+                  aria-label={t("config.closeMenu")}
+                  className="absolute -left-3 top-5 z-10 hidden md:flex h-8 w-8 items-center justify-center rounded-md bg-white text-black shadow-md hover:bg-white/90 transition-colors cursor-pointer"
+                >
+                  <ChevronRight className="w-4 h-4" strokeWidth={2.25} />
+                </button>
+
+                <ConfigPanel
+                  config={config}
+                  onChange={handleChange}
+                  onSectionChange={(s) => setFocus(s && s !== "overview" ? s : "default")}
+                />
+              </div>
+
+              {/* Отдельная кнопка закрытия под меню — как в референсе */}
+              <button
+                type="button"
+                onClick={closeMenu}
+                aria-label={t("config.closeMenu")}
+                className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-[#2a2a2a]/95 border border-white/10 text-white hover:bg-[#353535] transition-colors cursor-pointer shadow-lg"
+              >
+                <X className="w-4 h-4" strokeWidth={2} />
+              </button>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

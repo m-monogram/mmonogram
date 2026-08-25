@@ -27,6 +27,10 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Keep 3D deps prebundled — a broken .vite/deps cache returns 504 and blanks /configurator
+  optimizeDeps: {
+    include: ["three", "@react-three/fiber", "@react-three/drei", "three-stdlib"],
+  },
   build: {
     target: 'esnext',
     rollupOptions: {
