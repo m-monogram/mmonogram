@@ -78,7 +78,19 @@ const ConfiguratorPage = () => {
       </div>
 
       {/* Панель настроек: справа на десктопе, нижний лист на мобильном */}
-      <aside className="absolute z-30 md:right-6 md:top-1/2 md:-translate-y-1/2 md:w-[300px] md:max-h-[86vh] inset-x-0 bottom-0 max-h-[52vh] md:inset-x-auto md:bottom-auto overflow-y-auto bg-[#101010]/90 backdrop-blur-2xl border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.55)]">
+      {/* Панель: сбоку на десктопе, нижний лист на мобильном (со своей прокруткой) */}
+      <aside
+        className="absolute z-30 inset-x-0 bottom-0 max-h-[62dvh] rounded-t-2xl
+                   md:inset-x-auto md:bottom-auto md:right-6 md:top-1/2 md:-translate-y-1/2
+                   md:w-[300px] md:max-h-[86vh] md:rounded-none
+                   overflow-y-auto overscroll-contain bg-[#101010]/92 backdrop-blur-2xl
+                   border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+      >
+        {/* Ручка захвата — только на мобильном */}
+        <div className="md:hidden sticky top-0 z-10 flex justify-center pt-2.5 pb-1.5 bg-[#101010]/92 backdrop-blur-2xl">
+          <span className="w-10 h-1 rounded-full bg-white/25" />
+        </div>
         <ConfigPanel
           config={config}
           onChange={handleChange}

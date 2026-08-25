@@ -5,6 +5,7 @@ import { Bloom, BrightnessContrast, EffectComposer, HueSaturation, N8AO } from "
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import GClassModel from "./GClassModel";
+import Showroom from "./Showroom";
 import { BuildConfig } from "./config";
 
 export type CameraFocus = "default" | "exterior" | "wheels" | "kit" | "carbon" | "lights" | "env";
@@ -24,31 +25,31 @@ interface CameraPreset {
 const PRESETS: Record<CameraFocus, { desktop: CameraPreset; mobile: CameraPreset }> = {
   default: {
     desktop: { azimuth: 44, polar: 76, distance: 7.6, target: [0, 0.9, 0] },
-    mobile: { azimuth: 44, polar: 76, distance: 11.8, target: [0, 0.35, 0] },
+    mobile: { azimuth: 44, polar: 74, distance: 11.0, target: [0, -0.45, 0] },
   },
   exterior: {
     desktop: { azimuth: 78, polar: 80, distance: 7.0, target: [0, 0.85, 0] },
-    mobile: { azimuth: 78, polar: 80, distance: 10.5, target: [0, 0.4, 0] },
+    mobile: { azimuth: 78, polar: 78, distance: 10.2, target: [0, -0.4, 0] },
   },
   wheels: {
     desktop: { azimuth: 52, polar: 83, distance: 3.6, target: [1.45, 0.55, 0.4] },
-    mobile: { azimuth: 52, polar: 83, distance: 4.6, target: [1.45, 0.35, 0.3] },
+    mobile: { azimuth: 52, polar: 81, distance: 4.6, target: [1.45, -0.25, 0.3] },
   },
   kit: {
     desktop: { azimuth: 148, polar: 77, distance: 7.4, target: [-0.4, 0.85, 0] },
-    mobile: { azimuth: 148, polar: 77, distance: 10.8, target: [-0.4, 0.4, 0] },
+    mobile: { azimuth: 148, polar: 75, distance: 10.4, target: [-0.4, -0.4, 0] },
   },
   carbon: {
     desktop: { azimuth: 26, polar: 55, distance: 5.6, target: [1.1, 1.05, 0] },
-    mobile: { azimuth: 26, polar: 55, distance: 7.6, target: [1.1, 0.7, 0] },
+    mobile: { azimuth: 26, polar: 55, distance: 7.6, target: [1.1, -0.1, 0] },
   },
   lights: {
     desktop: { azimuth: 8, polar: 79, distance: 5.8, target: [1.6, 0.85, 0] },
-    mobile: { azimuth: 8, polar: 79, distance: 7.8, target: [1.6, 0.5, 0] },
+    mobile: { azimuth: 8, polar: 77, distance: 7.6, target: [1.6, -0.25, 0] },
   },
   env: {
     desktop: { azimuth: 60, polar: 70, distance: 9.0, target: [0, 0.9, 0] },
-    mobile: { azimuth: 60, polar: 70, distance: 13.0, target: [0, 0.35, 0] },
+    mobile: { azimuth: 60, polar: 70, distance: 11.0, target: [0, -0.45, 0] },
   },
 };
 
@@ -144,6 +145,36 @@ function CameraRig({
   return null;
 }
 
+/**
+ * Камера физически не должна выходить за стены и потолок помещения.
+ * Предел по высоте зависит от текущей дистанции, поэтому minPolarAngle
+ * пересчитывается каждый кадр: вблизи можно смотреть почти сверху,
+ * издалека — только с уровня зала.
+ */
+function ConfineCamera({
+  night,
+  controlsRef,
+}: {
+  night: boolean;
+  controlsRef: React.RefObject<OrbitControlsImpl>;
+}) {
+  const { camera } = useThree();
+  useFrame(() => {
+    const controls = controlsRef.current;
+    if (!controls) return;
+    const ceiling = night ? 5.6 : 10.5; // потолок гаража / высота циклорамы
+    const distance = camera.position.distanceTo(controls.target);
+    const headroom = ceiling - controls.target.y;
+    const minPolar = distance > headroom ? Math.acos(Math.min(1, headroom / distance)) : 0.12;
+    controls.minPolarAngle = Math.max(0.12, minPolar);
+    // и не опускаться ниже пола
+    const floorGap = 0.55 - controls.target.y;
+    const maxPolar = distance > Math.abs(floorGap) ? Math.acos(Math.max(-1, floorGap / distance)) : Math.PI / 2.05;
+    controls.maxPolarAngle = Math.min(Math.PI / 2.02, maxPolar);
+  });
+  return null;
+}
+
 /* Любое изменение конфигурации должно перерисовать кадр в demand-режиме */
 function InvalidateOnConfig({ config }: { config: BuildConfig }) {
   const { invalidate } = useThree();
@@ -154,51 +185,47 @@ function InvalidateOnConfig({ config }: { config: BuildConfig }) {
 }
 
 /**
- * Студийное окружение из Lightformer-панелей, рендерится в кубкарту локально —
- * без загрузки HDRI с внешних CDN.
+ * Окружение рендерится в кубкарту локально — без загрузки HDRI с внешних CDN.
+ * Studio: большой верхний софтбокс и боковые панели.
+ * Showroom: три продольные потолочные панели, повторяющие LED-полосы гаража,
+ * чтобы отражения в лаке совпадали с тем, что видно в помещении.
  */
-function StudioEnvironment({ night }: { night: boolean }) {
+function SceneEnvironment({ night }: { night: boolean }) {
   return (
-    <Environment resolution={256} frames={1}>
-      <color attach="background" args={[night ? "#050505" : "#3a3d40"]} />
-      <Lightformer intensity={night ? 4 : 7} position={[0, 5, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[10, 6, 1]} />
-      <Lightformer intensity={night ? 1.5 : 2.5} position={[-6, 2, 0]} rotation={[0, Math.PI / 2, 0]} scale={[8, 1.2, 1]} />
-      <Lightformer intensity={night ? 1.5 : 2.5} position={[6, 2, 0]} rotation={[0, -Math.PI / 2, 0]} scale={[8, 1.2, 1]} />
-      <Lightformer intensity={night ? 1 : 1.8} position={[0, 2, 7]} rotation={[0, Math.PI, 0]} scale={[7, 1.5, 1]} />
-      <Lightformer intensity={night ? 0.8 : 1.4} position={[0, 2, -7]} scale={[7, 1.5, 1]} />
+    <Environment resolution={night ? 512 : 256} frames={1}>
+      <color attach="background" args={[night ? "#08090a" : "#3a3d40"]} />
+      {night ? (
+        <>
+          {[-5.4, 0, 5.4].map((z) => (
+            <Lightformer
+              key={z}
+              form="rect"
+              intensity={9}
+              position={[0, 6.3, z]}
+              rotation={[Math.PI / 2, 0, 0]}
+              scale={[19, 0.8, 1]}
+            />
+          ))}
+          <Lightformer intensity={0.6} position={[-13, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} scale={[9, 3, 1]} />
+          <Lightformer intensity={0.6} position={[13, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} scale={[9, 3, 1]} />
+        </>
+      ) : (
+        <>
+          <Lightformer intensity={7} position={[0, 5, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[10, 6, 1]} />
+          <Lightformer intensity={2.5} position={[-6, 2, 0]} rotation={[0, Math.PI / 2, 0]} scale={[8, 1.2, 1]} />
+          <Lightformer intensity={2.5} position={[6, 2, 0]} rotation={[0, -Math.PI / 2, 0]} scale={[8, 1.2, 1]} />
+          <Lightformer intensity={1.8} position={[0, 2, 7]} rotation={[0, Math.PI, 0]} scale={[7, 1.5, 1]} />
+          <Lightformer intensity={1.4} position={[0, 2, -7]} scale={[7, 1.5, 1]} />
+        </>
+      )}
     </Environment>
   );
-}
-
-/* «Запечённая» подача пола: радиальный градиент затемняется к центру под машиной */
-function useFloorTexture(night: boolean) {
-  return useMemo(() => {
-    const c = document.createElement("canvas");
-    c.width = c.height = 512;
-    const ctx = c.getContext("2d")!;
-    const g = ctx.createRadialGradient(256, 256, 40, 256, 256, 256);
-    if (night) {
-      g.addColorStop(0, "#050506");
-      g.addColorStop(0.45, "#0a0a0b");
-      g.addColorStop(1, "#0d0d0e");
-    } else {
-      g.addColorStop(0, "#8f9396");
-      g.addColorStop(0.45, "#a9adb0");
-      g.addColorStop(1, "#b4b8bb");
-    }
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, 512, 512);
-    const tex = new THREE.CanvasTexture(c);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    return tex;
-  }, [night]);
 }
 
 export default function ConfiguratorScene({ config, focus = "default" }: { config: BuildConfig; focus?: CameraFocus }) {
   const controls = useRef<OrbitControlsImpl>(null);
   const flightRef = useRef<FlightState | null>(null);
-  const bg = config.night ? "#070708" : "#c7cbce";
-  const floorTex = useFloorTexture(config.night);
+  const bg = config.night ? "#08090a" : "#c7cbce";
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   return (
@@ -207,22 +234,22 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
       frameloop="demand"
       dpr={[1, 1.75]}
       gl={{ antialias: true, preserveDrawingBuffer: true }}
-      camera={{ position: isMobile ? [8.6, 3.1, 8.4] : [5.4, 2.1, 5.2], fov: 38 }}
+      camera={{ position: isMobile ? [7.9, 2.6, 7.6] : [5.4, 2.1, 5.2], fov: 38 }}
       className="touch-none"
     >
       <color attach="background" args={[bg]} />
-      <fog attach="fog" args={[bg, 18, 40]} />
 
       <InvalidateOnConfig config={config} />
+      <ConfineCamera night={config.night} controlsRef={controls} />
       <CameraRig focus={focus} isMobile={isMobile} controlsRef={controls} flightRef={flightRef} />
 
       <Suspense fallback={null}>
-        <StudioEnvironment night={config.night} />
+        <SceneEnvironment night={config.night} />
 
-        <ambientLight intensity={config.night ? 0.15 : 0.45} />
+        <ambientLight intensity={config.night ? 0.55 : 0.45} />
         <directionalLight
           position={[6, 8, 4]}
-          intensity={config.night ? 0.7 : 1.6}
+          intensity={config.night ? 1.25 : 1.6}
           castShadow
           shadow-mapSize={[2048, 2048]}
           shadow-camera-left={-6}
@@ -230,16 +257,10 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
           shadow-camera-top={6}
           shadow-camera-bottom={-6}
         />
-        {config.night && <pointLight position={[-4, 3, -4]} intensity={6} color="#3d5a80" />}
-
         <GClassModel config={config} />
 
-        {/* Пол */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.001, 0]} receiveShadow>
-          <circleGeometry args={[16, 64]} />
-          <meshStandardMaterial map={floorTex} color="#ffffff" metalness={0.15} roughness={0.85} />
-        </mesh>
-        <ContactShadows position={[0, 0.01, 0]} opacity={config.night ? 0.85 : 0.6} scale={12} blur={2.2} far={3} resolution={512} />
+        <Showroom night={config.night} />
+        <ContactShadows position={[0, 0.012, 0]} opacity={config.night ? 0.9 : 0.62} scale={12} blur={2.2} far={3} resolution={512} />
 
         {/* «Дорогая картинка» по пресету MANSORY — Quality: SAO в стыках,
             аккуратный bloom только на бликах, лёгкая студийная десатурация.
@@ -256,10 +277,8 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
         ref={controls}
         enablePan={false}
         minDistance={3.0}
-        maxDistance={14}
-        maxPolarAngle={Math.PI / 2.05}
-        minPolarAngle={0.2}
-        target={[0, isMobile ? 0.35 : 0.9, 0]}
+        maxDistance={config.night ? 11.5 : 12.5}
+        target={[0, isMobile ? -0.45 : 0.9, 0]}
         enableDamping
         dampingFactor={0.08}
         onStart={() => {
