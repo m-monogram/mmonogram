@@ -339,7 +339,7 @@ function SceneEnvironment({ night, isMobile }: { night: boolean; isMobile: boole
               scale={[19, 0.8, 1]}
             />
           ))}
-          {/* Боковые панели: рисуют борт и отделяют чёрный кузов от чёрного зала */}
+          {/* Боковые панели: рисуют борт и отделяют чёрный кузов от тёмного фона */}
           <Lightformer intensity={2.4} position={[-9, 2.2, 0]} rotation={[0, Math.PI / 2, 0]} scale={[12, 2.2, 1]} />
           <Lightformer intensity={2.4} position={[9, 2.2, 0]} rotation={[0, -Math.PI / 2, 0]} scale={[12, 2.2, 1]} />
           {/* Низкие полосы на высоте колёс: без них диски сливаются с покрышкой */}
