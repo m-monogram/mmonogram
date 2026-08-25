@@ -1,5 +1,6 @@
 import { memo, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { useNavigation } from "@/hooks/useNavigation";
 import { DBProject } from "@/hooks/useProjects";
@@ -103,29 +104,70 @@ const ProjectDetailView = memo(function ProjectDetailView({
   };
 
   if (isHub) {
+    const statement =
+      project.description?.split(".").map((s) => s.trim()).filter(Boolean).slice(0, 2).join(". ").trim();
+    const intro = statement ? `${statement}.` : project.description;
+
     return (
-      <section className="relative z-10 min-h-screen bg-white pt-[calc(env(safe-area-inset-top,0px)+7rem)] pb-20 sm:pb-28">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-10">
+      <div className="relative z-10 min-h-screen bg-black">
+        <div
+          className="absolute left-4 sm:left-6 md:left-12 z-20"
+          style={{ top: `calc(env(safe-area-inset-top, 0px) + 6rem)` }}
+        >
           <button
             type="button"
             onClick={() => navigate("/")}
-            className="mb-10 sm:mb-14 flex items-center gap-2 text-black/55 hover:text-black transition-colors font-body text-xs sm:text-sm uppercase tracking-widest cursor-pointer"
+            className="flex items-center gap-2 text-white/70 hover:text-white transition-all duration-300 font-body text-xs sm:text-sm uppercase tracking-widest cursor-pointer touch-target border border-white/20 hover:border-white/40 px-4 py-2.5 sm:px-5 sm:py-3 bg-black/50 backdrop-blur-md rounded-none"
             aria-label="Back"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back</span>
           </button>
-
-          <h1 className="font-display text-center font-bold uppercase tracking-[0.18em] text-lg sm:text-2xl md:text-3xl text-black mb-10 sm:mb-14">
-            {project.title}
-          </h1>
-
-          <ProjectEditionGrid
-            projects={editions}
-            onProjectClick={(id) => navigate(`/projects/${id}`)}
-          />
         </div>
-      </section>
+
+        <section
+          className="relative px-4 sm:px-8 lg:px-10 pb-10 sm:pb-12"
+          style={{ paddingTop: `calc(env(safe-area-inset-top, 0px) + 9rem)` }}
+        >
+          <div className="max-w-[1400px] mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0, scaleX: 0 }}
+              animate={{ opacity: 1, scaleX: 1 }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+              className="w-20 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent mx-auto mb-8"
+            />
+            <motion.h1
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.2 }}
+              className="font-display font-bold uppercase tracking-[0.18em] text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-5 sm:mb-6"
+            >
+              {project.title}
+            </motion.h1>
+            {intro ? (
+              <motion.p
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.35 }}
+                className="font-body text-sm sm:text-base md:text-lg text-white/60 leading-relaxed max-w-2xl mx-auto tracking-wide"
+              >
+                {intro}
+              </motion.p>
+            ) : null}
+          </div>
+        </section>
+
+        <section className="relative px-4 sm:px-8 lg:px-10 pb-24 sm:pb-32">
+          <div className="max-w-[1400px] mx-auto">
+            <ProjectEditionGrid
+              variant="dark"
+              columns={3}
+              projects={editions}
+              onProjectClick={(id) => navigate(`/projects/${id}`)}
+            />
+          </div>
+        </section>
+      </div>
     );
   }
 

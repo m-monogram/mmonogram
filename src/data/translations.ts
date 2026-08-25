@@ -556,7 +556,7 @@ export const translations: Record<Language, any> = {
       title: 'Официальные представители',
       subtitle: 'Найдите ближайшего представителя M-Monogram.',
       mapHint: 'Нажмите на точку или город',
-      locations: 'Локаций',
+      locations: 'Локации',
       back: 'Глобальная сеть',
       atelier: 'Ателье',
       address: 'Адрес',

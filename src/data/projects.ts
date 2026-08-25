@@ -185,7 +185,7 @@ export const projects: Project[] = [
   {
     id: "g3-iconic-black",
     editionOf: "g3-iconic",
-    title: "M Monogram Black",
+    title: "Black",
     subtitle: "ICONIC",
     year: "2024",
     duration: "12 weeks",
@@ -219,7 +219,7 @@ export const projects: Project[] = [
   {
     id: "g3-iconic-gold",
     editionOf: "g3-iconic",
-    title: "M Monogram Gold",
+    title: "Gold",
     subtitle: "ICONIC",
     year: "2024",
     duration: "12 weeks",
@@ -259,7 +259,7 @@ export const projects: Project[] = [
   {
     id: "g3-iconic-grey",
     editionOf: "g3-iconic",
-    title: "M Monogram Grey",
+    title: "Grey",
     subtitle: "ICONIC",
     year: "2024",
     duration: "12 weeks",

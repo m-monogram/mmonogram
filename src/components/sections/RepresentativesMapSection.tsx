@@ -1,6 +1,6 @@
 import { memo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import { representatives } from "@/data/representatives";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -16,16 +16,16 @@ const LABEL_OFFSET: Record<string, string> = {
 
 const GEO_STYLE = {
   default: {
-    fill: "hsl(0 0% 12%)",
-    stroke: "hsl(0 0% 26%)",
-    strokeWidth: 0.45,
+    fill: "hsl(0 0% 10%)",
+    stroke: "hsl(0 0% 22%)",
+    strokeWidth: 0.4,
     outline: "none" as const,
     pointerEvents: "none" as const,
   },
   hover: {
-    fill: "hsl(0 0% 12%)",
-    stroke: "hsl(0 0% 26%)",
-    strokeWidth: 0.45,
+    fill: "hsl(0 0% 10%)",
+    stroke: "hsl(0 0% 22%)",
+    strokeWidth: 0.4,
     outline: "none" as const,
     pointerEvents: "none" as const,
   },
@@ -77,17 +77,30 @@ const MapMarkers = memo(function MapMarkers({
                 }
               }}
             >
-              <circle r={42} fill="transparent" />
+              <circle r={48} fill="transparent" />
               <circle
-                r={isActive ? 22 : 16}
+                r={isActive ? 26 : 18}
                 fill="url(#marker-glow)"
-                style={{ pointerEvents: "none" }}
+                style={{ pointerEvents: "none", transition: "r 0.25s ease" }}
               />
+              {isActive && (
+                <circle
+                  r={10}
+                  fill="none"
+                  stroke="hsl(0 0% 100%)"
+                  strokeOpacity={0.35}
+                  strokeWidth={0.8}
+                  style={{ pointerEvents: "none" }}
+                >
+                  <animate attributeName="r" values="8;16;8" dur="2.2s" repeatCount="indefinite" />
+                  <animate attributeName="stroke-opacity" values="0.45;0;0.45" dur="2.2s" repeatCount="indefinite" />
+                </circle>
+              )}
               <circle
-                r={isActive ? 5 : 3.75}
+                r={isActive ? 5.25 : 3.9}
                 fill="hsl(0 0% 100%)"
                 stroke="hsl(0 0% 0%)"
-                strokeWidth={1.1}
+                strokeWidth={1.15}
                 style={{ pointerEvents: "none" }}
               />
               <g transform={LABEL_OFFSET[rep.id] ?? "translate(8, -5)"}>
@@ -96,14 +109,14 @@ const MapMarkers = memo(function MapMarkers({
                   y={0}
                   textAnchor={rep.id === "switzerland-hungary" ? "end" : "start"}
                   fill="hsl(0 0% 100%)"
-                  fillOpacity={isActive ? 1 : 0.8}
-                  fontSize={7.5}
+                  fillOpacity={isActive ? 1 : 0.72}
+                  fontSize={isActive ? 8.2 : 7.4}
                   fontFamily="var(--font-family-primary), sans-serif"
                   style={{
-                    letterSpacing: "0.14em",
+                    letterSpacing: "0.16em",
                     paintOrder: "stroke",
                     stroke: "hsl(0 0% 0%)",
-                    strokeWidth: 2.2,
+                    strokeWidth: 2.4,
                     strokeLinejoin: "round",
                     pointerEvents: "none",
                   }}
@@ -119,6 +132,91 @@ const MapMarkers = memo(function MapMarkers({
   );
 });
 
+const LocationCard = memo(function LocationCard({
+  id,
+  index,
+  city,
+  region,
+  atelierLabel,
+  isActive,
+  onHover,
+  onOpen,
+}: {
+  id: string;
+  index: number;
+  city: string;
+  region: string;
+  atelierLabel: string;
+  isActive: boolean;
+  onHover: (id: string | null) => void;
+  onOpen: (id: string) => void;
+}) {
+  return (
+    <motion.button
+      type="button"
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.08 }}
+      onMouseEnter={() => onHover(id)}
+      onMouseLeave={() => onHover(null)}
+      onFocus={() => onHover(id)}
+      onBlur={() => onHover(null)}
+      onClick={() => onOpen(id)}
+      className={`group relative w-full overflow-hidden text-left border px-5 py-6 sm:px-6 sm:py-7 md:px-7 md:py-8 transition-all duration-300 cursor-pointer ${
+        isActive
+          ? "border-white/40 bg-white/[0.055]"
+          : "border-white/12 bg-transparent hover:border-white/28 hover:bg-white/[0.03]"
+      }`}
+    >
+      <span
+        className={`absolute left-0 top-0 bottom-0 w-px transition-all duration-300 ${
+          isActive ? "bg-white/70" : "bg-transparent group-hover:bg-white/25"
+        }`}
+        aria-hidden
+      />
+
+      <div className="flex items-start justify-between gap-4 mb-5 sm:mb-6">
+        <span className="font-body text-[10px] sm:text-[11px] tracking-[0.38em] text-white/40 uppercase">
+          {String(index + 1).padStart(2, "0").split("").join(" ")}
+        </span>
+        <span className="relative mt-1 flex h-2 w-2 items-center justify-center" aria-hidden>
+          <span
+            className={`absolute inset-0 rounded-full transition-opacity duration-300 ${
+              isActive ? "bg-white/30 animate-ping opacity-100" : "opacity-0"
+            }`}
+          />
+          <span
+            className={`relative h-1.5 w-1.5 rounded-full transition-colors duration-300 ${
+              isActive ? "bg-white" : "bg-white/40 group-hover:bg-white/70"
+            }`}
+          />
+        </span>
+      </div>
+
+      <div className="font-display text-2xl sm:text-[28px] md:text-[32px] tracking-[0.12em] uppercase text-white font-bold leading-none">
+        {city}
+      </div>
+      <div className="mt-2.5 sm:mt-3 font-body text-[12px] sm:text-[13px] text-white/45 tracking-[0.02em]">
+        {region}
+      </div>
+
+      <div className="mt-7 sm:mt-8 flex items-center gap-3 text-white/40 group-hover:text-white/70 transition-colors duration-300">
+        <span className="shrink-0 font-body text-[10px] sm:text-[11px] uppercase tracking-[0.28em]">
+          {atelierLabel}
+        </span>
+        <span className="h-px flex-1 bg-current opacity-45" aria-hidden />
+        <span
+          className="shrink-0 text-sm leading-none transition-transform duration-300 group-hover:translate-x-1"
+          aria-hidden
+        >
+          →
+        </span>
+      </div>
+    </motion.button>
+  );
+});
+
 const RepresentativesMapSection = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -129,90 +227,167 @@ const RepresentativesMapSection = () => {
     [navigate]
   );
 
+  const activeCity = representatives.find((r) => r.id === hovered)?.city;
+
   return (
-    <section className="relative bg-black text-white">
-      <div className="w-full px-5 sm:px-8 lg:px-12 pt-16 sm:pt-20 md:pt-24 pb-6 sm:pb-8">
-        <motion.h2
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="font-display font-bold uppercase tracking-[0.14em] text-[22px] sm:text-3xl md:text-[34px] text-white"
-        >
-          {t("representatives.title")}
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0, y: 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.08 }}
-          className="mt-3 sm:mt-4 max-w-3xl font-body uppercase tracking-[0.22em] text-[9px] sm:text-[11px] text-white/55 leading-relaxed"
-        >
-          {t("representatives.subtitle")}
-        </motion.p>
-      </div>
+    <section className="relative overflow-hidden bg-black text-white">
+      {/* Soft atmosphere behind the composition */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-40"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 45% at 20% 0%, rgba(255,255,255,0.06), transparent 60%), radial-gradient(ellipse 50% 40% at 90% 80%, rgba(255,255,255,0.04), transparent 55%)",
+        }}
+        aria-hidden
+      />
 
-      <div className="px-5 sm:px-8 lg:px-12 pb-16 sm:pb-20 md:pb-24">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="relative overflow-hidden bg-neutral-950"
-        >
-          <div
-            className="aspect-[16/10] sm:aspect-[21/9] w-full overscroll-contain"
-            style={{ touchAction: "pan-y" }}
+      <div className="relative z-10 w-full px-5 sm:px-8 lg:px-12 pt-16 sm:pt-20 md:pt-24 pb-16 sm:pb-20 md:pb-28">
+        {/* Header */}
+        <div className="mb-10 sm:mb-12 md:mb-14">
+          <motion.p
+            initial={{ opacity: 0, y: 8 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.45 }}
+            className="font-body text-[10px] sm:text-[11px] uppercase tracking-[0.35em] text-white/40 mb-4"
           >
-            <ComposableMap
-              projection="geoEqualEarth"
-              width={800}
-              height={450}
-              projectionConfig={{ scale: 720, center: [8, 47] }}
-              style={{ width: "100%", height: "100%", display: "block" }}
-            >
-              <defs>
-                <radialGradient id="marker-glow" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="hsl(0 0% 100%)" stopOpacity="0.55" />
-                  <stop offset="60%" stopColor="hsl(0 0% 100%)" stopOpacity="0.08" />
-                  <stop offset="100%" stopColor="hsl(0 0% 100%)" stopOpacity="0" />
-                </radialGradient>
-              </defs>
-              <WorldGeographies />
-              <MapMarkers hovered={hovered} onHover={setHovered} onOpen={openRep} />
-            </ComposableMap>
-          </div>
-          <MediaEdgeFade edges="bottom" />
-        </motion.div>
+            {t("representatives.eyebrow")}
+          </motion.p>
 
-        <div className="mt-2 sm:mt-[10px] grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-[10px]">
-          {representatives.map((rep, i) => {
-            const isActive = hovered === rep.id;
-            return (
-              <button
-                key={rep.id}
-                type="button"
-                onMouseEnter={() => setHovered(rep.id)}
-                onMouseLeave={() => setHovered(null)}
-                onFocus={() => setHovered(rep.id)}
-                onBlur={() => setHovered(null)}
-                onClick={() => openRep(rep.id)}
-                className={`group text-left px-5 py-7 sm:px-6 sm:py-9 transition-colors duration-300 ${
-                  isActive ? "bg-neutral-100" : "bg-white hover:bg-neutral-100"
-                }`}
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between lg:gap-10">
+            <div className="min-w-0 flex-1">
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.05 }}
+                className="flex items-end gap-4 sm:gap-6"
               >
-                <div className="font-body text-[10px] tracking-[0.4em] text-black/40 mb-4">
-                  {String(i + 1).padStart(2, "0")}
-                </div>
-                <div className="font-display text-lg sm:text-xl md:text-2xl tracking-[0.14em] uppercase text-black font-bold leading-tight">
-                  {rep.city}
-                </div>
-                <div className="mt-2 text-[11px] sm:text-xs text-black/50 tracking-[0.08em] uppercase">
-                  {rep.region}
-                </div>
-              </button>
-            );
-          })}
+                <h2 className="font-display font-bold uppercase tracking-[0.12em] sm:tracking-[0.14em] text-[22px] sm:text-3xl md:text-[34px] text-white leading-tight">
+                  {t("representatives.title")}
+                </h2>
+                <div className="mb-2 hidden min-w-[3rem] flex-1 sm:block h-px bg-gradient-to-r from-white/25 to-transparent" aria-hidden />
+              </motion.div>
+              <motion.p
+                initial={{ opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.12 }}
+                className="mt-4 max-w-2xl font-body text-sm sm:text-base text-white/55 leading-relaxed tracking-wide"
+              >
+                {t("representatives.subtitle")}
+              </motion.p>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="shrink-0 font-body text-[10px] sm:text-[11px] uppercase tracking-[0.28em] text-white/35"
+            >
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={activeCity ?? "hint"}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.25 }}
+                  className="inline-block"
+                >
+                  {activeCity ? activeCity.toUpperCase() : t("representatives.mapHint")}
+                </motion.span>
+              </AnimatePresence>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Map + Locations composition */}
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-8 xl:gap-10">
+          {/* Map */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="relative lg:col-span-7 xl:col-span-8"
+          >
+            <div className="relative overflow-hidden border border-white/12 bg-neutral-950">
+              {/* Corner marks */}
+              <span className="pointer-events-none absolute left-3 top-3 z-10 h-4 w-4 border-l border-t border-white/35" aria-hidden />
+              <span className="pointer-events-none absolute right-3 top-3 z-10 h-4 w-4 border-r border-t border-white/35" aria-hidden />
+              <span className="pointer-events-none absolute bottom-3 left-3 z-10 h-4 w-4 border-b border-l border-white/35" aria-hidden />
+              <span className="pointer-events-none absolute bottom-3 right-3 z-10 h-4 w-4 border-b border-r border-white/35" aria-hidden />
+
+              <div
+                className="aspect-[16/11] sm:aspect-[21/11] lg:aspect-auto lg:h-full lg:min-h-[520px] xl:min-h-[560px] w-full overscroll-contain"
+                style={{ touchAction: "pan-y" }}
+              >
+                <ComposableMap
+                  projection="geoEqualEarth"
+                  width={800}
+                  height={450}
+                  projectionConfig={{ scale: 760, center: [8.2, 46.8] }}
+                  style={{ width: "100%", height: "100%", display: "block" }}
+                >
+                  <defs>
+                    <radialGradient id="marker-glow" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="hsl(0 0% 100%)" stopOpacity="0.6" />
+                      <stop offset="55%" stopColor="hsl(0 0% 100%)" stopOpacity="0.1" />
+                      <stop offset="100%" stopColor="hsl(0 0% 100%)" stopOpacity="0" />
+                    </radialGradient>
+                  </defs>
+                  <WorldGeographies />
+                  <MapMarkers hovered={hovered} onHover={setHovered} onOpen={openRep} />
+                </ComposableMap>
+              </div>
+
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    "radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.45) 100%)",
+                }}
+                aria-hidden
+              />
+              <MediaEdgeFade edges="bottom" />
+            </div>
+          </motion.div>
+
+          {/* Locations */}
+          <div className="lg:col-span-5 xl:col-span-4 flex flex-col">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.45 }}
+              className="mb-5 sm:mb-6 flex items-center gap-4 sm:gap-5"
+            >
+              <h3 className="shrink-0 font-display font-bold uppercase tracking-[0.16em] text-sm sm:text-base text-white">
+                {t("representatives.locations")}
+              </h3>
+              <div className="h-px flex-1 bg-white/20" aria-hidden />
+              <span className="shrink-0 font-body text-[10px] tracking-[0.28em] text-white/30 uppercase">
+                {String(representatives.length).padStart(2, "0")}
+              </span>
+            </motion.div>
+
+            <div className="flex flex-1 flex-col gap-3 sm:gap-3.5">
+              {representatives.map((rep, i) => (
+                <LocationCard
+                  key={rep.id}
+                  id={rep.id}
+                  index={i}
+                  city={rep.city}
+                  region={rep.region}
+                  atelierLabel={t("representatives.atelier")}
+                  isActive={hovered === rep.id}
+                  onHover={setHovered}
+                  onOpen={openRep}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -792,3 +792,9 @@
 .font-black {
   font-weight: 700;
 }
+
+/* Legal / meta lines that must stay visually light */
+.font-meta {
+  font-family: 'Avenir Next', sans-serif;
+  font-weight: 400 !important;
+}
