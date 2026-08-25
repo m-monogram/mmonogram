@@ -3,7 +3,12 @@
 
 Запуск (macOS):
   /Applications/Blender.app/Contents/MacOS/Blender --background \
-      --python scripts/fbx-to-glb.py -- <папка-с-fbx> <папка-для-glb> [--max-tris 300000]
+      --python scripts/fbx-to-glb.py -- <папка-с-fbx> <папка-для-glb> \
+      [--max-tris 300000] [--only <подстрока-имени>]
+
+Ключ --only обрабатывает один файл из папки. Тяжёлые модели лучше гонять
+по одному: децимация держит всю сетку в памяти, и на 8 ГБ система убивает
+процесс молча, посреди работы.
 
 Каждый .fbx обрабатывается в чистой сцене: импорт, децимация мешей до бюджета
 по треугольникам (нужна для CAD-геометрии, где полигонов миллионы), экспорт GLB
@@ -78,7 +83,8 @@ def parse_args(argv):
     if "--max-tris" in argv:
         max_tris = int(argv[argv.index("--max-tris") + 1])
     include_cad = "--include-cad" in argv
-    return src, dst, max_tris, include_cad
+    only = argv[argv.index("--only") + 1].lower() if "--only" in argv else None
+    return src, dst, max_tris, include_cad, only
 
 
 def reset_scene():
@@ -163,10 +169,14 @@ def export_glb(path):
 
 
 def main():
-    src, dst, max_tris, include_cad = parse_args(sys.argv)
+    src, dst, max_tris, include_cad, only = parse_args(sys.argv)
     os.makedirs(dst, exist_ok=True)
 
     files = sorted(glob.glob(os.path.join(src, "*.fbx")))
+    if only:
+        files = [f for f in files if only in os.path.basename(f).lower()]
+        if not files:
+            sys.exit(f"В {src} нет .fbx с «{only}» в имени")
     if not files:
         sys.exit(f"В {src} не найдено ни одного .fbx")
 
