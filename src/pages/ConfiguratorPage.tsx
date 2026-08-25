@@ -21,7 +21,16 @@ const ConfiguratorPage = () => {
   const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const [config, setConfig] = useState<BuildConfig>(() => decodeConfig(searchParams.get("c")));
-  const [focus, setFocus] = useState<CameraFocus>("default");
+  /* ?v=wheels|kit|... — стартовый ракурс камеры. Используется генератором
+     превью опций (скриншоты с реальной модели) и удобен для прямых ссылок. */
+  const [focus, setFocus] = useState<CameraFocus>(() => {
+    const v = searchParams.get("v");
+    const allowed: CameraFocus[] = [
+      "default", "exterior", "wheels", "kit", "carbon", "lights", "env",
+      "interiorFront", "interiorDriver", "interiorRear",
+    ];
+    return v && (allowed as string[]).includes(v) ? (v as CameraFocus) : "default";
+  });
   // Меню скрыто по умолчанию — машина видна целиком, открывается стрелкой
   const [menuOpen, setMenuOpen] = useState(false);
 

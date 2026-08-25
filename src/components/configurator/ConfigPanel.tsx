@@ -18,6 +18,18 @@ import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BuildConfig, PAINTS, RIM_DESIGNS, RIM_FINISHES, encodeConfig } from "./config";
 
+/* Превью опций — кадры реальной 3D-модели (§ ТЗ: картинки вместо кружков).
+   Генерируются скриптом скриншотов по ?c=...&v=... */
+const PAINT_PREVIEWS = Object.values(
+  import.meta.glob("@/assets/previews/paint-*.jpg", { eager: true, import: "default" })
+) as string[];
+const RIM_PREVIEWS = Object.values(
+  import.meta.glob("@/assets/previews/rim-*.jpg", { eager: true, import: "default" })
+) as string[];
+const FINISH_PREVIEWS = Object.values(
+  import.meta.glob("@/assets/previews/finish-*.jpg", { eager: true, import: "default" })
+) as string[];
+
 export type Section = "exterior" | "wheels" | "kit" | "carbon" | "lights" | "env" | "interior" | "overview";
 
 /* Раздел «Интерьер» — это не опции, а три ракурса внутри салона, как у Mansory */
@@ -123,6 +135,19 @@ function GroupTitle({ children }: { children: React.ReactNode }) {
 
 function Swatch({ color }: { color: string }) {
   return <span className="w-8 h-8 rounded-full shrink-0 ring-1 ring-white/20" style={{ backgroundColor: color }} />;
+}
+
+/* Карточка-превью с кадром модели; при отсутствии кадра — цветовой кружок */
+function Thumb({ src, alt, fallback }: { src?: string; alt: string; fallback: string }) {
+  if (!src) return <Swatch color={fallback} />;
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      className="w-[68px] h-[42px] shrink-0 rounded-md object-cover ring-1 ring-white/15"
+    />
+  );
 }
 
 export default function ConfigPanel({ config, onChange, onSectionChange, onInteriorView }: ConfigPanelProps) {
@@ -264,7 +289,7 @@ export default function ConfigPanel({ config, onChange, onSectionChange, onInter
                       key={p.id}
                       selected={config.paint === i}
                       onClick={() => set({ paint: i })}
-                      preview={<Swatch color={p.color} />}
+                      preview={<Thumb src={PAINT_PREVIEWS[i]} alt={p.name} fallback={p.color} />}
                       label={p.name}
                     />
                   ))}
@@ -279,7 +304,7 @@ export default function ConfigPanel({ config, onChange, onSectionChange, onInter
                       key={r.id}
                       selected={config.rim === i}
                       onClick={() => set({ rim: i })}
-                      preview={<span className="text-white/75 shrink-0"><WheelIcon design={i} className="w-8 h-8" /></span>}
+                      preview={<Thumb src={RIM_PREVIEWS[i]} alt={r.name} fallback="#26282b" />}
                       label={r.name}
                       sub={'24"'}
                     />
@@ -290,7 +315,7 @@ export default function ConfigPanel({ config, onChange, onSectionChange, onInter
                       key={f.id}
                       selected={config.rimFinish === i}
                       onClick={() => set({ rimFinish: i })}
-                      preview={<Swatch color={f.color} />}
+                      preview={<Thumb src={FINISH_PREVIEWS[i]} alt={f.name} fallback={f.color} />}
                       label={f.name}
                     />
                   ))}
