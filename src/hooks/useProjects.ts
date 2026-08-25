@@ -27,6 +27,8 @@ export interface DBProject {
   images?: DBProjectImage[];
   isHub?: boolean;
   editionOf?: string;
+  /** Static code-driven family (G-Wagen / Fusion) — not editable via CMS */
+  isStatic?: boolean;
 }
 
 export interface DBProjectImage {
@@ -57,6 +59,7 @@ const fallbackProjects: DBProject[] = staticProjects.map((p, idx) => ({
   updated_at: '',
   isHub: p.isHub,
   editionOf: p.editionOf,
+  isStatic: STATIC_FAMILY_SLUGS.has(p.id),
   images: p.images.map((img, i) => ({
     id: `${p.id}-${i}`,
     project_id: p.id,
@@ -113,7 +116,11 @@ export function useProjects(includeUnpublished = false) {
     const gwagen = fallbackProjects.filter((p) => STATIC_FAMILY_SLUGS.has(p.slug));
     const extras = fallbackProjects.filter((p) => !STATIC_FAMILY_SLUGS.has(p.slug) && !dbSlugs.has(p.slug));
 
-    setProjects([...gwagen, ...fromDb, ...extras]);
+    setProjects([
+      ...gwagen.map((p) => ({ ...p, isStatic: true })),
+      ...fromDb.map((p) => ({ ...p, isStatic: false })),
+      ...extras.map((p) => ({ ...p, isStatic: STATIC_FAMILY_SLUGS.has(p.slug) })),
+    ]);
     } catch {
       setProjects(fallbackProjects);
     } finally {

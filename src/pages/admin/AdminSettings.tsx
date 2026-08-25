@@ -26,17 +26,31 @@ export default function AdminSettings() {
   const handleSave = async () => {
     setSaving(true);
     for (const [key, value] of Object.entries(changes)) {
-      await queryTable('site_settings').update({ value: JSON.stringify(value) }).eq('key', key);
+      // jsonb column — pass the raw string/value, do not double-encode
+      await queryTable("site_settings").update({ value }).eq("key", key);
     }
-    toast({ title: 'Настройки сохранены' });
+    const { data } = await queryTable("site_settings").select("*").order("key");
+    setSettings((data as SiteSetting[]) ?? []);
+    toast({ title: "Настройки сохранены" });
     setChanges({});
     setSaving(false);
   };
 
   const getValue = (setting: SiteSetting) => {
-    if (setting.key in changes) return changes[setting.key] as string;
+    if (setting.key in changes) return String(changes[setting.key] ?? "");
     const val = setting.value;
-    return typeof val === 'string' ? val : JSON.stringify(val);
+    if (typeof val === "string") {
+      // Unwrap accidental double-encoded JSON strings from older saves
+      try {
+        const parsed = JSON.parse(val);
+        if (typeof parsed === "string") return parsed;
+      } catch {
+        /* plain string */
+      }
+      return val;
+    }
+    if (val == null) return "";
+    return typeof val === "object" ? JSON.stringify(val) : String(val);
   };
 
   return (

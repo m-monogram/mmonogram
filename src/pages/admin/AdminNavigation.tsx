@@ -97,7 +97,7 @@ export default function AdminNavigation() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-foreground font-display text-2xl tracking-widest uppercase">Навигация</h1>
-          <p className="text-foreground/40 text-sm font-body mt-1">Управление меню сайта</p>
+          <p className="text-foreground/40 text-sm font-body mt-1">Управление пунктами меню в БД</p>
         </div>
         <div className="flex items-center gap-2">
           {changed.size > 0 && (
@@ -114,6 +114,11 @@ export default function AdminNavigation() {
             <Plus className="w-3.5 h-3.5" /> Добавить
           </button>
         </div>
+      </div>
+
+      <div className="bg-amber-500/10 border border-amber-500/20 px-4 py-3 text-amber-200/80 text-xs font-body leading-relaxed">
+        Визуальное mega-меню на сайте (карточки с фото) задано в коде Header.
+        Этот раздел хранит структуру ссылок в БД для будущих простых меню / футера.
       </div>
 
       {/* Tabs */}

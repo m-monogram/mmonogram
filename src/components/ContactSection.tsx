@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Phone, MessageCircle, Send, MapPin, Clock, Mail, Instagram, Youtube } from "lucide-react";
+import { Phone, MessageCircle, Send, MapPin, Clock, Mail, Instagram, Youtube, CheckCircle2 } from "lucide-react";
 import ScrollReveal from "./ScrollReveal";
-import { buildWhatsAppUrl, safeOpenUrl, safeCall, sanitizeText } from "@/lib/validation";
+import { buildWhatsAppUrl, safeOpenUrl, safeCall } from "@/lib/validation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { AuroraBackground } from "@/components/ui/aurora-background";
+import { submitLead } from "@/lib/leads";
 
 const ContactSection = () => {
   const { t } = useLanguage();
@@ -12,6 +13,9 @@ const ContactSection = () => {
     phone: "",
     message: ""
   });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
 
   const whatsappNumber = "971545077707";
   const phoneNumber = "+971 54 507 7707";
@@ -19,19 +23,30 @@ const ContactSection = () => {
   const address = "Dubai, UAE, Al Quoz Industrial Area 3";
   const workHours = "Mon-Sat: 9AM - 7PM";
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setSubmitting(true);
 
-    // Sanitize user inputs
-    const sanitizedName = sanitizeText(formData.name, 100);
-    const sanitizedMessage = sanitizeText(formData.message, 500);
+    const result = await submitLead({
+      name: formData.name,
+      phone: formData.phone,
+      message: formData.message || null,
+      source: "contact",
+      page: "/contact",
+    });
 
-    const message = `Hello M-Monogram! My name is ${sanitizedName}. ${sanitizedMessage || "I am interested in your services."}`;
-    const whatsappUrl = buildWhatsAppUrl(whatsappNumber, message);
+    setSubmitting(false);
 
-    if (whatsappUrl) {
-      safeOpenUrl(whatsappUrl, ['https://wa.me/']);
+    if (!result.ok) {
+      if (result.error === "phone") setError(t("booking.errorPhone"));
+      else if (result.error === "name") setError(t("booking.errorName"));
+      else setError(t("booking.errorGeneric"));
+      return;
     }
+
+    setFormData({ name: "", phone: "", message: "" });
+    setSubmitted(true);
   };
 
   const handleWhatsApp = () => {
@@ -139,56 +154,77 @@ const ContactSection = () => {
 
             {/* Contact Form */}
             <ScrollReveal direction="right" delay={0.2}>
-              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-                <div>
-                  <label className="block font-body text-caption uppercase tracking-wide text-muted-foreground mb-2">
-                    {t('contact.name')}
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                    className="w-full bg-input border border-border px-4 py-3 font-body text-foreground focus:border-foreground focus:outline-none transition-all duration-300 text-sm sm:text-base"
-                    placeholder={t('contact.namePlaceholder')}
-                  />
+              {submitted ? (
+                <div className="bg-card border border-border p-8 text-center">
+                  <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto mb-4" />
+                  <h3 className="font-display text-lg uppercase tracking-widest mb-2">{t("booking.successTitle")}</h3>
+                  <p className="font-body text-sm text-muted-foreground mb-6">{t("booking.successBody")}</p>
+                  <button
+                    type="button"
+                    onClick={() => setSubmitted(false)}
+                    className="btn-primary text-sm"
+                  >
+                    {t("booking.sendAnother")}
+                  </button>
                 </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                  <div>
+                    <label className="block font-body text-caption uppercase tracking-wide text-muted-foreground mb-2">
+                      {t('contact.name')}
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      required
+                      disabled={submitting}
+                      className="w-full bg-input border border-border px-4 py-3 font-body text-foreground focus:border-foreground focus:outline-none transition-all duration-300 text-sm sm:text-base disabled:opacity-60"
+                      placeholder={t('contact.namePlaceholder')}
+                    />
+                  </div>
 
-                <div>
-                  <label className="block font-body text-caption uppercase tracking-wide text-muted-foreground mb-2">
-                    {t('contact.phone')} *
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    required
-                    className="w-full bg-input border border-border px-4 py-3 font-body text-foreground focus:border-foreground focus:outline-none transition-all duration-300 text-sm sm:text-base"
-                    placeholder={t('contact.phonePlaceholder')}
-                  />
-                </div>
+                  <div>
+                    <label className="block font-body text-caption uppercase tracking-wide text-muted-foreground mb-2">
+                      {t('contact.phone')} *
+                    </label>
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      required
+                      disabled={submitting}
+                      className="w-full bg-input border border-border px-4 py-3 font-body text-foreground focus:border-foreground focus:outline-none transition-all duration-300 text-sm sm:text-base disabled:opacity-60"
+                      placeholder={t('contact.phonePlaceholder')}
+                    />
+                  </div>
 
-                <div>
-                  <label className="block font-body text-caption uppercase tracking-wide text-muted-foreground mb-2">
-                    {t('contact.message')}
-                  </label>
-                  <textarea
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    rows={3}
-                    className="w-full bg-input border border-border px-4 py-3 font-body text-foreground focus:border-foreground focus:outline-none transition-all duration-300 text-sm sm:text-base resize-none"
-                    placeholder={t('contact.messagePlaceholder')}
-                  />
-                </div>
+                  <div>
+                    <label className="block font-body text-caption uppercase tracking-wide text-muted-foreground mb-2">
+                      {t('contact.message')}
+                    </label>
+                    <textarea
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      rows={3}
+                      disabled={submitting}
+                      className="w-full bg-input border border-border px-4 py-3 font-body text-foreground focus:border-foreground focus:outline-none transition-all duration-300 text-sm sm:text-base resize-none disabled:opacity-60"
+                      placeholder={t('contact.messagePlaceholder')}
+                    />
+                  </div>
 
-                <button
-                  type="submit"
-                  className="w-full flex items-center justify-center gap-2 btn-primary text-sm sm:text-base"
-                >
-                  <Send className="w-4 h-4" />
-                  {t('contact.submit')}
-                </button>
-              </form>
+                  {error && <p className="text-red-400 text-xs font-body">{error}</p>}
+
+                  <button
+                    type="submit"
+                    disabled={submitting || !formData.name || !formData.phone}
+                    className="w-full flex items-center justify-center gap-2 btn-primary text-sm sm:text-base disabled:opacity-50"
+                  >
+                    <Send className="w-4 h-4" />
+                    {submitting ? t("booking.submitting") : t('contact.submit')}
+                  </button>
+                </form>
+              )}
 
               <div className="flex gap-3 sm:gap-4 mt-4 sm:mt-6">
                 <button

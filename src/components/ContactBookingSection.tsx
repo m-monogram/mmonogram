@@ -7,6 +7,9 @@ import { useNavigation } from "@/hooks/useNavigation";
 import { safeCall } from "@/lib/validation";
 import contactBuildingImage from "@/assets/menu/menu-contact-new.jpg.webp";
 import MediaEdgeFade, { mediaFadeMask } from "@/components/MediaEdgeFade";
+import { useContent } from "@/hooks/useContent";
+import { submitLead } from "@/lib/leads";
+import { defaultContent } from "@/lib/defaultContent";
 
 interface ContactBookingSectionProps {
   setCurrentView?: (view: string) => void;
@@ -31,6 +34,8 @@ SnapchatIcon.displayName = "SnapchatIcon";
 const ContactBookingSection = memo(({ setCurrentView, prefilledModel }: ContactBookingSectionProps) => {
   const navigate = useNavigate();
   const { navigateToView } = useNavigation({ setCurrentView });
+  const { content: contactCms } = useContent("contact");
+  const cmsDefaults = defaultContent.contact;
   
   const [formData, setFormData] = useState({
     name: "",
@@ -40,6 +45,7 @@ const ContactBookingSection = memo(({ setCurrentView, prefilledModel }: ContactB
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [imagePosition, setImagePosition] = useState("center center");
   const [isMobile, setIsMobile] = useState(false);
 
@@ -71,12 +77,12 @@ const ContactBookingSection = memo(({ setCurrentView, prefilledModel }: ContactB
     }
   }, [prefilledModel]);
   const contactInfo = {
-    address: "Meta Garage St 9A, Al Quoz Industrial Area 1, Dubai",
-    hours: "Daily 9AM – 8PM (Sunday closed)",
+    address: String(contactCms?.address || cmsDefaults.address || "Meta Garage St 9A, Al Quoz Industrial Area 1, Dubai"),
+    hours: String(contactCms?.workHours || cmsDefaults.workHours || "Daily 9AM – 8PM (Sunday closed)"),
     phones: [
       {
         label: "AR/EN",
-        number: "+971 54 507 7707",
+        number: String(contactCms?.phone || cmsDefaults.phone || "+971 54 507 7707"),
       },
       {
         label: "RU",
@@ -84,7 +90,7 @@ const ContactBookingSection = memo(({ setCurrentView, prefilledModel }: ContactB
       },
       {
         label: "Office",
-        number: "(04) 228 4177",
+        number: String(contactCms?.landline || cmsDefaults.landline || "(04) 228 4177"),
       },
     ],
     socials: [
@@ -114,23 +120,31 @@ const ContactBookingSection = memo(({ setCurrentView, prefilledModel }: ContactB
       },
     ],
   };
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError("");
     setIsSubmitting(true);
-    
-    // Build WhatsApp message from form data
-    const whatsappNumber = "971545077707";
-    const parts = [`Hello M-Monogram!`];
-    if (formData.name) parts.push(`Name: ${formData.name}`);
-    if (formData.phone) parts.push(`Phone: ${formData.phone}`);
-    if (formData.email) parts.push(`Email: ${formData.email}`);
-    if (formData.message) parts.push(`Message: ${formData.message}`);
-    
-    const text = encodeURIComponent(parts.join("\n"));
-    const url = `https://wa.me/${whatsappNumber}?text=${text}`;
-    
-    window.open(url, "_blank", "noopener,noreferrer");
+
+    const result = await submitLead({
+      name: formData.name,
+      phone: formData.phone,
+      email: formData.email.trim() || null,
+      message: formData.message.trim() || null,
+      source: "contact",
+      page: "/contact",
+    });
+
     setIsSubmitting(false);
+
+    if (!result.ok) {
+      if (result.error === "phone") setSubmitError("Please enter a valid phone number");
+      else if (result.error === "name") setSubmitError("Please enter your name");
+      else if (result.error === "email") setSubmitError("Please enter a valid email");
+      else setSubmitError("Could not send. Please try again.");
+      return;
+    }
+
+    setFormData({ name: "", phone: "", email: "", message: "" });
     setIsSubmitted(true);
   };
   const handleCall = (phone: string) => {
@@ -303,10 +317,14 @@ const ContactBookingSection = memo(({ setCurrentView, prefilledModel }: ContactB
                         />
                       </div>
 
+                      {submitError && (
+                        <p className="text-red-400 text-xs font-body">{submitError}</p>
+                      )}
+
                       <div className="pt-2">
                         <motion.button
                           type="submit"
-                          disabled={isSubmitting}
+                          disabled={isSubmitting || !formData.name.trim() || !formData.phone.trim()}
                           whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
                           whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
                           className="w-full group flex items-center justify-center gap-3 bg-white text-black py-3.5 sm:py-4 rounded-none font-body text-sm sm:text-base uppercase tracking-widest disabled:opacity-50 cursor-pointer transition-all hover:bg-white/90 shadow-lg hover:shadow-xl"
@@ -339,6 +357,7 @@ const ContactBookingSection = memo(({ setCurrentView, prefilledModel }: ContactB
                       type="button"
                       onClick={() => {
                         setIsSubmitted(false);
+                        setSubmitError("");
                         setFormData({
                           name: "",
                           phone: "",

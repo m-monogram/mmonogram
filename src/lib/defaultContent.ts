@@ -8,9 +8,9 @@ export const defaultContent: Record<string, Record<string, unknown>> = {
     buttonDiscover: "Discover Collection",
   },
   mission: {
-    heading: "OUR MISSION",
-    headingLine2: "GOES BEYOND TUNING",
-    subtitle: "Luxury car modification and customization services in the UAE🇦🇪",
+    heading: "WHERE AUTOMOBILES",
+    headingLine2: "BECOME ART",
+    subtitle: "Bespoke luxury car customization and prototype development in the UAE.",
   },
   about: {
     values: ["Craftsmanship", "Innovation", "Excellence"],

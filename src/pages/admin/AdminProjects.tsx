@@ -42,13 +42,19 @@ export default function AdminProjects() {
     if (!dragging) return;
     setDragging(null);
     setSavingOrder(true);
-    const updates = displayProjects.map((p, i) => client.from('projects').update({ sort_order: i }).eq('id', p.id));
+    const updates = displayProjects
+      .filter((p) => !p.isStatic)
+      .map((p, i) => client.from('projects').update({ sort_order: i }).eq('id', p.id));
     await Promise.all(updates);
     setSavingOrder(false);
     toast({ title: 'Порядок сохранён' });
   };
 
   const handleDuplicate = async (project: DBProject) => {
+    if (project.isStatic) {
+      toast({ title: 'Статичный проект', description: 'G-Wagen / Fusion управляются в коде', variant: 'destructive' });
+      return;
+    }
     const newSlug = `${project.slug}-copy-${Date.now().toString(36)}`;
     const { data: newProject, error } = await client
       .from('projects')
@@ -84,7 +90,11 @@ export default function AdminProjects() {
     refetch();
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string, isStatic?: boolean) => {
+    if (isStatic) {
+      toast({ title: 'Нельзя удалить', description: 'Статичные семейства проектов редактируются в коде', variant: 'destructive' });
+      return;
+    }
     if (!confirm('Удалить проект и все его фото?')) return;
     const { error } = await client.from('projects').delete().eq('id', id);
     if (error) { toast({ title: 'Ошибка', description: error.message, variant: 'destructive' }); }
@@ -92,6 +102,10 @@ export default function AdminProjects() {
   };
 
   const togglePublished = async (project: DBProject) => {
+    if (project.isStatic) {
+      toast({ title: 'Только просмотр', description: 'Публикация статичных проектов задана в коде', variant: 'destructive' });
+      return;
+    }
     await client.from('projects').update({ is_published: !project.is_published }).eq('id', project.id);
     setOrderedProjects([]);
     refetch();
@@ -146,13 +160,13 @@ export default function AdminProjects() {
           {displayProjects.map((project, idx) => (
             <div
               key={project.id}
-              draggable
-              onDragStart={(e) => handleDragStart(e, project.id, idx)}
-              onDragOver={(e) => handleDragOver(e, idx)}
-              className={`flex items-center gap-3 bg-white/[0.03] border border-white/[0.07] hover:border-foreground/20 py-3 px-4 transition-all group cursor-grab active:cursor-grabbing ${dragging?.id === project.id ? 'opacity-50 border-foreground/30' : ''}`}
+              draggable={!project.isStatic}
+              onDragStart={(e) => !project.isStatic && handleDragStart(e, project.id, idx)}
+              onDragOver={(e) => !project.isStatic && handleDragOver(e, idx)}
+              className={`flex items-center gap-3 bg-white/[0.03] border border-white/[0.07] hover:border-foreground/20 py-3 px-4 transition-all group ${project.isStatic ? '' : 'cursor-grab active:cursor-grabbing'} ${dragging?.id === project.id ? 'opacity-50 border-foreground/30' : ''}`}
             >
               {/* Drag handle */}
-              <GripVertical className="w-4 h-4 text-foreground/20 group-hover:text-foreground/40 transition-colors flex-shrink-0" />
+              <GripVertical className={`w-4 h-4 flex-shrink-0 ${project.isStatic ? 'text-foreground/10' : 'text-foreground/20 group-hover:text-foreground/40 transition-colors'}`} />
 
               {/* Thumbnail */}
               <div className="w-16 h-12 bg-black/50 flex-shrink-0 overflow-hidden">
@@ -171,12 +185,15 @@ export default function AdminProjects() {
               <div className="flex-1 min-w-0">
                 <h3 className="text-foreground text-sm font-display tracking-wider truncate">{project.title}</h3>
                 <p className="text-foreground/40 text-xs">{project.subtitle} · {project.year}</p>
-                <p className="text-foreground/20 text-[10px] font-body mt-0.5 truncate">{project.slug} · {project.images?.length || 0} фото</p>
+                <p className="text-foreground/20 text-[10px] font-body mt-0.5 truncate">
+                  {project.slug} · {project.images?.length || 0} фото
+                  {project.isStatic ? ' · статичный (код)' : ''}
+                </p>
               </div>
 
               {/* Status */}
-              <span className={`text-xs px-2 py-0.5 flex-shrink-0 ${project.is_published ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}`}>
-                {project.is_published ? 'Опубликован' : 'Черновик'}
+              <span className={`text-xs px-2 py-0.5 flex-shrink-0 ${project.isStatic ? 'bg-white/5 text-foreground/40' : project.is_published ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}`}>
+                {project.isStatic ? 'Код' : project.is_published ? 'Опубликован' : 'Черновик'}
               </span>
 
               {/* Actions */}
@@ -190,18 +207,22 @@ export default function AdminProjects() {
                 >
                   <ExternalLink className="w-4 h-4" />
                 </a>
-                <button onClick={() => togglePublished(project)} className="p-2 text-foreground/40 hover:text-foreground transition-colors" title={project.is_published ? 'Скрыть' : 'Опубликовать'}>
-                  {project.is_published ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                </button>
-                <button onClick={() => setEditingProject(project)} className="p-2 text-foreground/40 hover:text-foreground transition-colors" title="Редактировать">
-                  <Pencil className="w-4 h-4" />
-                </button>
-                <button onClick={() => handleDuplicate(project)} className="p-2 text-foreground/40 hover:text-blue-400 transition-colors" title="Дублировать">
-                  <Copy className="w-4 h-4" />
-                </button>
-                <button onClick={() => handleDelete(project.id)} className="p-2 text-foreground/40 hover:text-red-400 transition-colors" title="Удалить">
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                {!project.isStatic && (
+                  <>
+                    <button onClick={() => togglePublished(project)} className="p-2 text-foreground/40 hover:text-foreground transition-colors" title={project.is_published ? 'Скрыть' : 'Опубликовать'}>
+                      {project.is_published ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                    </button>
+                    <button onClick={() => setEditingProject(project)} className="p-2 text-foreground/40 hover:text-foreground transition-colors" title="Редактировать">
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleDuplicate(project)} className="p-2 text-foreground/40 hover:text-blue-400 transition-colors" title="Дублировать">
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleDelete(project.id, project.isStatic)} className="p-2 text-foreground/40 hover:text-red-400 transition-colors" title="Удалить">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           ))}

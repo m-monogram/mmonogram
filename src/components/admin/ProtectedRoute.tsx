@@ -1,12 +1,19 @@
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import AdminLogin from "@/pages/admin/AdminLogin";
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   requireAdmin?: boolean;
+  /** When true, unauthenticated users see the login form instead of redirecting */
+  loginFallback?: boolean;
 }
 
-export default function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
+export default function ProtectedRoute({
+  children,
+  requireAdmin = false,
+  loginFallback = false,
+}: ProtectedRouteProps) {
   const { user, loading, canEdit, isAdmin } = useAuth();
 
   if (loading) {
@@ -18,6 +25,7 @@ export default function ProtectedRoute({ children, requireAdmin = false }: Prote
   }
 
   if (!user) {
+    if (loginFallback) return <AdminLogin />;
     return <Navigate to="/admin" replace />;
   }
 
@@ -27,7 +35,9 @@ export default function ProtectedRoute({ children, requireAdmin = false }: Prote
         <div>
           <h1 className="text-2xl font-display tracking-wider mb-4">ACCESS DENIED</h1>
           <p className="text-white/50 mb-6">У вас нет прав для доступа к админ-панели.</p>
-          <a href="/" className="text-white/70 underline hover:text-white">← Вернуться на сайт</a>
+          <a href="/" className="text-white/70 underline hover:text-white">
+            ← Вернуться на сайт
+          </a>
         </div>
       </div>
     );
@@ -37,5 +47,5 @@ export default function ProtectedRoute({ children, requireAdmin = false }: Prote
     return <Navigate to="/admin/dashboard" replace />;
   }
 
-  return <>{children}</>;
+  return children ? <>{children}</> : <Outlet />;
 }
