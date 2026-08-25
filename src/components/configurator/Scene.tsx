@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, Environment, Lightformer, OrbitControls } from "@react-three/drei";
 import { Bloom, BrightnessContrast, EffectComposer, HueSaturation, N8AO } from "@react-three/postprocessing";
@@ -90,6 +90,34 @@ const PRESETS: Record<CameraFocus, { desktop: CameraPreset; mobile: CameraPreset
    Максимум 2.1 м — дальше камера вылезла бы за кузов сквозь стекло. */
 const INTERIOR_MIN_DISTANCE = 0.35;
 const INTERIOR_MAX_DISTANCE = 2.1;
+
+function useSceneQuality() {
+  const read = () => {
+    if (typeof window === "undefined") {
+      return { isMobile: false, reducedMotion: false };
+    }
+    return {
+      isMobile: window.matchMedia("(max-width: 767px), (pointer: coarse)").matches,
+      reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    };
+  };
+
+  const [quality, setQuality] = useState(read);
+
+  useEffect(() => {
+    const mobile = window.matchMedia("(max-width: 767px), (pointer: coarse)");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setQuality(read());
+    mobile.addEventListener("change", update);
+    reduced.addEventListener("change", update);
+    return () => {
+      mobile.removeEventListener("change", update);
+      reduced.removeEventListener("change", update);
+    };
+  }, []);
+
+  return quality;
+}
 
 function presetToPosition(p: CameraPreset): THREE.Vector3 {
   if (p.eye) return new THREE.Vector3(...p.eye);
@@ -281,7 +309,7 @@ function WarmUpFrames() {
     const started = performance.now();
     const tick = () => {
       invalidate();
-      if (performance.now() - started < 2500) raf = requestAnimationFrame(tick);
+      if (performance.now() - started < 1400) raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
@@ -295,9 +323,9 @@ function WarmUpFrames() {
  * Showroom: три продольные потолочные панели, повторяющие LED-полосы гаража,
  * чтобы отражения в лаке совпадали с тем, что видно в помещении.
  */
-function SceneEnvironment({ night }: { night: boolean }) {
+function SceneEnvironment({ night, isMobile }: { night: boolean; isMobile: boolean }) {
   return (
-    <Environment resolution={night ? 512 : 256} frames={1}>
+    <Environment resolution={night || isMobile ? 256 : 384} frames={1}>
       <color attach="background" args={[night ? "#08090a" : "#3a3d40"]} />
       {night ? (
         <>
@@ -328,18 +356,27 @@ function SceneEnvironment({ night }: { night: boolean }) {
 }
 
 export default function ConfiguratorScene({ config, focus = "default" }: { config: BuildConfig; focus?: CameraFocus }) {
+  const { isMobile, reducedMotion } = useSceneQuality();
   const interior = isInteriorFocus(focus);
   const controls = useRef<OrbitControlsImpl>(null);
   const flightRef = useRef<FlightState | null>(null);
   const bg = config.night ? "#08090a" : "#c7cbce";
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const enableHeavyEffects = !isMobile && !reducedMotion;
 
   return (
     <Canvas
-      shadows
+      shadows={!isMobile}
       frameloop="demand"
-      dpr={[1, 1.75]}
-      gl={{ antialias: true, preserveDrawingBuffer: true }}
+      dpr={isMobile ? [1, 1.2] : [1, 1.5]}
+      performance={{ min: 0.55 }}
+      gl={{
+        antialias: !isMobile,
+        alpha: false,
+        stencil: false,
+        depth: true,
+        powerPreference: "high-performance",
+        preserveDrawingBuffer: true,
+      }}
       camera={{ position: isMobile ? [8.6, 2.9, 4.6] : [5.4, 2.1, 5.2], fov: isMobile ? BASE_FOV_MOBILE : BASE_FOV, near: 0.05 }}
       className="touch-none"
     >
@@ -350,14 +387,14 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
       <CameraRig focus={focus} isMobile={isMobile} controlsRef={controls} flightRef={flightRef} />
 
       <Suspense fallback={null}>
-        <SceneEnvironment night={config.night} />
+        <SceneEnvironment night={config.night} isMobile={isMobile} />
 
         <ambientLight intensity={config.night ? 0.3 : 0.45} />
         <directionalLight
           position={[6, 8, 4]}
-          intensity={config.night ? 0.95 : 1.6}
-          castShadow
-          shadow-mapSize={[2048, 2048]}
+          intensity={config.night ? 0.82 : 1.45}
+          castShadow={!isMobile}
+          shadow-mapSize={[1024, 1024]}
           shadow-camera-left={-6}
           shadow-camera-right={6}
           shadow-camera-top={6}
@@ -367,25 +404,33 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
 
         <Showroom key={config.night ? "night" : "day"} night={config.night} />
         <WarmUpFrames />
-        <ContactShadows position={[0, 0.012, 0]} opacity={config.night ? 0.9 : 0.62} scale={12} blur={2.2} far={3} resolution={512} />
+        <ContactShadows
+          position={[0, 0.01, 0]}
+          opacity={config.night ? 0.62 : 0.48}
+          scale={11}
+          blur={2.6}
+          far={2.8}
+          resolution={isMobile ? 192 : 384}
+          frames={1}
+        />
 
         {/* «Дорогая картинка» по пресету MANSORY — Quality: SAO в стыках,
             аккуратный bloom только на бликах, лёгкая студийная десатурация.
             На мобильных AO в половинном разрешении (ТЗ 6.9). */}
-        <EffectComposer multisampling={isMobile ? 0 : 4}>
+        {enableHeavyEffects && <EffectComposer multisampling={2}>
           {/* В салоне радиус AO меньше: с «уличными» 0.5 м вся кабина попадает
               в затенение и уходит в чёрное. */}
           <N8AO
             aoRadius={interior ? 0.14 : 0.5}
-            intensity={interior ? 1.6 : 4}
+            intensity={interior ? 1.35 : 2.8}
             distanceFalloff={1}
-            quality={isMobile ? "performance" : "medium"}
-            halfRes={isMobile}
+            quality="medium"
+            halfRes
           />
-          <Bloom intensity={0.15} luminanceThreshold={0.95} luminanceSmoothing={0.2} mipmapBlur />
+          <Bloom intensity={0.11} luminanceThreshold={1.05} luminanceSmoothing={0.25} mipmapBlur />
           <BrightnessContrast contrast={-0.01} />
           <HueSaturation saturation={-0.05} />
-        </EffectComposer>
+        </EffectComposer>}
       </Suspense>
 
       <OrbitControls

@@ -5,7 +5,7 @@ import * as THREE from "three";
  * Два окружения для конфигуратора:
  *  - Studio: круговая бесшовная циклорама (infinity cove) — работает с любого угла орбиты;
  *  - Showroom: тёмный гараж с потолочными LED-панелями, панельными стенами
- *    и полированным полом с отражениями.
+ *    и чистым сатиновым полом без шумных отражений.
  * Геометрия строится процедурно, текстуры — на canvas, поэтому внешних файлов нет.
  */
 
@@ -44,14 +44,14 @@ function useWallTexture() {
     c.height = 512;
     const ctx = c.getContext("2d")!;
     const g = ctx.createLinearGradient(0, 512, 0, 0);
-    g.addColorStop(0, "#131619");
-    g.addColorStop(0.5, "#0d0f11");
-    g.addColorStop(1, "#08090b");
+    g.addColorStop(0, "#15191d");
+    g.addColorStop(0.48, "#0f1215");
+    g.addColorStop(1, "#090a0c");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, 512, 512);
     // вертикальные швы между панелями
-    ctx.strokeStyle = "rgba(0,0,0,0.55)";
-    ctx.lineWidth = 3;
+    ctx.strokeStyle = "rgba(0,0,0,0.38)";
+    ctx.lineWidth = 2;
     for (let x = 64; x < 512; x += 64) {
       ctx.beginPath();
       ctx.moveTo(x, 0);
@@ -59,8 +59,8 @@ function useWallTexture() {
       ctx.stroke();
     }
     // тонкий блик слева от каждого шва — панели читаются объёмно
-    ctx.strokeStyle = "rgba(255,255,255,0.045)";
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = "rgba(255,255,255,0.035)";
+    ctx.lineWidth = 1;
     for (let x = 66; x < 512; x += 64) {
       ctx.beginPath();
       ctx.moveTo(x, 0);
@@ -114,12 +114,32 @@ function GarageRoom() {
     () => new THREE.MeshStandardMaterial({ color: "#ffffff", emissive: "#e6efff", emissiveIntensity: 1.9 }),
     []
   );
+  const panelMat = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: "#0b0d10",
+        roughness: 0.68,
+        metalness: 0.18,
+      }),
+    []
+  );
+  const trimMat = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: "#1a2025",
+        emissive: "#3e4b55",
+        emissiveIntensity: 0.32,
+        roughness: 0.55,
+        metalness: 0.2,
+      }),
+    []
+  );
 
   // Повторение текстуры по длине стен
   const sideTex = useMemo(() => {
     const t = wallTex.clone();
     t.needsUpdate = true;
-    t.repeat.set(4, 1.2);
+    t.repeat.set(2.6, 1.1);
     return t;
   }, [wallTex]);
 
@@ -137,10 +157,22 @@ function GarageRoom() {
         <meshStandardMaterial map={sideTex} roughness={0.75} metalness={0.12} />
       </mesh>
 
+      {/* Чистая задняя стена: крупные панели вместо яркой вывески */}
+      {[-8.2, -4.1, 0, 4.1, 8.2].map((x) => (
+        <mesh key={`rear-panel-${x}`} position={[x, 2.72, -ROOM_HALF_D + 0.085]} material={panelMat}>
+          <planeGeometry args={[3.56, 3.56]} />
+        </mesh>
+      ))}
+      {[-10.25, -6.15, -2.05, 2.05, 6.15, 10.25].map((x) => (
+        <mesh key={`rear-trim-${x}`} position={[x, 2.72, -ROOM_HALF_D + 0.105]} material={trimMat}>
+          <planeGeometry args={[0.055, 3.72]} />
+        </mesh>
+      ))}
+
       {/* Потолочные LED-панели — источник фирменных продольных бликов на кузове */}
       {[-5.4, 0, 5.4].map((z) => (
         <mesh key={z} position={[0, ROOM_H - 0.12, z]} rotation={[Math.PI / 2, 0, 0]} material={stripMat}>
-          <planeGeometry args={[19, 0.8]} />
+          <planeGeometry args={[17.5, 0.58]} />
         </mesh>
       ))}
 
@@ -148,10 +180,15 @@ function GarageRoom() {
       {[-ROOM_HALF_D + 0.12, ROOM_HALF_D - 0.12].map((z) => (
         <mesh key={z} position={[0, 0.09, z]}>
           <planeGeometry args={[ROOM_HALF_W * 2, 0.07]} />
-          <meshStandardMaterial color="#20262c" emissive="#55636f" emissiveIntensity={0.55} side={THREE.DoubleSide} />
+          <meshStandardMaterial color="#1a2025" emissive="#55636f" emissiveIntensity={0.42} side={THREE.DoubleSide} />
         </mesh>
       ))}
-
+      {[-ROOM_HALF_W + 0.12, ROOM_HALF_W - 0.12].map((x) => (
+        <mesh key={`side-glow-${x}`} position={[x, 0.1, 0]} rotation={[0, Math.PI / 2, 0]}>
+          <planeGeometry args={[ROOM_HALF_D * 2, 0.055]} />
+          <meshStandardMaterial color="#161b20" emissive="#44515c" emissiveIntensity={0.24} side={THREE.DoubleSide} />
+        </mesh>
+      ))}
     </group>
   );
 }
