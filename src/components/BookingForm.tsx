@@ -4,14 +4,24 @@ import { MessageCircle, Phone, Car, Wrench, User } from "lucide-react";
 import { buildWhatsAppUrl, safeOpenUrl, sanitizeText } from "@/lib/validation";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+/* Код сборки из 3D-конфигуратора (?build=1-0-1-0-1-1-0-0) — только цифры и дефисы */
+const getBuildFromUrl = (): string | null => {
+  if (typeof window === "undefined") return null;
+  const raw = new URLSearchParams(window.location.search).get("build");
+  return raw && /^[0-9-]{1,32}$/.test(raw) ? raw : null;
+};
+
 const BookingForm = () => {
   const { t } = useLanguage();
-  const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    car: "",
-    service: "",
-    message: ""
+  const [formData, setFormData] = useState(() => {
+    const build = getBuildFromUrl();
+    return {
+      name: "",
+      phone: "",
+      car: build ? "Mercedes G-Class — 3D Studio build" : "",
+      service: "",
+      message: build ? `3D Studio: ${window.location.origin}/configurator?c=${build}` : ""
+    };
   });
   const whatsappNumber = "971545077707";
   

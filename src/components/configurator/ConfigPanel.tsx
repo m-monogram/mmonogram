@@ -16,12 +16,14 @@ import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BuildConfig, PAINTS, RIM_DESIGNS, RIM_FINISHES, encodeConfig } from "./config";
 
+type Section = "exterior" | "wheels" | "kit" | "carbon" | "lights" | "env";
+
 interface ConfigPanelProps {
   config: BuildConfig;
   onChange: (next: BuildConfig) => void;
+  /* Сообщаем странице, какой раздел открыт — камера подлетает к нужной детали */
+  onSectionChange?: (section: Section | null) => void;
 }
-
-type Section = "exterior" | "wheels" | "kit" | "carbon" | "lights" | "env";
 
 /* Схематичная иконка дизайна диска */
 function WheelIcon({ design, className = "w-9 h-9" }: { design: number; className?: string }) {
@@ -116,11 +118,15 @@ function Swatch({ color }: { color: string }) {
   return <span className="w-8 h-8 rounded-full shrink-0 ring-1 ring-white/20" style={{ backgroundColor: color }} />;
 }
 
-export default function ConfigPanel({ config, onChange }: ConfigPanelProps) {
+export default function ConfigPanel({ config, onChange, onSectionChange }: ConfigPanelProps) {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
-  const [section, setSection] = useState<Section | null>(null);
+  const [section, setSectionState] = useState<Section | null>(null);
+  const setSection = (s: Section | null) => {
+    setSectionState(s);
+    onSectionChange?.(s);
+  };
 
   const set = (patch: Partial<BuildConfig>) => onChange({ ...config, ...patch });
 
@@ -208,7 +214,7 @@ export default function ConfigPanel({ config, onChange }: ConfigPanelProps) {
 
             <button
               type="button"
-              onClick={() => navigate("/booking")}
+              onClick={() => navigate(`/booking?build=${encodeConfig(config)}`)}
               className="mt-2.5 w-full py-3.5 font-body text-[10px] uppercase tracking-[0.22em] bg-white text-black hover:bg-white/90 transition-all cursor-pointer"
             >
               {t("config.book")}
