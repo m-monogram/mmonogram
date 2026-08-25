@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { MeshReflectorMaterial, useTexture } from "@react-three/drei";
 import * as THREE from "three";
-import logoWhite from "@/assets/logo-white.webp";
 import metagarageSign from "@/assets/metagarage-sign.png";
 
 /**
@@ -47,9 +46,9 @@ function useWallTexture() {
     c.height = 512;
     const ctx = c.getContext("2d")!;
     const g = ctx.createLinearGradient(0, 512, 0, 0);
-    g.addColorStop(0, "#1c1e21");
-    g.addColorStop(0.5, "#16181a");
-    g.addColorStop(1, "#101113");
+    g.addColorStop(0, "#131619");
+    g.addColorStop(0.5, "#0d0f11");
+    g.addColorStop(1, "#08090b");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, 512, 512);
     // вертикальные швы между панелями
@@ -105,26 +104,26 @@ function StudioCove() {
 
 function GarageRoom() {
   const wallTex = useWallTexture();
-  const [logo, sign] = useTexture([logoWhite, metagarageSign]);
+  const sign = useTexture(metagarageSign);
   // цветовые текстуры должны быть в sRGB, иначе оранжевый логотип уходит в кислоту
   useMemo(() => {
-    for (const t of [logo, sign]) {
+    for (const t of [sign]) {
       t.colorSpace = THREE.SRGBColorSpace;
       t.anisotropy = 8;
       t.needsUpdate = true;
     }
-  }, [logo, sign]);
+  }, [sign]);
 
   const wallMat = useMemo(
     () => new THREE.MeshStandardMaterial({ map: wallTex, roughness: 0.8, metalness: 0.1, side: THREE.BackSide }),
     [wallTex]
   );
   const ceilingMat = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: "#0c0d0e", roughness: 0.9, metalness: 0, side: THREE.BackSide }),
+    () => new THREE.MeshStandardMaterial({ color: "#060708", roughness: 0.9, metalness: 0, side: THREE.BackSide }),
     []
   );
   const stripMat = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: "#ffffff", emissive: "#eaf2ff", emissiveIntensity: 2.6 }),
+    () => new THREE.MeshStandardMaterial({ color: "#ffffff", emissive: "#e6efff", emissiveIntensity: 1.9 }),
     []
   );
 
@@ -166,8 +165,8 @@ function GarageRoom() {
       ))}
 
       {/* Вывеска METAGARAGE на дальней стене — светящаяся, как на фасаде ателье */}
-      <mesh position={[0, 3.05, -ROOM_HALF_D + 0.1]}>
-        <planeGeometry args={[10.4, 1.85]} />
+      <mesh position={[-4.6, 2.55, -ROOM_HALF_D + 0.1]}>
+        <planeGeometry args={[9.0, 1.6]} />
         <meshStandardMaterial
           map={sign}
           transparent
@@ -178,24 +177,12 @@ function GarageRoom() {
           roughness={0.5}
         />
       </mesh>
-      {/* Отсвет вывески на стене */}
-      <mesh position={[0, 3.05, -ROOM_HALF_D + 0.06]}>
-        <planeGeometry args={[12.5, 3.4]} />
-        <meshBasicMaterial color="#20262c" transparent opacity={0.5} />
+      {/* Чёрная монтажная панель под вывеской — как на фасаде ателье */}
+      <mesh position={[-4.6, 2.55, -ROOM_HALF_D + 0.06]}>
+        <planeGeometry args={[10.6, 2.9]} />
+        <meshStandardMaterial color="#040507" roughness={0.55} metalness={0.25} />
       </mesh>
 
-      {/* Логотип M-Monogram на боковой стене */}
-      <mesh position={[-ROOM_HALF_W + 0.1, 2.6, 0]} rotation={[0, Math.PI / 2, 0]}>
-        <planeGeometry args={[4.2, 1]} />
-        <meshStandardMaterial
-          map={logo}
-          transparent
-          emissiveMap={logo}
-          emissive="#ffffff"
-          emissiveIntensity={0.55}
-          roughness={0.6}
-        />
-      </mesh>
     </group>
   );
 }
@@ -236,15 +223,15 @@ function GarageFloor() {
       <MeshReflectorMaterial
         resolution={512}
         mixBlur={1}
-        mixStrength={24}
+        mixStrength={13}
         blur={[420, 120]}
         depthScale={1.1}
         minDepthThreshold={0.4}
         maxDepthThreshold={1.35}
         mirror={0}
-        color="#0e1012"
-        metalness={0.55}
-        roughness={0.75}
+        color="#07080a"
+        metalness={0.72}
+        roughness={0.6}
       />
     </mesh>
   );

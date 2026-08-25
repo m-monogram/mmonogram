@@ -142,17 +142,25 @@ const ConfiguratorPage = () => {
               className="absolute inset-0 z-30 bg-black/35 md:bg-transparent md:pointer-events-none cursor-pointer md:cursor-default"
             />
 
+            {/* Позиционирование и центрирование — на обёртке.
+                На самой панели их держать нельзя: framer-motion пишет свой
+                inline transform и затирает -translate-y-1/2, из-за чего
+                панель уезжала вниз от центра. */}
+            <div
+              className="absolute z-40 flex flex-col justify-end md:justify-center pointer-events-none
+                right-3 sm:right-5
+                top-[max(5.5rem,env(safe-area-inset-top)+4.5rem)]
+                bottom-[max(1rem,env(safe-area-inset-bottom))]
+                md:top-0 md:bottom-0
+                w-[min(292px,calc(100vw-1.5rem))]"
+            >
             <motion.aside
               initial={{ x: "110%", opacity: 0.6 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "110%", opacity: 0.6 }}
               transition={{ type: "spring", stiffness: 380, damping: 36 }}
-              className="absolute z-40 flex flex-col gap-2.5
-                right-3 sm:right-5
-                top-[max(5.5rem,env(safe-area-inset-top)+4.5rem)]
-                bottom-[max(1rem,env(safe-area-inset-bottom))]
-                w-[min(292px,calc(100vw-1.5rem))]
-                md:top-1/2 md:bottom-auto md:-translate-y-1/2 md:max-h-[min(78vh,640px)]"
+              className="pointer-events-auto relative flex flex-col gap-2.5 w-full
+                min-h-0 max-h-full md:max-h-[min(78vh,640px)]"
             >
               {/* Кнопка свернуть — на самом aside, иначе её обрезает прокрутка панели */}
               <button
@@ -177,11 +185,12 @@ const ConfiguratorPage = () => {
                 type="button"
                 onClick={closeMenu}
                 aria-label={t("config.closeMenu")}
-                className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-[#2a2a2a]/95 border border-white/10 text-white hover:bg-[#353535] transition-colors cursor-pointer shadow-lg"
+                className="flex h-11 w-full shrink-0 items-center justify-center rounded-xl bg-[#2a2a2a]/95 border border-white/10 text-white hover:bg-[#353535] transition-colors cursor-pointer shadow-lg"
               >
                 <X className="w-4 h-4" strokeWidth={2} />
               </button>
             </motion.aside>
+            </div>
           </>
         )}
       </AnimatePresence>

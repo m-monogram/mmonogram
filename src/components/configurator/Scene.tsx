@@ -26,32 +26,32 @@ interface CameraPreset {
 
 const PRESETS: Record<CameraFocus, { desktop: CameraPreset; mobile: CameraPreset }> = {
   default: {
-    desktop: { azimuth: 44, polar: 76, distance: 7.6, target: [0, 0.9, 0] },
-    mobile: { azimuth: 44, polar: 74, distance: 11.0, target: [0, -0.45, 0] },
+    desktop: { azimuth: 50, polar: 76, distance: 8.2, target: [0, 0.9, 0] },
+    mobile: { azimuth: 24, polar: 80, distance: 9.6, target: [0, 1.0, 0] },
   },
   exterior: {
     desktop: { azimuth: 78, polar: 80, distance: 7.0, target: [0, 0.85, 0] },
-    mobile: { azimuth: 78, polar: 78, distance: 10.2, target: [0, -0.4, 0] },
+    mobile: { azimuth: 30, polar: 81, distance: 11.0, target: [0, 1.0, 0] },
   },
   wheels: {
     desktop: { azimuth: 52, polar: 83, distance: 3.6, target: [1.45, 0.55, 0.4] },
-    mobile: { azimuth: 52, polar: 81, distance: 4.6, target: [1.45, -0.25, 0.3] },
+    mobile: { azimuth: 50, polar: 82, distance: 4.0, target: [1.45, 0.5, 0.35] },
   },
   kit: {
     desktop: { azimuth: 148, polar: 77, distance: 7.4, target: [-0.4, 0.85, 0] },
-    mobile: { azimuth: 148, polar: 75, distance: 10.4, target: [-0.4, -0.4, 0] },
+    mobile: { azimuth: 156, polar: 80, distance: 10.8, target: [-0.3, 1.0, 0] },
   },
   carbon: {
     desktop: { azimuth: 26, polar: 55, distance: 5.6, target: [1.1, 1.05, 0] },
-    mobile: { azimuth: 26, polar: 55, distance: 7.6, target: [1.1, -0.1, 0] },
+    mobile: { azimuth: 22, polar: 58, distance: 8.0, target: [1.0, 1.0, 0] },
   },
   lights: {
     desktop: { azimuth: 8, polar: 79, distance: 5.8, target: [1.6, 0.85, 0] },
-    mobile: { azimuth: 8, polar: 77, distance: 7.6, target: [1.6, -0.25, 0] },
+    mobile: { azimuth: 6, polar: 80, distance: 7.5, target: [1.5, 0.8, 0] },
   },
   env: {
     desktop: { azimuth: 60, polar: 70, distance: 9.0, target: [0, 0.9, 0] },
-    mobile: { azimuth: 60, polar: 70, distance: 11.0, target: [0, -0.45, 0] },
+    mobile: { azimuth: 28, polar: 74, distance: 11.0, target: [0, 1.05, 0] },
   },
 };
 
@@ -222,7 +222,7 @@ function SceneEnvironment({ night }: { night: boolean }) {
             <Lightformer
               key={z}
               form="rect"
-              intensity={9}
+              intensity={7}
               position={[0, 6.3, z]}
               rotation={[Math.PI / 2, 0, 0]}
               scale={[19, 0.8, 1]}
@@ -256,7 +256,7 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
       frameloop="demand"
       dpr={[1, 1.75]}
       gl={{ antialias: true, preserveDrawingBuffer: true }}
-      camera={{ position: isMobile ? [7.9, 2.6, 7.6] : [5.4, 2.1, 5.2], fov: 38 }}
+      camera={{ position: isMobile ? [8.6, 2.9, 4.6] : [5.4, 2.1, 5.2], fov: isMobile ? 54 : 38 }}
       className="touch-none"
     >
       <color attach="background" args={[bg]} />
@@ -268,10 +268,10 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
       <Suspense fallback={null}>
         <SceneEnvironment night={config.night} />
 
-        <ambientLight intensity={config.night ? 0.55 : 0.45} />
+        <ambientLight intensity={config.night ? 0.3 : 0.45} />
         <directionalLight
           position={[6, 8, 4]}
-          intensity={config.night ? 1.25 : 1.6}
+          intensity={config.night ? 0.95 : 1.6}
           castShadow
           shadow-mapSize={[2048, 2048]}
           shadow-camera-left={-6}
@@ -301,7 +301,7 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
         enablePan={false}
         minDistance={3.0}
         maxDistance={config.night ? 11.5 : 12.5}
-        target={[0, isMobile ? -0.45 : 0.9, 0]}
+        target={[0, isMobile ? 1.0 : 0.9, 0]}
         enableDamping
         dampingFactor={0.08}
         onStart={() => {
