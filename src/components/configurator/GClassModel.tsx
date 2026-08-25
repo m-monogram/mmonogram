@@ -170,30 +170,31 @@ function Wheel({ position, design, finishIdx }: WheelProps) {
       <mesh material={rimMat} position={[0, 0.17, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.35, 0.018, 12, 48]} />
       </mesh>
-      {/* Тарелка монолитного диска */}
+      {/* Тарелка монолитного диска — у самого устья обода: в глубине бочонка
+          дизайн съедали AO и тень, и любой диск выглядел чёрным блином */}
       {design === 0 && (
-        <mesh material={rimMat} position={[0, 0.12, 0]}>
+        <mesh material={rimMat} position={[0, 0.15, 0]}>
           <cylinderGeometry args={[0.35, 0.35, 0.05, 48]} />
         </mesh>
       )}
       {holes.map((a, i) => (
-        <mesh key={i} material={TRIM} position={[Math.cos(a) * 0.25, 0.16, Math.sin(a) * 0.25]}>
+        <mesh key={i} material={TRIM} position={[Math.cos(a) * 0.25, 0.185, Math.sin(a) * 0.25]}>
           <cylinderGeometry args={[0.05, 0.05, 0.03, 16]} />
         </mesh>
       ))}
-      {/* Спицы: слегка вогнутые к ступице */}
+      {/* Спицы: в плоскости губы, слегка вогнутые к ступице */}
       {spokes.map((s, i) => (
         <group key={i} rotation={[0, s.rot, 0]}>
-          <mesh material={rimMat} position={[0.18, 0.12, 0]} rotation={[0, s.tilt, -0.12]}>
+          <mesh material={rimMat} position={[0.18, 0.155, 0]} rotation={[0, s.tilt, -0.12]}>
             <boxGeometry args={[0.32, 0.05, design === 2 ? 0.04 : 0.055]} />
           </mesh>
         </group>
       ))}
       {/* Ступица */}
-      <mesh material={rimMat} position={[0, 0.14, 0]}>
+      <mesh material={rimMat} position={[0, 0.165, 0]}>
         <cylinderGeometry args={[0.08, 0.09, 0.06, 28]} />
       </mesh>
-      <mesh material={TRIM} position={[0, 0.175, 0]}>
+      <mesh material={TRIM} position={[0, 0.2, 0]}>
         <cylinderGeometry args={[0.04, 0.04, 0.015, 20]} />
       </mesh>
     </group>
