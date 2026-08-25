@@ -66,14 +66,20 @@ export const DEFAULT_CONFIG: BuildConfig = {
   night: false,
 };
 
+/* Первый сегмент — версия схемы: старые ссылки не ломаются при добавлении опций */
+const SCHEMA_VERSION = 1;
+
 export function encodeConfig(c: BuildConfig): string {
-  return [c.paint, c.rim, c.rimFinish, +c.kit, +c.carbon, +c.lights, +c.night].join("-");
+  return [SCHEMA_VERSION, c.paint, c.rim, c.rimFinish, +c.kit, +c.carbon, +c.lights, +c.night].join("-");
 }
 
 export function decodeConfig(raw: string | null): BuildConfig {
   if (!raw) return DEFAULT_CONFIG;
-  const p = raw.split("-").map((n) => parseInt(n, 10));
-  if (p.length !== 7 || p.some((n) => Number.isNaN(n))) return DEFAULT_CONFIG;
+  let p = raw.split("-").map((n) => parseInt(n, 10));
+  if (p.some((n) => Number.isNaN(n))) return DEFAULT_CONFIG;
+  // Версионированный код: первый сегмент — версия; 7 сегментов — легаси-ссылки без версии
+  if (p.length === 8 && p[0] === 1) p = p.slice(1);
+  if (p.length !== 7) return DEFAULT_CONFIG;
   const clamp = (v: number, max: number) => Math.min(Math.max(v, 0), max);
   return {
     paint: clamp(p[0], PAINTS.length - 1),

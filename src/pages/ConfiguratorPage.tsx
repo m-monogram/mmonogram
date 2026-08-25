@@ -5,6 +5,7 @@ import SEOHead from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BuildConfig, decodeConfig, encodeConfig } from "@/components/configurator/config";
 import ConfigPanel from "@/components/configurator/ConfigPanel";
+import type { CameraFocus } from "@/components/configurator/Scene";
 
 // three.js подтягивается только на этой странице — остальной сайт не тяжелеет
 const ConfiguratorScene = lazy(() => import("@/components/configurator/Scene"));
@@ -13,6 +14,7 @@ const ConfiguratorPage = () => {
   const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const [config, setConfig] = useState<BuildConfig>(() => decodeConfig(searchParams.get("c")));
+  const [focus, setFocus] = useState<CameraFocus>("default");
 
   // Конфигурация живёт в URL — ссылкой можно делиться, как у Mansory
   const handleChange = useCallback(
@@ -48,7 +50,7 @@ const ConfiguratorPage = () => {
             </div>
           }
         >
-          <ConfiguratorScene config={config} />
+          <ConfiguratorScene config={config} focus={focus} />
         </Suspense>
       </div>
 
@@ -77,7 +79,11 @@ const ConfiguratorPage = () => {
 
       {/* Панель настроек: справа на десктопе, нижний лист на мобильном */}
       <aside className="absolute z-30 md:right-6 md:top-1/2 md:-translate-y-1/2 md:w-[300px] md:max-h-[86vh] inset-x-0 bottom-0 max-h-[52vh] md:inset-x-auto md:bottom-auto overflow-y-auto bg-[#101010]/90 backdrop-blur-2xl border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.55)]">
-        <ConfigPanel config={config} onChange={handleChange} />
+        <ConfigPanel
+          config={config}
+          onChange={handleChange}
+          onSectionChange={(s) => setFocus(s ?? "default")}
+        />
       </aside>
     </div>
   );
