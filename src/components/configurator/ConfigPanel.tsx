@@ -1,5 +1,17 @@
 import { useState } from "react";
-import { Camera, Check, Link2, Sun, Moon } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Camera,
+  Car,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Hexagon,
+  Lightbulb,
+  Link2,
+  Palette,
+  SunMoon,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BuildConfig, PAINTS, RIM_DESIGNS, RIM_FINISHES, encodeConfig } from "./config";
@@ -9,40 +21,106 @@ interface ConfigPanelProps {
   onChange: (next: BuildConfig) => void;
 }
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
+type Section = "exterior" | "wheels" | "kit" | "carbon" | "lights" | "env";
+
+/* Схематичная иконка дизайна диска */
+function WheelIcon({ design, className = "w-9 h-9" }: { design: number; className?: string }) {
+  const marks: JSX.Element[] = [];
+  if (design === 0) {
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      marks.push(
+        <circle key={i} cx={20 + Math.cos(a) * 10.5} cy={20 + Math.sin(a) * 10.5} r="1.7" fill="currentColor" />
+      );
+    }
+    marks.push(<circle key="disc" cx="20" cy="20" r="13.5" fill="none" stroke="currentColor" strokeWidth="1.2" />);
+  } else if (design === 1) {
+    for (let i = 0; i < 12; i++) {
+      marks.push(
+        <line key={i} x1="20" y1="15" x2="20" y2="5.5" stroke="currentColor" strokeWidth="1.6" transform={`rotate(${i * 30} 20 20)`} />
+      );
+    }
+  } else {
+    for (let i = 0; i < 6; i++) {
+      marks.push(
+        <g key={i} transform={`rotate(${i * 60} 20 20)`}>
+          <line x1="18.4" y1="14.5" x2="17" y2="5.8" stroke="currentColor" strokeWidth="1.5" />
+          <line x1="21.6" y1="14.5" x2="23" y2="5.8" stroke="currentColor" strokeWidth="1.5" />
+        </g>
+      );
+    }
+  }
   return (
-    <p className="font-display text-[10px] uppercase tracking-[0.28em] text-white/45 mb-2.5">{children}</p>
+    <svg viewBox="0 0 40 40" className={className} aria-hidden>
+      <circle cx="20" cy="20" r="16.5" fill="none" stroke="currentColor" strokeWidth="2" />
+      <circle cx="20" cy="20" r="3.4" fill="currentColor" />
+      {marks}
+    </svg>
   );
 }
 
-function PillButton({
-  active,
+/* Радио-индикатор как в референсе */
+function Radio({ selected }: { selected: boolean }) {
+  return (
+    <span
+      className={`ml-auto w-[18px] h-[18px] rounded-full border flex items-center justify-center transition-colors ${
+        selected ? "border-white" : "border-white/30"
+      }`}
+    >
+      {selected && <span className="w-2 h-2 rounded-full bg-white" />}
+    </span>
+  );
+}
+
+/* Строка-опция внутри категории: превью, название, радио */
+function OptionRow({
+  selected,
   onClick,
-  children,
+  preview,
+  label,
+  sub,
 }: {
-  active: boolean;
+  selected: boolean;
   onClick: () => void;
-  children: React.ReactNode;
+  preview: React.ReactNode;
+  label: string;
+  sub?: string;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`flex-1 px-3 py-2.5 text-[11px] font-body uppercase tracking-wider border transition-all duration-200 cursor-pointer ${
-        active
-          ? "border-white bg-white text-black"
-          : "border-white/20 text-white/70 hover:border-white/50 hover:text-white"
+      className={`w-full flex items-center gap-3.5 px-3.5 py-3 border transition-all duration-200 cursor-pointer text-left ${
+        selected
+          ? "border-white/60 bg-white/[0.08]"
+          : "border-white/10 hover:border-white/30 hover:bg-white/[0.03]"
       }`}
     >
-      {children}
+      {preview}
+      <span className="min-w-0">
+        <span className="block font-body text-[13px] text-white/90 truncate">{label}</span>
+        {sub && <span className="block font-body text-[10px] uppercase tracking-[0.12em] text-white/35 mt-0.5">{sub}</span>}
+      </span>
+      <Radio selected={selected} />
     </button>
   );
+}
+
+function GroupTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="font-display text-[10px] uppercase tracking-[0.3em] text-white/40 mb-3 mt-1">{children}</p>
+  );
+}
+
+function Swatch({ color }: { color: string }) {
+  return <span className="w-8 h-8 rounded-full shrink-0 ring-1 ring-white/20" style={{ backgroundColor: color }} />;
 }
 
 export default function ConfigPanel({ config, onChange }: ConfigPanelProps) {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
+  const [section, setSection] = useState<Section | null>(null);
 
   const set = (patch: Partial<BuildConfig>) => onChange({ ...config, ...patch });
 
@@ -51,7 +129,7 @@ export default function ConfigPanel({ config, onChange }: ConfigPanelProps) {
     try {
       await navigator.clipboard.writeText(url);
     } catch {
-      /* без clipboard API просто показываем ссылку в адресной строке — она уже там */
+      /* без clipboard API ссылка уже в адресной строке */
     }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -66,177 +144,213 @@ export default function ConfigPanel({ config, onChange }: ConfigPanelProps) {
     a.click();
   };
 
-  const handleBook = () => {
-    navigate("/booking");
-  };
+  const rootItems: { id: Section; icon: React.ReactNode; label: string; value: string }[] = [
+    { id: "exterior", icon: <Palette className="w-[18px] h-[18px]" />, label: t("config.exterior"), value: PAINTS[config.paint].name },
+    { id: "wheels", icon: <WheelIcon design={config.rim} className="w-5 h-5" />, label: t("config.rims"), value: RIM_DESIGNS[config.rim].name },
+    { id: "kit", icon: <Car className="w-[18px] h-[18px]" />, label: t("config.kit"), value: config.kit ? t("config.kitMM") : t("config.kitStandard") },
+    { id: "carbon", icon: <Hexagon className="w-[18px] h-[18px]" />, label: t("config.carbon"), value: config.carbon ? t("config.carbonOn") : t("config.carbonOff") },
+    { id: "lights", icon: <Lightbulb className="w-[18px] h-[18px]" />, label: t("config.lights"), value: config.lights ? t("config.lightsOn") : t("config.lightsOff") },
+    { id: "env", icon: <SunMoon className="w-[18px] h-[18px]" />, label: t("config.environment"), value: config.night ? t("config.envNight") : t("config.envStudio") },
+  ];
 
   return (
-    <div className="flex flex-col gap-6 p-5 sm:p-6">
-      {/* Цвет кузова */}
-      <div>
-        <SectionTitle>{t("config.exterior")}</SectionTitle>
-        <div className="flex flex-wrap gap-2.5">
-          {PAINTS.map((p, i) => (
+    <div className="relative overflow-hidden">
+      <AnimatePresence mode="wait" initial={false}>
+        {section === null ? (
+          /* ---------- Уровень 1: список категорий ---------- */
+          <motion.div
+            key="root"
+            initial={{ x: -24, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -24, opacity: 0 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            className="flex flex-col p-2.5"
+          >
+            <div className="flex flex-col divide-y divide-white/[0.06]">
+              {rootItems.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setSection(item.id)}
+                  className="group flex items-center gap-3.5 px-3 py-[15px] hover:bg-white/[0.04] transition-colors cursor-pointer text-left"
+                >
+                  <span className="text-white/50 group-hover:text-white/80 transition-colors shrink-0">{item.icon}</span>
+                  <span className="font-body text-sm text-white/90">{item.label}</span>
+                  <span className="ml-auto font-body text-[10px] uppercase tracking-[0.1em] text-white/35 text-right max-w-[96px] truncate">
+                    {item.value}
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 text-white/25 group-hover:text-white/50 transition-colors shrink-0" />
+                </button>
+              ))}
+
+              {/* Поделиться и скриншот */}
+              <button
+                type="button"
+                onClick={handleShare}
+                className="group flex items-center gap-3.5 px-3 py-[15px] hover:bg-white/[0.04] transition-colors cursor-pointer text-left"
+              >
+                <span className="text-white/50 group-hover:text-white/80 transition-colors shrink-0">
+                  {copied ? <Check className="w-[18px] h-[18px]" /> : <Link2 className="w-[18px] h-[18px]" />}
+                </span>
+                <span className="font-body text-sm text-white/90">{copied ? t("config.shareCopied") : t("config.share")}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleScreenshot}
+                className="group flex items-center gap-3.5 px-3 py-[15px] hover:bg-white/[0.04] transition-colors cursor-pointer text-left"
+              >
+                <span className="text-white/50 group-hover:text-white/80 transition-colors shrink-0">
+                  <Camera className="w-[18px] h-[18px]" />
+                </span>
+                <span className="font-body text-sm text-white/90">{t("config.screenshot")}</span>
+              </button>
+            </div>
+
             <button
-              key={p.id}
               type="button"
-              title={p.name}
-              aria-label={p.name}
-              onClick={() => set({ paint: i })}
-              className={`relative w-9 h-9 rounded-full border-2 transition-all duration-200 cursor-pointer ${
-                config.paint === i ? "border-white scale-110" : "border-white/25 hover:border-white/60"
-              }`}
-              style={{ backgroundColor: p.color }}
+              onClick={() => navigate("/booking")}
+              className="mt-2.5 w-full py-3.5 font-body text-[10px] uppercase tracking-[0.22em] bg-white text-black hover:bg-white/90 transition-all cursor-pointer"
             >
-              {config.paint === i && (
-                <Check className="absolute inset-0 m-auto w-4 h-4 text-white mix-blend-difference" strokeWidth={3} />
+              {t("config.book")}
+            </button>
+          </motion.div>
+        ) : (
+          /* ---------- Уровень 2: опции категории ---------- */
+          <motion.div
+            key={section}
+            initial={{ x: 24, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 24, opacity: 0 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            className="flex flex-col p-4"
+          >
+            <div className="flex flex-col gap-2 max-h-[52vh] md:max-h-[58vh] overflow-y-auto pr-0.5">
+              {section === "exterior" && (
+                <>
+                  <GroupTitle>{t("config.exterior")}</GroupTitle>
+                  {PAINTS.map((p, i) => (
+                    <OptionRow
+                      key={p.id}
+                      selected={config.paint === i}
+                      onClick={() => set({ paint: i })}
+                      preview={<Swatch color={p.color} />}
+                      label={p.name}
+                    />
+                  ))}
+                </>
               )}
-            </button>
-          ))}
-        </div>
-        <p className="mt-2 text-[11px] text-white/50 font-body">{PAINTS[config.paint].name}</p>
-      </div>
 
-      {/* Обвес */}
-      <div>
-        <SectionTitle>{t("config.kit")}</SectionTitle>
-        <div className="flex gap-2">
-          <PillButton active={!config.kit} onClick={() => set({ kit: false })}>
-            {t("config.kitStandard")}
-          </PillButton>
-          <PillButton active={config.kit} onClick={() => set({ kit: true })}>
-            {t("config.kitMM")}
-          </PillButton>
-        </div>
-      </div>
+              {section === "wheels" && (
+                <>
+                  <GroupTitle>{t("config.rims")}</GroupTitle>
+                  {RIM_DESIGNS.map((r, i) => (
+                    <OptionRow
+                      key={r.id}
+                      selected={config.rim === i}
+                      onClick={() => set({ rim: i })}
+                      preview={<span className="text-white/75 shrink-0"><WheelIcon design={i} className="w-8 h-8" /></span>}
+                      label={r.name}
+                      sub={'24"'}
+                    />
+                  ))}
+                  <GroupTitle>{t("config.rimColor")}</GroupTitle>
+                  {RIM_FINISHES.map((f, i) => (
+                    <OptionRow
+                      key={f.id}
+                      selected={config.rimFinish === i}
+                      onClick={() => set({ rimFinish: i })}
+                      preview={<Swatch color={f.color} />}
+                      label={f.name}
+                    />
+                  ))}
+                </>
+              )}
 
-      {/* Карбон */}
-      <div>
-        <SectionTitle>{t("config.carbon")}</SectionTitle>
-        <div className="flex gap-2">
-          <PillButton active={!config.carbon} onClick={() => set({ carbon: false })}>
-            {t("config.carbonOff")}
-          </PillButton>
-          <PillButton active={config.carbon} onClick={() => set({ carbon: true })}>
-            {t("config.carbonOn")}
-          </PillButton>
-        </div>
-      </div>
+              {section === "kit" && (
+                <>
+                  <GroupTitle>{t("config.kit")}</GroupTitle>
+                  <OptionRow
+                    selected={!config.kit}
+                    onClick={() => set({ kit: false })}
+                    preview={<span className="text-white/60 shrink-0"><Car className="w-7 h-7" strokeWidth={1.5} /></span>}
+                    label={t("config.kitStandard")}
+                  />
+                  <OptionRow
+                    selected={config.kit}
+                    onClick={() => set({ kit: true })}
+                    preview={<span className="text-white/60 shrink-0"><Car className="w-7 h-7" strokeWidth={1.5} /></span>}
+                    label={t("config.kitMM")}
+                  />
+                </>
+              )}
 
-      {/* Диски */}
-      <div>
-        <SectionTitle>{t("config.rims")}</SectionTitle>
-        <div className="flex flex-col gap-2">
-          {RIM_DESIGNS.map((r, i) => (
+              {section === "carbon" && (
+                <>
+                  <GroupTitle>{t("config.carbon")}</GroupTitle>
+                  <OptionRow
+                    selected={!config.carbon}
+                    onClick={() => set({ carbon: false })}
+                    preview={<Swatch color={PAINTS[config.paint].color} />}
+                    label={t("config.carbonOff")}
+                  />
+                  <OptionRow
+                    selected={config.carbon}
+                    onClick={() => set({ carbon: true })}
+                    preview={<Swatch color="#1a1b1f" />}
+                    label={t("config.carbonOn")}
+                  />
+                </>
+              )}
+
+              {section === "lights" && (
+                <>
+                  <GroupTitle>{t("config.lights")}</GroupTitle>
+                  <OptionRow
+                    selected={config.lights}
+                    onClick={() => set({ lights: true })}
+                    preview={<span className="text-white/75 shrink-0"><Lightbulb className="w-7 h-7" strokeWidth={1.5} /></span>}
+                    label={t("config.lightsOn")}
+                  />
+                  <OptionRow
+                    selected={!config.lights}
+                    onClick={() => set({ lights: false })}
+                    preview={<span className="text-white/40 shrink-0"><Lightbulb className="w-7 h-7" strokeWidth={1.5} /></span>}
+                    label={t("config.lightsOff")}
+                  />
+                </>
+              )}
+
+              {section === "env" && (
+                <>
+                  <GroupTitle>{t("config.environment")}</GroupTitle>
+                  <OptionRow
+                    selected={!config.night}
+                    onClick={() => set({ night: false })}
+                    preview={<Swatch color="#c7cbce" />}
+                    label={t("config.envStudio")}
+                  />
+                  <OptionRow
+                    selected={config.night}
+                    onClick={() => set({ night: true })}
+                    preview={<Swatch color="#0a0a0c" />}
+                    label={t("config.envNight")}
+                  />
+                </>
+              )}
+            </div>
+
+            {/* Назад — как в референсе, отдельной полосой внизу */}
             <button
-              key={r.id}
               type="button"
-              onClick={() => set({ rim: i })}
-              className={`flex items-center justify-between px-3 py-2.5 text-[11px] font-body uppercase tracking-wider border transition-all duration-200 cursor-pointer ${
-                config.rim === i
-                  ? "border-white/80 bg-white/10 text-white"
-                  : "border-white/15 text-white/60 hover:border-white/40 hover:text-white"
-              }`}
+              onClick={() => setSection(null)}
+              className="mt-4 w-full flex items-center justify-between px-4 py-3.5 border border-white/15 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/35 transition-all cursor-pointer"
             >
-              <span>{r.name}</span>
-              <span
-                className={`w-3.5 h-3.5 rounded-full border ${
-                  config.rim === i ? "border-white bg-white" : "border-white/40"
-                }`}
-              />
+              <span className="font-body text-sm text-white/85">{t("common.back")}</span>
+              <ChevronLeft className="w-4 h-4 text-white/60" />
             </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Отделка дисков */}
-      <div>
-        <SectionTitle>{t("config.rimColor")}</SectionTitle>
-        <div className="flex gap-2.5">
-          {RIM_FINISHES.map((f, i) => (
-            <button
-              key={f.id}
-              type="button"
-              title={f.name}
-              aria-label={f.name}
-              onClick={() => set({ rimFinish: i })}
-              className={`w-8 h-8 rounded-full border-2 transition-all duration-200 cursor-pointer ${
-                config.rimFinish === i ? "border-white scale-110" : "border-white/25 hover:border-white/60"
-              }`}
-              style={{ backgroundColor: f.color }}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Свет и окружение */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <SectionTitle>{t("config.lights")}</SectionTitle>
-          <div className="flex gap-2">
-            <PillButton active={config.lights} onClick={() => set({ lights: true })}>
-              {t("config.lightsOn")}
-            </PillButton>
-            <PillButton active={!config.lights} onClick={() => set({ lights: false })}>
-              {t("config.lightsOff")}
-            </PillButton>
-          </div>
-        </div>
-        <div>
-          <SectionTitle>{t("config.environment")}</SectionTitle>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              aria-label={t("config.envStudio")}
-              onClick={() => set({ night: false })}
-              className={`flex-1 flex items-center justify-center py-2.5 border transition-all cursor-pointer ${
-                !config.night ? "border-white bg-white text-black" : "border-white/20 text-white/70 hover:border-white/50"
-              }`}
-            >
-              <Sun className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              aria-label={t("config.envNight")}
-              onClick={() => set({ night: true })}
-              className={`flex-1 flex items-center justify-center py-2.5 border transition-all cursor-pointer ${
-                config.night ? "border-white bg-white text-black" : "border-white/20 text-white/70 hover:border-white/50"
-              }`}
-            >
-              <Moon className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Действия */}
-      <div className="flex flex-col gap-2 pt-2 border-t border-white/10">
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={handleShare}
-            className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 text-[11px] font-body uppercase tracking-wider border border-white/25 text-white/80 hover:border-white/60 hover:text-white transition-all cursor-pointer"
-          >
-            {copied ? <Check className="w-3.5 h-3.5" /> : <Link2 className="w-3.5 h-3.5" />}
-            {copied ? t("config.shareCopied") : t("config.share")}
-          </button>
-          <button
-            type="button"
-            onClick={handleScreenshot}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 text-[11px] font-body uppercase tracking-wider border border-white/25 text-white/80 hover:border-white/60 hover:text-white transition-all cursor-pointer"
-            aria-label={t("config.screenshot")}
-          >
-            <Camera className="w-3.5 h-3.5" />
-          </button>
-        </div>
-        <button
-          type="button"
-          onClick={handleBook}
-          className="w-full px-3 py-3 text-[11px] font-body uppercase tracking-[0.2em] bg-white text-black hover:bg-white/90 transition-all cursor-pointer"
-        >
-          {t("config.book")}
-        </button>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
