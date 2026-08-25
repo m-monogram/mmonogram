@@ -76,7 +76,7 @@ const ConfiguratorPage = () => {
       </div>
 
       {/* Панель настроек: справа на десктопе, нижний лист на мобильном */}
-      <aside className="absolute z-30 md:right-6 md:top-1/2 md:-translate-y-1/2 md:w-[330px] md:max-h-[86vh] md:rounded-none inset-x-0 bottom-0 max-h-[46vh] md:inset-x-auto md:bottom-auto overflow-y-auto bg-black/75 backdrop-blur-xl border border-white/10 shadow-2xl">
+      <aside className="absolute z-30 md:right-6 md:top-1/2 md:-translate-y-1/2 md:w-[300px] md:max-h-[86vh] inset-x-0 bottom-0 max-h-[52vh] md:inset-x-auto md:bottom-auto overflow-y-auto bg-[#101010]/90 backdrop-blur-2xl border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.55)]">
         <ConfigPanel config={config} onChange={handleChange} />
       </aside>
     </div>
