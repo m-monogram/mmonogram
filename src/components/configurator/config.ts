@@ -59,14 +59,16 @@ export interface BuildConfig {
 /** Camera presets tied to config panel sections */
 export type CameraFocus = "default" | "exterior" | "wheels" | "kit" | "carbon" | "lights" | "env";
 
+/* По умолчанию машина собирается в тёмном гараже: чёрный лак на светлом фоне
+   терялся, а тёмный зал — фирменная подача ателье. */
 export const DEFAULT_CONFIG: BuildConfig = {
   paint: 0,
   rim: 1,
   rimFinish: 0,
   kit: true,
   carbon: true,
-  lights: false,
-  night: false,
+  lights: true,
+  night: true,
 };
 
 /* Первый сегмент — версия схемы: старые ссылки не ломаются при добавлении опций */
