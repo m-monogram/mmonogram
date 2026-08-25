@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ClipboardList,
+  Armchair,
   Hexagon,
   Lightbulb,
   Link2,
@@ -17,13 +18,18 @@ import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BuildConfig, PAINTS, RIM_DESIGNS, RIM_FINISHES, encodeConfig } from "./config";
 
-export type Section = "exterior" | "wheels" | "kit" | "carbon" | "lights" | "env" | "overview";
+export type Section = "exterior" | "wheels" | "kit" | "carbon" | "lights" | "env" | "interior" | "overview";
+
+/* Раздел «Интерьер» — это не опции, а три ракурса внутри салона, как у Mansory */
+export type InteriorView = "interiorFront" | "interiorDriver" | "interiorRear";
 
 interface ConfigPanelProps {
   config: BuildConfig;
   onChange: (next: BuildConfig) => void;
   /* Сообщаем странице, какой раздел открыт — камера подлетает к нужной детали */
   onSectionChange?: (section: Section | null) => void;
+  /* Выбранный ракурс салона — камера залетает внутрь */
+  onInteriorView?: (view: InteriorView) => void;
 }
 
 /* Схематичная иконка дизайна диска */
@@ -119,15 +125,19 @@ function Swatch({ color }: { color: string }) {
   return <span className="w-8 h-8 rounded-full shrink-0 ring-1 ring-white/20" style={{ backgroundColor: color }} />;
 }
 
-export default function ConfigPanel({ config, onChange, onSectionChange }: ConfigPanelProps) {
+export default function ConfigPanel({ config, onChange, onSectionChange, onInteriorView }: ConfigPanelProps) {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const [section, setSectionState] = useState<Section | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const [interiorView, setInteriorView] = useState<InteriorView>("interiorFront");
   const setSection = (s: Section | null) => {
     setSectionState(s);
-    onSectionChange?.(s);
+    // Ровно один источник ракурса на клик: два setFocus в одном обработчике
+    // конфликтовали, и камера отставала на шаг.
+    if (s === "interior") onInteriorView?.(interiorView);
+    else onSectionChange?.(s);
     // На мобильном лист прокручен — новый раздел должен открываться с начала
     rootRef.current?.closest("aside")?.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -161,6 +171,7 @@ export default function ConfigPanel({ config, onChange, onSectionChange }: Confi
     { id: "carbon", icon: <Hexagon className="w-[18px] h-[18px]" />, label: t("config.carbon"), value: config.carbon ? t("config.carbonOn") : t("config.carbonOff") },
     { id: "lights", icon: <Lightbulb className="w-[18px] h-[18px]" />, label: t("config.lights"), value: config.lights ? t("config.lightsOn") : t("config.lightsOff") },
     { id: "env", icon: <SunMoon className="w-[18px] h-[18px]" />, label: t("config.environment"), value: config.night ? t("config.envNight") : t("config.envStudio") },
+    { id: "interior", icon: <Armchair className="w-[18px] h-[18px]" />, label: t("config.interior"), value: "" },
     { id: "overview", icon: <ClipboardList className="w-[18px] h-[18px]" />, label: t("config.overview"), value: "" },
   ];
 
@@ -337,6 +348,31 @@ export default function ConfigPanel({ config, onChange, onSectionChange }: Confi
                     preview={<span className="text-white/40 shrink-0"><Lightbulb className="w-7 h-7" strokeWidth={1.5} /></span>}
                     label={t("config.lightsOff")}
                   />
+                </>
+              )}
+
+              {section === "interior" && (
+                <>
+                  <GroupTitle>{t("config.interior")}</GroupTitle>
+                  {([
+                    ["interiorFront", t("config.interiorFront")],
+                    ["interiorDriver", t("config.interiorDriver")],
+                    ["interiorRear", t("config.interiorRear")],
+                  ] as [InteriorView, string][]).map(([id, label]) => (
+                    <OptionRow
+                      key={id}
+                      selected={interiorView === id}
+                      onClick={() => {
+                        setInteriorView(id);
+                        onInteriorView?.(id);
+                      }}
+                      preview={<span className="text-white/70 shrink-0"><Armchair className="w-7 h-7" strokeWidth={1.4} /></span>}
+                      label={label}
+                    />
+                  ))}
+                  <p className="mt-1 font-body text-[10px] text-white/35 leading-relaxed">
+                    {t("config.interiorHint")}
+                  </p>
                 </>
               )}
 

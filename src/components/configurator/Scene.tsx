@@ -6,7 +6,7 @@ import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import GClassModel from "./GClassModel";
 import Showroom from "./Showroom";
-import { BuildConfig, type CameraFocus } from "./config";
+import { BuildConfig, isInteriorFocus, type CameraFocus } from "./config";
 
 export type { CameraFocus };
 
@@ -18,11 +18,23 @@ export type { CameraFocus };
  * azimuth — угол от оси +X (перед машины) к +Z, в градусах; polar — от зенита.
  */
 interface CameraPreset {
-  azimuth: number;
-  polar: number;
-  distance: number;
+  /** Явная позиция камеры. В тесном салоне сферические углы неудобны —
+      проще задать точку глаза прямо в координатах кабины. */
+  eye?: [number, number, number];
+  azimuth?: number;
+  polar?: number;
+  distance?: number;
   target: [number, number, number];
+  /** Угол обзора для этого ракурса. В салоне «уличные» 38° слишком узкие:
+      руль занимает полкадра, торпедо в кадр не помещается. */
+  fov?: number;
 }
+
+/* Базовый и «салонный» угол обзора: в кабине нужен широкоугольник */
+const BASE_FOV = 38;
+const BASE_FOV_MOBILE = 54;
+const INTERIOR_FOV = 56;
+const INTERIOR_FOV_MOBILE = 68;
 
 const PRESETS: Record<CameraFocus, { desktop: CameraPreset; mobile: CameraPreset }> = {
   default: {
@@ -53,15 +65,41 @@ const PRESETS: Record<CameraFocus, { desktop: CameraPreset; mobile: CameraPreset
     desktop: { azimuth: 60, polar: 70, distance: 9.0, target: [0, 0.9, 0] },
     mobile: { azimuth: 28, polar: 74, distance: 11.0, target: [0, 1.05, 0] },
   },
+  /* Салон. Точки глаза стоят в проходе между рядами — там, где нет мебели:
+     пол колодца 0.86, потолок 1.80, передние кресла x=-0.02 (z=±0.42),
+     диван x=-1.28, торпедо x=0.62, руль (0.3, 1.18, 0.38).
+     Мобильные позиции ближе к цели: fov там 54° против 38° на десктопе. */
+  interiorFront: {
+    desktop: { eye: [-1.12, 1.64, 0], target: [0.5, 1.1, 0.05], fov: INTERIOR_FOV },
+    mobile: { eye: [-0.67, 1.49, 0.01], target: [0.5, 1.1, 0.05], fov: INTERIOR_FOV_MOBILE },
+  },
+  /* С места водителя: точка глаза чуть впереди подголовника, взгляд поверх
+     руля на приборку. Из прохода за креслами руль закрывала спинка. */
+  interiorDriver: {
+    desktop: { eye: [-0.2, 1.52, 0.4], target: [0.5, 1.26, 0.36], fov: INTERIOR_FOV },
+    mobile: { eye: [0.0, 1.47, 0.39], target: [0.5, 1.26, 0.36], fov: INTERIOR_FOV_MOBILE },
+  },
+  /* Из прохода между передними креслами назад на диван */
+  interiorRear: {
+    desktop: { eye: [0.3, 1.62, 0], target: [-1.45, 1.16, 0], fov: INTERIOR_FOV },
+    mobile: { eye: [-0.19, 1.49, 0], target: [-1.45, 1.16, 0], fov: INTERIOR_FOV_MOBILE },
+  },
 };
 
+/* Внутри салона своя дистанция орбиты и свой предел по высоте.
+   Максимум 2.1 м — дальше камера вылезла бы за кузов сквозь стекло. */
+const INTERIOR_MIN_DISTANCE = 0.35;
+const INTERIOR_MAX_DISTANCE = 2.1;
+
 function presetToPosition(p: CameraPreset): THREE.Vector3 {
-  const azimuth = THREE.MathUtils.degToRad(p.azimuth);
-  const polar = THREE.MathUtils.degToRad(p.polar);
+  if (p.eye) return new THREE.Vector3(...p.eye);
+  const azimuth = THREE.MathUtils.degToRad(p.azimuth ?? 50);
+  const polar = THREE.MathUtils.degToRad(p.polar ?? 76);
+  const distance = p.distance ?? 8;
   return new THREE.Vector3(
-    p.target[0] + p.distance * Math.sin(polar) * Math.cos(azimuth),
-    p.target[1] + p.distance * Math.cos(polar),
-    p.target[2] + p.distance * Math.sin(polar) * Math.sin(azimuth)
+    p.target[0] + distance * Math.sin(polar) * Math.cos(azimuth),
+    p.target[1] + distance * Math.cos(polar),
+    p.target[2] + distance * Math.sin(polar) * Math.sin(azimuth)
   );
 }
 
@@ -72,6 +110,8 @@ interface FlightState {
   toPos: THREE.Vector3;
   fromTarget: THREE.Vector3;
   toTarget: THREE.Vector3;
+  fromFov: number;
+  toFov: number;
   start: number;
   duration: number;
 }
@@ -100,17 +140,26 @@ function CameraRig({
     const preset = PRESETS[focus][isMobile ? "mobile" : "desktop"];
     const toPos = presetToPosition(preset);
     const toTarget = new THREE.Vector3(...preset.target);
+    const cam = camera as THREE.PerspectiveCamera;
+    const toFov = preset.fov ?? (isMobile ? BASE_FOV_MOBILE : BASE_FOV);
 
     if (!mounted.current) {
       // Интро-облёт: стартуем издалека и сверху, плавно прилетаем к дефолту
       mounted.current = true;
-      const introPreset: CameraPreset = { ...preset, azimuth: preset.azimuth - 55, polar: 55, distance: preset.distance * 1.9 };
+      const introPreset: CameraPreset = {
+        target: preset.target,
+        azimuth: (preset.azimuth ?? 50) - 55,
+        polar: 55,
+        distance: (preset.distance ?? 8.2) * 1.9,
+      };
       camera.position.copy(presetToPosition(introPreset));
       flightRef.current = {
         fromPos: camera.position.clone(),
         toPos,
         fromTarget: toTarget.clone(),
         toTarget,
+        fromFov: cam.fov,
+        toFov,
         start: performance.now(),
         duration: 2200,
       };
@@ -120,6 +169,8 @@ function CameraRig({
         toPos,
         fromTarget: controls ? controls.target.clone() : toTarget.clone(),
         toTarget,
+        fromFov: cam.fov,
+        toFov,
         start: performance.now(),
         duration: 900,
       };
@@ -136,6 +187,11 @@ function CameraRig({
     const e = easeInOutCubic(t);
     camera.position.lerpVectors(flight.fromPos, flight.toPos, e);
     controls.target.lerpVectors(flight.fromTarget, flight.toTarget, e);
+    const cam = camera as THREE.PerspectiveCamera;
+    if (cam.isPerspectiveCamera && flight.fromFov !== flight.toFov) {
+      cam.fov = THREE.MathUtils.lerp(flight.fromFov, flight.toFov, e);
+      cam.updateProjectionMatrix();
+    }
     controls.update();
     if (t >= 1) {
       flightRef.current = null;
@@ -156,14 +212,41 @@ function CameraRig({
 function ConfineCamera({
   night,
   controlsRef,
+  interior,
+  flightRef,
 }: {
   night: boolean;
   controlsRef: React.RefObject<OrbitControlsImpl>;
+  interior: boolean;
+  flightRef: React.MutableRefObject<FlightState | null>;
 }) {
   const { camera } = useThree();
   useFrame(() => {
     const controls = controlsRef.current;
     if (!controls) return;
+    /* Пределы дистанции нужно выставлять и во время перелёта: OrbitControls.update()
+       зажимает радиус по min/maxDistance, поэтому оставленные от прошлого режима
+       границы (снаружи — минимум 3 м) выталкивали камеру обратно из салона.
+       На время перелёта границы расширяем до объединения обоих режимов, иначе
+       вход в салон обрезался бы скачком вместо плавного залёта. */
+    const minDist = interior ? INTERIOR_MIN_DISTANCE : 3.0;
+    const maxDist = interior ? INTERIOR_MAX_DISTANCE : night ? 11.5 : 12.5;
+    if (flightRef.current) {
+      controls.minDistance = Math.min(minDist, INTERIOR_MIN_DISTANCE);
+      controls.maxDistance = Math.max(maxDist, 12.5);
+      // углы во время перелёта тоже не режем — траектория задана пресетом
+      controls.minPolarAngle = 0;
+      controls.maxPolarAngle = Math.PI;
+      return;
+    }
+    controls.minDistance = minDist;
+    controls.maxDistance = maxDist;
+    if (interior) {
+      // в салоне ограничения зала не нужны — крутим вокруг точки внутри кабины
+      controls.minPolarAngle = 0.35;
+      controls.maxPolarAngle = Math.PI - 0.35;
+      return;
+    }
     const ceiling = night ? 5.6 : 10.5; // потолок гаража / высота циклорамы
     const distance = camera.position.distanceTo(controls.target);
     const headroom = ceiling - controls.target.y;
@@ -245,6 +328,7 @@ function SceneEnvironment({ night }: { night: boolean }) {
 }
 
 export default function ConfiguratorScene({ config, focus = "default" }: { config: BuildConfig; focus?: CameraFocus }) {
+  const interior = isInteriorFocus(focus);
   const controls = useRef<OrbitControlsImpl>(null);
   const flightRef = useRef<FlightState | null>(null);
   const bg = config.night ? "#08090a" : "#c7cbce";
@@ -256,13 +340,13 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
       frameloop="demand"
       dpr={[1, 1.75]}
       gl={{ antialias: true, preserveDrawingBuffer: true }}
-      camera={{ position: isMobile ? [8.6, 2.9, 4.6] : [5.4, 2.1, 5.2], fov: isMobile ? 54 : 38 }}
+      camera={{ position: isMobile ? [8.6, 2.9, 4.6] : [5.4, 2.1, 5.2], fov: isMobile ? BASE_FOV_MOBILE : BASE_FOV, near: 0.05 }}
       className="touch-none"
     >
       <color attach="background" args={[bg]} />
 
       <InvalidateOnConfig config={config} />
-      <ConfineCamera night={config.night} controlsRef={controls} />
+      <ConfineCamera night={config.night} controlsRef={controls} interior={interior} flightRef={flightRef} />
       <CameraRig focus={focus} isMobile={isMobile} controlsRef={controls} flightRef={flightRef} />
 
       <Suspense fallback={null}>
@@ -289,7 +373,15 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
             аккуратный bloom только на бликах, лёгкая студийная десатурация.
             На мобильных AO в половинном разрешении (ТЗ 6.9). */}
         <EffectComposer multisampling={isMobile ? 0 : 4}>
-          <N8AO aoRadius={0.5} intensity={4} distanceFalloff={1} quality={isMobile ? "performance" : "medium"} halfRes={isMobile} />
+          {/* В салоне радиус AO меньше: с «уличными» 0.5 м вся кабина попадает
+              в затенение и уходит в чёрное. */}
+          <N8AO
+            aoRadius={interior ? 0.14 : 0.5}
+            intensity={interior ? 1.6 : 4}
+            distanceFalloff={1}
+            quality={isMobile ? "performance" : "medium"}
+            halfRes={isMobile}
+          />
           <Bloom intensity={0.15} luminanceThreshold={0.95} luminanceSmoothing={0.2} mipmapBlur />
           <BrightnessContrast contrast={-0.01} />
           <HueSaturation saturation={-0.05} />
@@ -299,8 +391,6 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
       <OrbitControls
         ref={controls}
         enablePan={false}
-        minDistance={3.0}
-        maxDistance={config.night ? 11.5 : 12.5}
         target={[0, isMobile ? 1.0 : 0.9, 0]}
         enableDamping
         dampingFactor={0.08}

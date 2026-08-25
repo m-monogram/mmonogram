@@ -68,22 +68,6 @@ const ConfiguratorPage = () => {
       </div>
 
       <div
-        className={`absolute left-4 sm:left-6 md:left-12 z-20 pointer-events-none ${config.night ? "text-white" : "text-black"}`}
-        style={{ top: `calc(env(safe-area-inset-top, 0px) + 6rem)` }}
-      >
-        <h1
-          className={`font-display text-xl sm:text-2xl md:text-3xl uppercase tracking-[0.18em] ${
-            config.night ? "text-white" : "text-black"
-          }`}
-        >
-          {t("config.title")}
-        </h1>
-        <p className={`mt-1 font-body text-[11px] sm:text-xs ${config.night ? "text-white/50" : "text-black/60"}`}>
-          {t("config.subtitle")}
-        </p>
-      </div>
-
-      <div
         className={`absolute left-4 sm:left-6 md:left-12 bottom-4 z-20 pointer-events-none hidden md:block ${
           config.night ? "text-white/40" : "text-black/40"
         }`}
@@ -176,7 +160,8 @@ const ConfiguratorPage = () => {
                 <ConfigPanel
                   config={config}
                   onChange={handleChange}
-                  onSectionChange={(s) => setFocus(s && s !== "overview" ? s : "default")}
+                  onSectionChange={(s) => setFocus(s && s !== "overview" && s !== "interior" ? s : "default")}
+                  onInteriorView={setFocus}
                 />
               </div>
 

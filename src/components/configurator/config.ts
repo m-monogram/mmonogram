@@ -57,7 +57,14 @@ export interface BuildConfig {
 }
 
 /** Camera presets tied to config panel sections */
-export type CameraFocus = "default" | "exterior" | "wheels" | "kit" | "carbon" | "lights" | "env";
+export type CameraFocus =
+  | "default" | "exterior" | "wheels" | "kit" | "carbon" | "lights" | "env"
+  /* Ракурсы внутри салона */
+  | "interiorFront" | "interiorDriver" | "interiorRear";
+
+/* Ракурсы, в которых камера находится внутри салона */
+const INTERIOR_FOCUS: CameraFocus[] = ["interiorFront", "interiorDriver", "interiorRear"];
+export const isInteriorFocus = (f: CameraFocus) => INTERIOR_FOCUS.includes(f);
 
 /* По умолчанию машина собирается в тёмном гараже: чёрный лак на светлом фоне
    терялся, а тёмный зал — фирменная подача ателье. */

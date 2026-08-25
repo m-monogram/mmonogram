@@ -1,6 +1,11 @@
 import { useMemo } from "react";
 import { RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
+import Interior from "./Interior";
+import { CABIN_BELT_Y, CABIN_FLOOR_Y, CABIN_FRONT_X, CABIN_REAR_X } from "./cabin";
+
+/* Стойки стоят по краю остекления (оно доходит до z = ±0.82) */
+const PILLAR_Z = 0.83;
 import { BuildConfig, PAINTS, RIM_FINISHES } from "./config";
 
 /**
@@ -12,11 +17,19 @@ import { BuildConfig, PAINTS, RIM_FINISHES } from "./config";
  */
 
 const GLASS = new THREE.MeshPhysicalMaterial({
-  color: "#10151a",
-  metalness: 0.25,
-  roughness: 0.05,
+  color: "#0e1319",
+  metalness: 0.1,
+  roughness: 0.04,
   clearcoat: 1,
   clearcoatRoughness: 0.03,
+  transparent: true,
+  opacity: 0.42,
+  /* Остекление — сплошной объём, а не оболочка. FrontSide обязателен:
+     при DoubleSide камера внутри салона смотрит сквозь несколько тонированных
+     граней подряд и кабина уходит в чёрное. Снаружи видна ближняя грань,
+     сквозь неё — салон; изнутри стекло отбраковывается и окна чистые. */
+  side: THREE.FrontSide,
+  depthWrite: false,
 });
 const TRIM = new THREE.MeshStandardMaterial({ color: "#141414", metalness: 0.4, roughness: 0.6 });
 const CHROME = new THREE.MeshStandardMaterial({ color: "#cfd3d6", metalness: 1, roughness: 0.12 });
@@ -43,8 +56,12 @@ function useBodyGeometry() {
     s.lineTo(2.42, 1.0);
     s.lineTo(2.34, 1.08);
     s.lineTo(0.9, 1.08); // капот
-    s.lineTo(0.84, 1.18); // подоконная линия почти вровень с капотом
-    s.lineTo(-2.42, 1.18); // борт до кормы
+    s.lineTo(CABIN_FRONT_X, CABIN_BELT_Y); // подоконная линия почти вровень с капотом
+    // колодец салона: моторный щит — пол — задняя стенка
+    s.lineTo(CABIN_FRONT_X, CABIN_FLOOR_Y);
+    s.lineTo(CABIN_REAR_X, CABIN_FLOOR_Y);
+    s.lineTo(CABIN_REAR_X, CABIN_BELT_Y);
+    s.lineTo(-2.42, CABIN_BELT_Y); // борт до кормы
     s.lineTo(-2.42, 0.42); // корма
     s.lineTo(-2.07, 0.42);
     s.absarc(-1.47, 0.42, ARCH_R, Math.PI, 0, true); // задняя арка
@@ -235,16 +252,38 @@ export default function GClassModel({ config }: { config: BuildConfig }) {
     <group>
       {/* Кузов и остекление */}
       <mesh geometry={bodyGeom} material={bodyMat} castShadow receiveShadow />
-      <mesh geometry={glassGeom} material={GLASS} castShadow />
+
+      {/* Внешние панели дверей: колодец салона прорезан в профиле насквозь,
+          поэтому с бортов его закрывают панели в цвет кузова — снаружи борт
+          сплошной, изнутри их дублируют тёмные панели обшивки. */}
+      {[0.905, -0.905].map((z) => (
+        <RoundedBox
+          key={`door${z}`}
+          args={[CABIN_FRONT_X - CABIN_REAR_X + 0.06, CABIN_BELT_Y - CABIN_FLOOR_Y + 0.06, 0.07]}
+          radius={0.02}
+          smoothness={2}
+          position={[(CABIN_FRONT_X + CABIN_REAR_X) / 2, (CABIN_FLOOR_Y + CABIN_BELT_Y) / 2, z]}
+          material={bodyMat}
+          castShadow
+        />
+      ))}
+      <Interior />
+      <mesh geometry={glassGeom} material={GLASS} renderOrder={2} />
 
       {/* Крыша */}
       <RoundedBox args={[3.0, 0.1, 1.72]} radius={0.04} position={[-0.85, 1.86, 0]} material={bodyMat} castShadow />
 
-      {/* Стойки поверх остекления */}
-      <RoundedBox args={[0.1, 0.72, 1.68]} radius={0.03} position={[0.71, 1.5, 0]} rotation={[0, 0, 0.37]} material={bodyMat} />
-      <RoundedBox args={[0.09, 0.64, 1.68]} radius={0.03} position={[-0.35, 1.5, 0]} material={bodyMat} />
-      <RoundedBox args={[0.09, 0.64, 1.68]} radius={0.03} position={[-1.15, 1.5, 0]} material={bodyMat} />
-      <RoundedBox args={[0.12, 0.7, 1.68]} radius={0.03} position={[-2.19, 1.5, 0]} rotation={[0, 0, -0.32]} material={bodyMat} />
+      {/* Стойки поверх остекления — по бортам, а не сплошными плитами поперёк
+          кабины: полноширинные плиты изнутри работали глухими перегородками
+          в полуметре от камеры и салон уходил в чёрное. */}
+      {[PILLAR_Z, -PILLAR_Z].map((z) => (
+        <group key={z}>
+          <RoundedBox args={[0.1, 0.72, 0.1]} radius={0.03} position={[0.71, 1.5, z]} rotation={[0, 0, 0.37]} material={bodyMat} />
+          <RoundedBox args={[0.09, 0.64, 0.09]} radius={0.03} position={[-0.35, 1.5, z]} material={bodyMat} />
+          <RoundedBox args={[0.09, 0.64, 0.09]} radius={0.03} position={[-1.15, 1.5, z]} material={bodyMat} />
+          <RoundedBox args={[0.12, 0.7, 0.1]} radius={0.03} position={[-2.19, 1.5, z]} rotation={[0, 0, -0.32]} material={bodyMat} />
+        </group>
+      ))}
 
       {/* Капот-«ракушка» — шире кузова, фирменная черта G-Class */}
       <RoundedBox args={[1.44, 0.05, 1.88]} radius={0.02} position={[1.62, 1.11, 0]} material={accentMat} castShadow />

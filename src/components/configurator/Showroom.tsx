@@ -1,7 +1,6 @@
 import { useMemo } from "react";
-import { MeshReflectorMaterial, useTexture } from "@react-three/drei";
+import { MeshReflectorMaterial } from "@react-three/drei";
 import * as THREE from "three";
-import metagarageSign from "@/assets/metagarage-sign.png";
 
 /**
  * Два окружения для конфигуратора:
@@ -104,16 +103,6 @@ function StudioCove() {
 
 function GarageRoom() {
   const wallTex = useWallTexture();
-  const sign = useTexture(metagarageSign);
-  // цветовые текстуры должны быть в sRGB, иначе оранжевый логотип уходит в кислоту
-  useMemo(() => {
-    for (const t of [sign]) {
-      t.colorSpace = THREE.SRGBColorSpace;
-      t.anisotropy = 8;
-      t.needsUpdate = true;
-    }
-  }, [sign]);
-
   const wallMat = useMemo(
     () => new THREE.MeshStandardMaterial({ map: wallTex, roughness: 0.8, metalness: 0.1, side: THREE.BackSide }),
     [wallTex]
@@ -163,25 +152,6 @@ function GarageRoom() {
           <meshStandardMaterial color="#20262c" emissive="#55636f" emissiveIntensity={0.55} side={THREE.DoubleSide} />
         </mesh>
       ))}
-
-      {/* Вывеска METAGARAGE на дальней стене — светящаяся, как на фасаде ателье */}
-      <mesh position={[-4.6, 2.55, -ROOM_HALF_D + 0.1]}>
-        <planeGeometry args={[9.0, 1.6]} />
-        <meshStandardMaterial
-          map={sign}
-          transparent
-          alphaTest={0.02}
-          emissiveMap={sign}
-          emissive="#ffffff"
-          emissiveIntensity={0.85}
-          roughness={0.5}
-        />
-      </mesh>
-      {/* Чёрная монтажная панель под вывеской — как на фасаде ателье */}
-      <mesh position={[-4.6, 2.55, -ROOM_HALF_D + 0.06]}>
-        <planeGeometry args={[10.6, 2.9]} />
-        <meshStandardMaterial color="#040507" roughness={0.55} metalness={0.25} />
-      </mesh>
 
     </group>
   );
