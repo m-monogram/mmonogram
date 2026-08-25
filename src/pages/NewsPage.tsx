@@ -76,6 +76,8 @@ const NewsPage = () => {
           className="absolute inset-0 w-full h-full object-cover object-[center_45%]"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-transparent" />
+        {/* Нижний градиент — текст хиро расположен внизу, поверх светлой части фото */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
         <MediaEdgeFade edges="bottom" />
         <div className="relative z-10 h-full flex flex-col justify-end pb-12 sm:pb-16 px-4 sm:px-8 lg:px-12 max-w-[1600px] mx-auto">
           <motion.button
