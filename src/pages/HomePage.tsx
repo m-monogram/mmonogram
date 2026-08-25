@@ -6,6 +6,7 @@ import HeroSection from "@/components/HeroSection";
 import MissionStatement from "@/components/MissionStatement";
 import BrandStrip from "@/components/BrandStrip";
 import VinBanner from "@/components/VinBanner";
+import Configurator3DBanner from "@/components/Configurator3DBanner";
 import NextSectionCTA from "@/components/NextSectionCTA";
 import SEOHead from "@/components/SEOHead";
 import LazyOnVisible from "@/components/LazyOnVisible";
@@ -161,6 +162,7 @@ const HomePage = () => {
             nextLabel={t("homeNextCta.next")}
             onClick={() => handleSetCurrentView("brand")}
           />
+          <Configurator3DBanner />
           <VinBanner />
           <Suspense fallback={null}>
             <Footer />

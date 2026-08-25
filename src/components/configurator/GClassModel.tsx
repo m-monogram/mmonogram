@@ -4,49 +4,86 @@ import * as THREE from "three";
 import { BuildConfig, PAINTS, RIM_FINISHES } from "./config";
 
 /**
- * Стилизованная процедурная модель G-Class, собранная из примитивов —
- * без внешних 3D-файлов. Демонстрирует механику конфигуратора;
- * при появлении настоящей модели кита M-Monogram (GLB) компонент
- * заменяется загрузкой через useGLTF с тем же набором пропсов.
+ * Стилизованная модель G-Class без внешних 3D-файлов.
+ * Кузов построен экструзией бокового профиля с вырезами под колёсные арки —
+ * колёса сидят внутри кузова, силуэт узнаваем. При появлении оцифрованного
+ * кита M-Monogram (GLB) компонент заменяется загрузкой useGLTF
+ * с тем же набором пропсов.
  */
 
 const GLASS = new THREE.MeshPhysicalMaterial({
-  color: "#0d1216",
-  metalness: 0.1,
-  roughness: 0.08,
-  transmission: 0,
+  color: "#10151a",
+  metalness: 0.25,
+  roughness: 0.05,
   clearcoat: 1,
-  clearcoatRoughness: 0.05,
+  clearcoatRoughness: 0.03,
 });
 const TRIM = new THREE.MeshStandardMaterial({ color: "#141414", metalness: 0.4, roughness: 0.6 });
-const CHROME = new THREE.MeshStandardMaterial({ color: "#cfd3d6", metalness: 1, roughness: 0.15 });
-const TIRE = new THREE.MeshStandardMaterial({ color: "#111111", metalness: 0, roughness: 0.95 });
+const CHROME = new THREE.MeshStandardMaterial({ color: "#cfd3d6", metalness: 1, roughness: 0.12 });
+const TIRE = new THREE.MeshStandardMaterial({ color: "#0e0e0e", metalness: 0, roughness: 0.95 });
 const CARBON = new THREE.MeshPhysicalMaterial({
-  color: "#17181c",
+  color: "#1a1b1f",
   metalness: 0.55,
-  roughness: 0.42,
+  roughness: 0.4,
   clearcoat: 1,
-  clearcoatRoughness: 0.12,
+  clearcoatRoughness: 0.1,
 });
-const RED_GLOW = new THREE.MeshStandardMaterial({ color: "#3a0a0a", emissive: "#a11212", emissiveIntensity: 0.7 });
+const RED_GLOW = new THREE.MeshStandardMaterial({ color: "#2a0707", emissive: "#a11212", emissiveIntensity: 0.6 });
 
-/* Луч фары: цель прожектора должна находиться в графе сцены, иначе three.js её не обновит */
-function HeadlightBeam({ z }: { z: number }) {
-  const target = useMemo(() => new THREE.Object3D(), []);
-  return (
-    <group>
-      <primitive object={target} position={[8, 0.3, z]} />
-      <spotLight
-        position={[2.35, 1.18, z]}
-        target={target}
-        angle={0.45}
-        intensity={40}
-        distance={14}
-        penumbra={0.7}
-        color="#dcebff"
-      />
-    </group>
-  );
+const WHEEL_X = 1.47;
+const WHEEL_Y = 0.49;
+const WHEEL_Z = 0.78;
+const ARCH_R = 0.6;
+
+/* Нижний кузов: боковой профиль с арками, экструзия по ширине */
+function useBodyGeometry() {
+  return useMemo(() => {
+    const s = new THREE.Shape();
+    s.moveTo(2.42, 0.42);
+    s.lineTo(2.42, 1.0);
+    s.lineTo(2.34, 1.08);
+    s.lineTo(0.9, 1.08); // капот
+    s.lineTo(0.84, 1.18); // подоконная линия почти вровень с капотом
+    s.lineTo(-2.42, 1.18); // борт до кормы
+    s.lineTo(-2.42, 0.42); // корма
+    s.lineTo(-2.07, 0.42);
+    s.absarc(-1.47, 0.42, ARCH_R, Math.PI, 0, true); // задняя арка
+    s.lineTo(0.87, 0.42);
+    s.absarc(1.47, 0.42, ARCH_R, Math.PI, 0, true); // передняя арка
+    s.lineTo(2.42, 0.42);
+    const g = new THREE.ExtrudeGeometry(s, {
+      depth: 1.8,
+      bevelEnabled: true,
+      bevelThickness: 0.04,
+      bevelSize: 0.04,
+      bevelSegments: 3,
+      curveSegments: 40,
+    });
+    g.translate(0, 0, -0.9);
+    return g;
+  }, []);
+}
+
+/* Остекление кабины единым объёмом */
+function useGlassGeometry() {
+  return useMemo(() => {
+    const s = new THREE.Shape();
+    s.moveTo(0.84, 1.18);
+    s.lineTo(0.6, 1.82);
+    s.lineTo(-2.1, 1.82);
+    s.lineTo(-2.3, 1.18);
+    s.lineTo(0.84, 1.18);
+    const g = new THREE.ExtrudeGeometry(s, {
+      depth: 1.64,
+      bevelEnabled: true,
+      bevelThickness: 0.02,
+      bevelSize: 0.02,
+      bevelSegments: 2,
+      curveSegments: 8,
+    });
+    g.translate(0, 0, -0.82);
+    return g;
+  }, []);
 }
 
 interface WheelProps {
@@ -74,8 +111,8 @@ function Wheel({ position, design, finishIdx }: WheelProps) {
     } else if (design === 2) {
       for (let i = 0; i < 6; i++) {
         const base = (i / 6) * Math.PI * 2;
-        arr.push({ rot: base - 0.16, tilt: 0.22 });
-        arr.push({ rot: base + 0.16, tilt: -0.22 });
+        arr.push({ rot: base - 0.15, tilt: 0.24 });
+        arr.push({ rot: base + 0.15, tilt: -0.24 });
       }
     }
     return arr;
@@ -87,53 +124,80 @@ function Wheel({ position, design, finishIdx }: WheelProps) {
   }, [design]);
 
   return (
-    /* Лицевая сторона диска должна смотреть наружу на обоих бортах */
+    /* Лицевая сторона диска смотрит наружу на обоих бортах */
     <group position={position} rotation={[position[2] > 0 ? Math.PI / 2 : -Math.PI / 2, 0, 0]}>
-      {/* Шина */}
+      {/* Шина с закруглёнными плечами */}
       <mesh material={TIRE}>
-        <cylinderGeometry args={[0.42, 0.42, 0.3, 40]} />
+        <cylinderGeometry args={[0.49, 0.49, 0.32, 48]} />
       </mesh>
-      {/* Заглушка глубины, тормозной диск и суппорт за спицами */}
+      {[0.16, -0.16].map((y) => (
+        <mesh key={y} material={TIRE} position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.44, 0.05, 12, 48]} />
+        </mesh>
+      ))}
+      {/* Заглушка глубины, тормозной диск и суппорт */}
       <mesh material={TRIM} position={[0, 0.02, 0]}>
-        <cylinderGeometry args={[0.27, 0.27, 0.02, 32]} />
+        <cylinderGeometry args={[0.33, 0.33, 0.02, 40]} />
       </mesh>
-      <mesh material={CHROME} position={[0, 0.045, 0]}>
-        <cylinderGeometry args={[0.2, 0.2, 0.025, 32]} />
+      <mesh material={CHROME} position={[0, 0.05, 0]}>
+        <cylinderGeometry args={[0.24, 0.24, 0.025, 40]} />
       </mesh>
-      <mesh position={[0.19, 0.06, 0.1]} rotation={[0, 0.5, 0]}>
-        <boxGeometry args={[0.12, 0.06, 0.1]} />
+      <mesh position={[0.24, 0.065, 0.1]} rotation={[0, 0.45, 0]}>
+        <boxGeometry args={[0.13, 0.06, 0.1]} />
         <meshStandardMaterial color="#7a1616" metalness={0.4} roughness={0.4} />
       </mesh>
-      {/* Обод */}
-      <mesh material={rimMat} position={[0, 0.02, 0]}>
-        <cylinderGeometry args={[0.3, 0.3, 0.28, 40, 1, true]} />
+      {/* Обод и внешняя губа */}
+      <mesh material={rimMat} position={[0, 0.04, 0]}>
+        <cylinderGeometry args={[0.36, 0.36, 0.28, 48, 1, true]} />
+      </mesh>
+      <mesh material={rimMat} position={[0, 0.17, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.35, 0.018, 12, 48]} />
       </mesh>
       {/* Тарелка монолитного диска */}
       {design === 0 && (
-        <mesh material={rimMat} position={[0, 0.1, 0]}>
-          <cylinderGeometry args={[0.29, 0.29, 0.05, 40]} />
+        <mesh material={rimMat} position={[0, 0.12, 0]}>
+          <cylinderGeometry args={[0.35, 0.35, 0.05, 48]} />
         </mesh>
       )}
       {holes.map((a, i) => (
-        <mesh key={i} material={TRIM} position={[Math.cos(a) * 0.2, 0.13, Math.sin(a) * 0.2]}>
-          <cylinderGeometry args={[0.045, 0.045, 0.03, 16]} />
+        <mesh key={i} material={TRIM} position={[Math.cos(a) * 0.25, 0.16, Math.sin(a) * 0.25]}>
+          <cylinderGeometry args={[0.05, 0.05, 0.03, 16]} />
         </mesh>
       ))}
-      {/* Спицы */}
+      {/* Спицы: слегка вогнутые к ступице */}
       {spokes.map((s, i) => (
         <group key={i} rotation={[0, s.rot, 0]}>
-          <mesh material={rimMat} position={[0.15, 0.1, 0]} rotation={[0, s.tilt, 0]}>
-            <boxGeometry args={[0.26, 0.05, design === 2 ? 0.035 : 0.05]} />
+          <mesh material={rimMat} position={[0.18, 0.12, 0]} rotation={[0, s.tilt, -0.12]}>
+            <boxGeometry args={[0.32, 0.05, design === 2 ? 0.04 : 0.055]} />
           </mesh>
         </group>
       ))}
       {/* Ступица */}
-      <mesh material={rimMat} position={[0, 0.12, 0]}>
-        <cylinderGeometry args={[0.07, 0.07, 0.05, 24]} />
+      <mesh material={rimMat} position={[0, 0.14, 0]}>
+        <cylinderGeometry args={[0.08, 0.09, 0.06, 28]} />
       </mesh>
-      <mesh material={TRIM} position={[0, 0.15, 0]}>
-        <cylinderGeometry args={[0.035, 0.035, 0.015, 16]} />
+      <mesh material={TRIM} position={[0, 0.175, 0]}>
+        <cylinderGeometry args={[0.04, 0.04, 0.015, 20]} />
       </mesh>
+    </group>
+  );
+}
+
+/* Луч фары: цель прожектора должна находиться в графе сцены */
+function HeadlightBeam({ z }: { z: number }) {
+  const target = useMemo(() => new THREE.Object3D(), []);
+  return (
+    <group>
+      <primitive object={target} position={[8, 0.3, z]} />
+      <spotLight
+        position={[2.4, 0.9, z]}
+        target={target}
+        angle={0.45}
+        intensity={40}
+        distance={14}
+        penumbra={0.7}
+        color="#dcebff"
+      />
     </group>
   );
 }
@@ -147,165 +211,164 @@ export default function GClassModel({ config }: { config: BuildConfig }) {
         metalness: paint.metalness,
         roughness: paint.roughness,
         clearcoat: 1,
-        clearcoatRoughness: 0.08,
+        clearcoatRoughness: 0.06,
       }),
     [paint]
   );
   const accentMat = config.carbon ? CARBON : bodyMat;
+  const bodyGeom = useBodyGeometry();
+  const glassGeom = useGlassGeometry();
 
   const headlightMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#dfe6ea",
+        color: "#e6ebef",
         emissive: config.lights ? "#cfe4ff" : "#0a0a0a",
-        emissiveIntensity: config.lights ? 2.2 : 0,
+        emissiveIntensity: config.lights ? 2.4 : 0,
         metalness: 0.2,
-        roughness: 0.2,
+        roughness: 0.15,
       }),
     [config.lights]
   );
 
-  const wheelX = 1.42;
-  const wheelZ = 0.82;
-  const wheelY = 0.42;
-
   return (
     <group>
-      {/* Рама и днище */}
-      <RoundedBox args={[4.15, 0.32, 1.6]} radius={0.05} position={[0, 0.52, 0]} material={TRIM} />
+      {/* Кузов и остекление */}
+      <mesh geometry={bodyGeom} material={bodyMat} castShadow receiveShadow />
+      <mesh geometry={glassGeom} material={GLASS} castShadow />
 
-      {/* Основной корпус */}
-      <RoundedBox args={[4.5, 0.72, 1.8]} radius={0.07} position={[0, 1.02, 0]} material={bodyMat} />
+      {/* Крыша */}
+      <RoundedBox args={[3.0, 0.1, 1.72]} radius={0.04} position={[-0.85, 1.86, 0]} material={bodyMat} castShadow />
 
-      {/* Капот */}
-      <RoundedBox args={[1.15, 0.07, 1.66]} radius={0.03} position={[1.62, 1.4, 0]} material={accentMat} />
+      {/* Стойки поверх остекления */}
+      <RoundedBox args={[0.1, 0.72, 1.68]} radius={0.03} position={[0.71, 1.5, 0]} rotation={[0, 0, 0.37]} material={bodyMat} />
+      <RoundedBox args={[0.09, 0.64, 1.68]} radius={0.03} position={[-0.35, 1.5, 0]} material={bodyMat} />
+      <RoundedBox args={[0.09, 0.64, 1.68]} radius={0.03} position={[-1.15, 1.5, 0]} material={bodyMat} />
+      <RoundedBox args={[0.12, 0.7, 1.68]} radius={0.03} position={[-2.19, 1.5, 0]} rotation={[0, 0, -0.32]} material={bodyMat} />
 
-      {/* Кабина до задней стенки: нижняя часть в цвет кузова, стеклянный пояс, крыша */}
-      <RoundedBox args={[3.0, 0.24, 1.78]} radius={0.04} position={[-0.6, 1.44, 0]} material={bodyMat} />
-      <RoundedBox args={[2.98, 0.44, 1.72]} radius={0.04} position={[-0.6, 1.74, 0]} material={GLASS} />
-      <RoundedBox args={[3.08, 0.14, 1.8]} radius={0.05} position={[-0.6, 2.0, 0]} material={bodyMat} />
-
-      {/* Цоколь под лобовым стеклом (капот-кабина без зазора) */}
-      <RoundedBox args={[0.5, 0.18, 1.66]} radius={0.03} position={[1.02, 1.4, 0]} material={bodyMat} />
-
-      {/* Лобовое стекло (почти вертикальное, как у G-Class) */}
-      <mesh material={GLASS} position={[0.95, 1.72, 0]} rotation={[0, 0, -0.14]}>
-        <boxGeometry args={[0.06, 0.52, 1.6]} />
-      </mesh>
-
-      {/* Стойки */}
-      {[0.9, -0.35, -2.0].map((x) => (
-        <RoundedBox key={x} args={[0.1, 0.5, 1.76]} radius={0.03} position={[x, 1.74, 0]} material={bodyMat} />
-      ))}
-
-      {/* Расширители арок */}
-      {[wheelX, -wheelX].map((x) =>
-        [wheelZ, -wheelZ].map((z) => (
-          <RoundedBox
-            key={`${x}${z}`}
-            args={config.kit ? [1.08, 0.3, 0.26] : [0.95, 0.24, 0.16]}
-            radius={0.05}
-            position={[x, 0.98, z > 0 ? z + (config.kit ? 0.12 : 0.06) : z - (config.kit ? 0.12 : 0.06)]}
-            material={config.kit ? accentMat : bodyMat}
-          />
-        ))
+      {/* Капот-«ракушка» — шире кузова, фирменная черта G-Class */}
+      <RoundedBox args={[1.44, 0.05, 1.88]} radius={0.02} position={[1.62, 1.11, 0]} material={accentMat} castShadow />
+      {config.kit && (
+        <RoundedBox args={[0.6, 0.07, 0.55]} radius={0.02} position={[1.55, 1.14, 0]} material={CARBON} />
       )}
 
-      {/* Решётка */}
-      <RoundedBox args={[0.08, 0.4, 1.24]} radius={0.02} position={[2.28, 1.16, 0]} material={TRIM} />
-      {Array.from({ length: 7 }, (_, i) => (
-        <mesh key={i} material={config.kit ? CHROME : TRIM} position={[2.33, 1.16, -0.51 + i * 0.17]}>
-          <boxGeometry args={[0.02, 0.34, 0.03]} />
+      {/* Поворотники на крыльях — фирменная черта */}
+      {[0.79, -0.79].map((z) => (
+        <RoundedBox key={z} args={[0.2, 0.07, 0.1]} radius={0.02} position={[2.05, 1.14, z]} material={TRIM} />
+      ))}
+
+      {/* Решётка радиатора */}
+      <RoundedBox args={[0.07, 0.34, 1.14]} radius={0.02} position={[2.44, 0.86, 0]} material={TRIM} />
+      {Array.from({ length: 8 }, (_, i) => (
+        <mesh key={i} material={config.kit ? CHROME : TRIM} position={[2.48, 0.86, -0.49 + i * 0.14]}>
+          <boxGeometry args={[0.02, 0.28, 0.03]} />
         </mesh>
       ))}
 
-      {/* Фары */}
-      {[0.62, -0.62].map((z) => (
-        <group key={z}>
-          <mesh material={TRIM} position={[2.27, 1.18, z]} rotation={[0, 0, Math.PI / 2]}>
-            <cylinderGeometry args={[0.15, 0.15, 0.06, 28]} />
+      {/* Круглые фары с LED-кольцами */}
+      {[0.66, -0.66].map((z) => (
+        <group key={z} position={[2.45, 0.9, z]}>
+          <mesh material={TRIM} rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[0.17, 0.17, 0.07, 32]} />
           </mesh>
-          <mesh material={headlightMat} position={[2.31, 1.18, z]} rotation={[0, 0, Math.PI / 2]}>
-            <cylinderGeometry args={[0.11, 0.11, 0.03, 28]} />
+          <mesh material={headlightMat} position={[0.03, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[0.12, 0.12, 0.03, 32]} />
+          </mesh>
+          <mesh material={headlightMat} position={[0.045, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+            <torusGeometry args={[0.14, 0.012, 10, 40]} />
           </mesh>
         </group>
       ))}
-      {config.lights && [0.62, -0.62].map((z) => <HeadlightBeam key={z} z={z} />)}
+      {config.lights && [0.66, -0.66].map((z) => <HeadlightBeam key={z} z={z} />)}
 
       {/* Передний бампер */}
-      <RoundedBox args={[0.4, 0.36, 1.78]} radius={0.06} position={[2.18, 0.6, 0]} material={config.kit ? accentMat : TRIM} />
-      {config.kit && (
-        <RoundedBox args={[0.3, 0.1, 1.62]} radius={0.03} position={[2.32, 0.38, 0]} material={CARBON} />
+      <RoundedBox args={[0.3, 0.3, 1.86]} radius={0.05} position={[2.42, 0.44, 0]} material={config.kit ? accentMat : TRIM} castShadow />
+      {config.kit && <RoundedBox args={[0.24, 0.09, 1.66]} radius={0.03} position={[2.52, 0.26, 0]} material={CARBON} />}
+
+      {/* Расширители арок — дуги по контуру арок */}
+      {[WHEEL_X, -WHEEL_X].map((x) =>
+        [1, -1].map((side) => (
+          <mesh
+            key={`${x}${side}`}
+            position={[x, 0.42, side * (config.kit ? 0.97 : 0.94)]}
+            material={config.kit ? accentMat : bodyMat}
+            castShadow
+          >
+            <torusGeometry args={[config.kit ? 0.65 : 0.62, config.kit ? 0.075 : 0.05, 10, 32, Math.PI]} />
+          </mesh>
+        ))
       )}
 
-      {/* Кит: воздухозаборник капота, козырёк с LED, пороги, диффузор */}
-      {config.kit && (
-        <>
-          <RoundedBox args={[0.55, 0.09, 0.5]} radius={0.03} position={[1.55, 1.47, 0]} material={CARBON} />
-          <RoundedBox args={[0.16, 0.1, 1.7]} radius={0.03} position={[0.85, 2.12, 0]} material={CARBON} />
-          {config.lights &&
-            [-0.5, -0.17, 0.17, 0.5].map((z) => (
-              <mesh key={z} material={headlightMat} position={[0.94, 2.12, z]}>
-                <boxGeometry args={[0.02, 0.05, 0.16]} />
-              </mesh>
-            ))}
-          {[0.94, -0.94].map((z) => (
-            <RoundedBox key={z} args={[2.1, 0.14, 0.16]} radius={0.04} position={[0, 0.42, z]} material={CARBON} />
-          ))}
-          <RoundedBox args={[0.24, 0.18, 1.5]} radius={0.04} position={[-2.28, 0.44, 0]} material={CARBON} />
-          {/* Четыре патрубка выхлопа */}
-          {[0.62, 0.42, -0.42, -0.62].map((z) => (
-            <mesh key={z} material={CHROME} position={[-2.3, 0.56, z]} rotation={[0, 0, Math.PI / 2]}>
-              <cylinderGeometry args={[0.055, 0.055, 0.2, 20]} />
+      {/* Пороги / подножки */}
+      {[1, -1].map((side) => (
+        <RoundedBox key={side} args={[2.15, 0.08, 0.2]} radius={0.03} position={[0, 0.36, side * 0.96]} material={config.kit ? CARBON : TRIM} />
+      ))}
+
+      {/* Кит: боковые выхлопы перед задними арками, как у G63 */}
+      {config.kit &&
+        [1, -1].map((side) =>
+          [-0.62, -0.82].map((x) => (
+            <mesh key={`${side}${x}`} material={CHROME} position={[x, 0.4, side * 1.0]} rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.05, 0.05, 0.14, 24]} />
             </mesh>
-          ))}
-        </>
-      )}
+          ))
+        )}
       {!config.kit &&
-        [0.5, -0.5].map((z) => (
-          <mesh key={z} material={TRIM} position={[-2.26, 0.5, z]} rotation={[0, 0, Math.PI / 2]}>
-            <cylinderGeometry args={[0.05, 0.05, 0.16, 20]} />
+        [0.45, -0.45].map((z) => (
+          <mesh key={z} material={TRIM} position={[-2.48, 0.34, z]} rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[0.05, 0.05, 0.14, 20]} />
           </mesh>
         ))}
 
-      {/* Задний бампер и запаска на двери */}
-      <RoundedBox args={[0.3, 0.36, 1.78]} radius={0.06} position={[-2.2, 0.6, 0]} material={config.kit ? accentMat : TRIM} />
-      <group position={[-2.32, 1.22, 0]} rotation={[0, 0, Math.PI / 2]}>
+      {/* Кит: LED-козырёк на крыше */}
+      {config.kit && (
+        <>
+          <RoundedBox args={[0.16, 0.1, 1.56]} radius={0.03} position={[0.5, 1.92, 0]} material={CARBON} />
+          {config.lights &&
+            [-0.52, -0.17, 0.17, 0.52].map((z) => (
+              <mesh key={z} material={headlightMat} position={[0.59, 1.92, z]}>
+                <boxGeometry args={[0.02, 0.05, 0.18]} />
+              </mesh>
+            ))}
+        </>
+      )}
+
+      {/* Задний бампер, запаска, фонари */}
+      <RoundedBox args={[0.26, 0.3, 1.86]} radius={0.05} position={[-2.44, 0.44, 0]} material={config.kit ? accentMat : TRIM} />
+      <group position={[-2.6, 0.95, 0]} rotation={[0, 0, Math.PI / 2]}>
         <mesh material={TIRE}>
-          <cylinderGeometry args={[0.38, 0.38, 0.24, 36]} />
+          <cylinderGeometry args={[0.4, 0.4, 0.24, 40]} />
         </mesh>
         <mesh material={accentMat} position={[0, -0.14, 0]}>
-          <cylinderGeometry args={[0.3, 0.3, 0.04, 36]} />
+          <cylinderGeometry args={[0.32, 0.32, 0.05, 40]} />
         </mesh>
       </group>
-
-      {/* Задние фонари */}
-      {[0.72, -0.72].map((z) => (
-        <RoundedBox key={z} args={[0.06, 0.28, 0.14]} radius={0.02} position={[-2.26, 1.22, z]} material={RED_GLOW} />
+      {[0.76, -0.76].map((z) => (
+        <RoundedBox key={z} args={[0.06, 0.28, 0.13]} radius={0.02} position={[-2.47, 1.0, z]} material={RED_GLOW} />
       ))}
 
-      {/* Зеркала */}
-      {[0.95, -0.95].map((z) => (
-        <group key={z} position={[0.8, 1.5, z]}>
-          <mesh material={TRIM}>
-            <boxGeometry args={[0.05, 0.05, 0.14]} />
+      {/* Зеркала на ножках у A-стойки */}
+      {[1, -1].map((side) => (
+        <group key={side} position={[0.7, 1.32, side * 0.92]}>
+          <mesh material={TRIM} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.02, 0.02, 0.14, 12]} />
           </mesh>
-          <RoundedBox args={[0.1, 0.14, 0.2]} radius={0.03} position={[0, 0.02, z > 0 ? 0.14 : -0.14]} material={accentMat} />
+          <RoundedBox args={[0.09, 0.13, 0.2]} radius={0.03} position={[0, 0.03, side * 0.13]} material={accentMat} />
         </group>
       ))}
 
       {/* Дверные ручки */}
-      {[0.35, -0.85].map((x) =>
-        [0.91, -0.91].map((z) => (
-          <RoundedBox key={`${x}${z}`} args={[0.24, 0.05, 0.04]} radius={0.015} position={[x, 1.28, z]} material={CHROME} />
+      {[0.32, -0.72].map((x) =>
+        [0.925, -0.925].map((z) => (
+          <RoundedBox key={`${x}${z}`} args={[0.22, 0.045, 0.035]} radius={0.015} position={[x, 1.04, z]} material={CHROME} />
         ))
       )}
 
-      {/* Колёса */}
-      <Wheel position={[wheelX, wheelY, wheelZ]} design={config.rim} finishIdx={config.rimFinish} />
-      <Wheel position={[wheelX, wheelY, -wheelZ]} design={config.rim} finishIdx={config.rimFinish} />
-      <Wheel position={[-wheelX, wheelY, wheelZ]} design={config.rim} finishIdx={config.rimFinish} />
-      <Wheel position={[-wheelX, wheelY, -wheelZ]} design={config.rim} finishIdx={config.rimFinish} />
+      {/* Колёса — внутри арок */}
+      <Wheel position={[WHEEL_X, WHEEL_Y, WHEEL_Z]} design={config.rim} finishIdx={config.rimFinish} />
+      <Wheel position={[WHEEL_X, WHEEL_Y, -WHEEL_Z]} design={config.rim} finishIdx={config.rimFinish} />
+      <Wheel position={[-WHEEL_X, WHEEL_Y, WHEEL_Z]} design={config.rim} finishIdx={config.rimFinish} />
+      <Wheel position={[-WHEEL_X, WHEEL_Y, -WHEEL_Z]} design={config.rim} finishIdx={config.rimFinish} />
     </group>
   );
 }
