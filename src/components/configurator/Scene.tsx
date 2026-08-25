@@ -339,8 +339,12 @@ function SceneEnvironment({ night, isMobile }: { night: boolean; isMobile: boole
               scale={[19, 0.8, 1]}
             />
           ))}
-          <Lightformer intensity={0.6} position={[-13, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} scale={[9, 3, 1]} />
-          <Lightformer intensity={0.6} position={[13, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} scale={[9, 3, 1]} />
+          {/* Боковые панели: рисуют борт и отделяют чёрный кузов от чёрного зала */}
+          <Lightformer intensity={2.4} position={[-9, 2.2, 0]} rotation={[0, Math.PI / 2, 0]} scale={[12, 2.2, 1]} />
+          <Lightformer intensity={2.4} position={[9, 2.2, 0]} rotation={[0, -Math.PI / 2, 0]} scale={[12, 2.2, 1]} />
+          {/* Низкие полосы на высоте колёс: без них диски сливаются с покрышкой */}
+          <Lightformer intensity={1.8} position={[-6, 0.7, 0]} rotation={[0, Math.PI / 2, 0]} scale={[10, 0.5, 1]} />
+          <Lightformer intensity={1.8} position={[6, 0.7, 0]} rotation={[0, -Math.PI / 2, 0]} scale={[10, 0.5, 1]} />
         </>
       ) : (
         <>
@@ -389,7 +393,7 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
       <Suspense fallback={null}>
         <SceneEnvironment night={config.night} isMobile={isMobile} />
 
-        <ambientLight intensity={config.night ? 0.3 : 0.45} />
+        <ambientLight intensity={0.45} />
         <directionalLight
           position={[6, 8, 4]}
           intensity={config.night ? 0.82 : 1.45}

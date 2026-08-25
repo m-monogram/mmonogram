@@ -1,5 +1,6 @@
-import { Component, Suspense, useLayoutEffect, useMemo, type ReactNode } from "react";
+import { Component, Suspense, useCallback, useLayoutEffect, useMemo, useState, type ReactNode } from "react";
 import { useGLTF } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { BuildConfig, PAINTS, RIM_FINISHES } from "./config";
 import { DRACO_PATH, MODEL_FILES, type FileRole, type PartRole } from "./models";
@@ -29,14 +30,15 @@ function Parts({
   kind,
   materials,
   visible = true,
-  onFit,
+  onGround,
 }: {
   url: string;
   fit?: Fit;
   kind: FileRole;
   materials: Materials;
   visible?: boolean;
-  onFit?: (fit: Fit) => void;
+  /** Нижняя точка файла после посадки — по ней выставляется уровень пола. */
+  onGround?: (url: string, minY: number) => void;
 }) {
   const { scene } = useGLTF(url, DRACO_PATH);
 
@@ -73,12 +75,12 @@ function Parts({
       byRole[classifyPart(describeMaterial(source), centerY, fit.carSize.y, mesh.name)].push(mesh);
     });
 
-    return { root, byRole, fit };
+    return { root, byRole, fit, minY: new THREE.Box3().setFromObject(root).min.y };
   }, [scene, shared, kind]);
 
   useLayoutEffect(() => {
-    onFit?.(prepared.fit);
-  }, [prepared, onFit]);
+    onGround?.(url, prepared.minY);
+  }, [url, prepared, onGround]);
 
   useLayoutEffect(() => {
     for (const [role, meshes] of Object.entries(prepared.byRole)) {
@@ -164,12 +166,39 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
 
   useLayoutEffect(() => () => Object.values(materials).forEach((m) => m.dispose()), [materials]);
 
+  /*
+   * Пол считается по всей видимой сборке, а не по одному кузову: покрышки
+   * лежат в файле обвеса и уходят на 15 см ниже низа кузова. Трансформ,
+   * посаженный только по кузову, утапливал их под пол — колёса выглядели
+   * срезанными.
+   */
+  const [grounds, setGrounds] = useState<Record<string, number>>({});
+  const reportGround = useCallback((url: string, minY: number) => {
+    setGrounds((prev) => (prev[url] === minY ? prev : { ...prev, [url]: minY }));
+  }, []);
+
+  const groundOffset = useMemo(() => {
+    const active = Object.entries(grounds).filter(([url]) => url !== MODEL_FILES.kit || config.kit);
+    return active.length ? -Math.min(...active.map(([, y]) => y)) : 0;
+  }, [grounds, config.kit]);
+
+  // frameloop="demand": без явного запроса сдвиг пола не попал бы в кадр
+  const invalidate = useThree((s) => s.invalidate);
+  useLayoutEffect(() => invalidate(), [groundOffset, invalidate]);
+
   return (
-    <group>
-      <Parts url={MODEL_FILES.body} fit={fit} kind="exterior" materials={materials} />
+    <group position-y={groundOffset}>
+      <Parts url={MODEL_FILES.body} fit={fit} kind="exterior" materials={materials} onGround={reportGround} />
 
       <OptionalBoundary label="обвес и колёса">
-        <Parts url={MODEL_FILES.kit} fit={fit} kind="exterior" materials={materials} visible={config.kit} />
+        <Parts
+          url={MODEL_FILES.kit}
+          fit={fit}
+          kind="exterior"
+          materials={materials}
+          visible={config.kit}
+          onGround={reportGround}
+        />
       </OptionalBoundary>
 
       <OptionalBoundary label="интерьер">
