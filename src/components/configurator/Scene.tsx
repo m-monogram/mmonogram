@@ -4,7 +4,7 @@ import { ContactShadows, Environment, Lightformer, OrbitControls } from "@react-
 import { Bloom, BrightnessContrast, EffectComposer, HueSaturation, N8AO } from "@react-three/postprocessing";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
-import GClassModel from "./GClassModel";
+import CarModel from "./CarModel";
 import Showroom from "./Showroom";
 import { BuildConfig, isInteriorFocus, type CameraFocus } from "./config";
 
@@ -400,7 +400,7 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
           shadow-camera-top={6}
           shadow-camera-bottom={-6}
         />
-        <GClassModel config={config} />
+        <CarModel config={config} />
 
         <Showroom key={config.night ? "night" : "day"} night={config.night} />
         <WarmUpFrames />
