@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { MeshReflectorMaterial } from "@react-three/drei";
 import * as THREE from "three";
 
 /**
@@ -187,22 +186,34 @@ function StudioFloor() {
 }
 
 function GarageFloor() {
+  const floorTex = useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 1024;
+    const ctx = c.getContext("2d")!;
+    const base = ctx.createLinearGradient(0, 0, 0, 1024);
+    base.addColorStop(0, "#0d1013");
+    base.addColorStop(0.52, "#090b0d");
+    base.addColorStop(1, "#050607");
+    ctx.fillStyle = base;
+    ctx.fillRect(0, 0, 1024, 1024);
+
+    const centerGlow = ctx.createRadialGradient(512, 470, 70, 512, 470, 620);
+    centerGlow.addColorStop(0, "rgba(255,255,255,0.075)");
+    centerGlow.addColorStop(0.42, "rgba(255,255,255,0.025)");
+    centerGlow.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = centerGlow;
+    ctx.fillRect(0, 0, 1024, 1024);
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.anisotropy = 8;
+    return tex;
+  }, []);
+
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.006, 0]} receiveShadow>
       <planeGeometry args={[ROOM_HALF_W * 2 - 0.1, ROOM_HALF_D * 2 - 0.1]} />
-      <MeshReflectorMaterial
-        resolution={512}
-        mixBlur={1}
-        mixStrength={13}
-        blur={[420, 120]}
-        depthScale={1.1}
-        minDepthThreshold={0.4}
-        maxDepthThreshold={1.35}
-        mirror={0}
-        color="#07080a"
-        metalness={0.72}
-        roughness={0.6}
-      />
+      <meshStandardMaterial map={floorTex} color="#111418" roughness={0.54} metalness={0.32} />
     </mesh>
   );
 }

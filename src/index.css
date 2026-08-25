@@ -238,6 +238,14 @@
     font-style: normal;
   }
 
+  .btn-label {
+    font-family: var(--font-family-primary);
+    font-weight: var(--weight-bold);
+    letter-spacing: 0.14em;
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+
   /* ===== Unified Heading Utilities ===== */
   .h-display-1 {
     font-family: var(--font-family-primary);
@@ -502,7 +510,7 @@
 
   /* Luxury Button with Sheen Animation - White accent */
   .btn-primary {
-    @apply relative px-8 py-4 font-body font-normal uppercase tracking-widest text-sm overflow-hidden transition-all duration-300;
+    @apply relative px-8 py-4 btn-label text-[13px] sm:text-sm overflow-hidden transition-all duration-300;
     background: hsl(var(--accent-white));
     color: hsl(0 0% 0%);
     min-height: 48px;
@@ -534,12 +542,12 @@
   }
 
   .btn-outline {
-    @apply px-8 py-4 border border-foreground/30 text-foreground font-body font-normal uppercase tracking-widest text-sm hover:bg-foreground/10 hover:border-foreground transition-all duration-300;
+    @apply px-8 py-4 border border-foreground/30 text-foreground btn-label text-[13px] sm:text-sm hover:bg-foreground/10 hover:border-foreground transition-all duration-300;
     min-height: 48px;
   }
 
   .btn-ghost {
-    @apply px-8 py-4 border border-border text-muted-foreground font-body font-normal uppercase tracking-widest text-sm hover:border-primary hover:text-primary transition-all duration-300;
+    @apply px-8 py-4 border border-border text-muted-foreground btn-label text-[13px] sm:text-sm hover:border-primary hover:text-primary transition-all duration-300;
     min-height: 48px;
   }
 

@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => ({
   ].filter(Boolean),
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(import.meta.dirname, "./src"),
     },
   },
   // Keep 3D deps prebundled — a broken .vite/deps cache returns 504 and blanks /configurator

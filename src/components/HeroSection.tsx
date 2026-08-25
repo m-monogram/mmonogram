@@ -83,7 +83,7 @@ const HeroSection = memo(({ setCurrentView }: HeroSectionProps) => {
             onClick={() => navigateToView("contact")}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full sm:w-auto px-8 py-3.5 sm:px-10 sm:py-4 bg-white text-black font-body text-sm sm:text-base uppercase tracking-widest hover:bg-white/90 transition-all duration-300 cursor-pointer touch-target shadow-lg hover:shadow-xl"
+            className="w-full sm:w-auto px-8 py-3.5 sm:px-10 sm:py-4 bg-white text-black btn-label text-[13px] sm:text-sm hover:bg-white/90 transition-all duration-300 cursor-pointer touch-target shadow-lg hover:shadow-xl"
           >
             {String(heroCms?.buttonBookProject || t("hero.bookProject"))}
           </motion.button>
@@ -93,7 +93,7 @@ const HeroSection = memo(({ setCurrentView }: HeroSectionProps) => {
             onClick={() => navigateToView("projects")}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full sm:w-auto px-8 py-3.5 sm:px-10 sm:py-4 bg-transparent border border-white/30 text-white font-body text-sm sm:text-base uppercase tracking-widest hover:border-white/60 hover:bg-white/5 transition-all duration-300 cursor-pointer touch-target"
+            className="w-full sm:w-auto px-8 py-3.5 sm:px-10 sm:py-4 bg-transparent border border-white/30 text-white btn-label text-[13px] sm:text-sm hover:border-white/60 hover:bg-white/5 transition-all duration-300 cursor-pointer touch-target"
           >
             {String(heroCms?.buttonDiscover || t("hero.discoverCollection"))}
           </motion.button>
