@@ -154,17 +154,17 @@ const ConfiguratorPage = () => {
                 w-[min(292px,calc(100vw-1.5rem))]
                 md:top-1/2 md:bottom-auto md:-translate-y-1/2 md:max-h-[min(78vh,640px)]"
             >
-              <div className="relative flex-1 min-h-0 overflow-y-auto rounded-xl border border-white/12 bg-[#121212]/92 backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.55)]">
-                {/* Кнопка свернуть на краю панели */}
-                <button
-                  type="button"
-                  onClick={closeMenu}
-                  aria-label={t("config.closeMenu")}
-                  className="absolute -left-3 top-5 z-10 hidden md:flex h-8 w-8 items-center justify-center rounded-md bg-white text-black shadow-md hover:bg-white/90 transition-colors cursor-pointer"
-                >
-                  <ChevronRight className="w-4 h-4" strokeWidth={2.25} />
-                </button>
+              {/* Кнопка свернуть — на самом aside, иначе её обрезает прокрутка панели */}
+              <button
+                type="button"
+                onClick={closeMenu}
+                aria-label={t("config.closeMenu")}
+                className="absolute -left-3.5 top-1/2 -translate-y-1/2 z-50 hidden md:flex h-9 w-9 items-center justify-center rounded-md bg-white text-black shadow-lg hover:bg-white/90 transition-colors cursor-pointer"
+              >
+                <ChevronRight className="w-4 h-4" strokeWidth={2.25} />
+              </button>
 
+              <div className="relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain rounded-xl border border-white/10 bg-[rgba(15,15,16,0.94)] backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.55)]">
                 <ConfigPanel
                   config={config}
                   onChange={handleChange}

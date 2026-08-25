@@ -192,11 +192,11 @@ export default function ConfigPanel({ config, onChange, onSectionChange }: Confi
                   key={item.id}
                   type="button"
                   onClick={() => setSection(item.id)}
-                  className="group flex items-center gap-3 px-3 py-3 hover:bg-white/[0.04] transition-colors cursor-pointer text-left"
+                  className="group flex items-center gap-3 px-3 py-3 hover:bg-white/[0.04] transition-colors cursor-pointer text-left min-w-0"
                 >
                   <span className="text-white/50 group-hover:text-white/80 transition-colors shrink-0">{item.icon}</span>
-                  <span className="font-body text-sm text-white/90">{item.label}</span>
-                  <span className="ml-auto font-body text-[10px] uppercase tracking-[0.1em] text-white/35 text-right max-w-[96px] truncate">
+                  <span className="font-body text-sm text-white/90 whitespace-nowrap">{item.label}</span>
+                  <span className="ml-auto min-w-0 font-body text-[10px] uppercase tracking-[0.1em] text-white/35 text-right truncate">
                     {item.value}
                   </span>
                   <ChevronRight className="w-3.5 h-3.5 text-white/25 group-hover:text-white/50 transition-colors shrink-0" />
@@ -207,7 +207,7 @@ export default function ConfigPanel({ config, onChange, onSectionChange }: Confi
               <button
                 type="button"
                 onClick={handleShare}
-                className="group flex items-center gap-3 px-3 py-3 hover:bg-white/[0.04] transition-colors cursor-pointer text-left"
+                className="group flex items-center gap-3 px-3 py-3 hover:bg-white/[0.04] transition-colors cursor-pointer text-left min-w-0"
               >
                 <span className="text-white/50 group-hover:text-white/80 transition-colors shrink-0">
                   {copied ? <Check className="w-[18px] h-[18px]" /> : <Link2 className="w-[18px] h-[18px]" />}
@@ -217,7 +217,7 @@ export default function ConfigPanel({ config, onChange, onSectionChange }: Confi
               <button
                 type="button"
                 onClick={handleScreenshot}
-                className="group flex items-center gap-3 px-3 py-3 hover:bg-white/[0.04] transition-colors cursor-pointer text-left"
+                className="group flex items-center gap-3 px-3 py-3 hover:bg-white/[0.04] transition-colors cursor-pointer text-left min-w-0"
               >
                 <span className="text-white/50 group-hover:text-white/80 transition-colors shrink-0">
                   <Camera className="w-[18px] h-[18px]" />

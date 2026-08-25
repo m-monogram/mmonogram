@@ -166,7 +166,7 @@ const LocationCard = memo(function LocationCard({
       className={`group relative w-full overflow-hidden text-left border px-5 py-6 sm:px-6 sm:py-7 md:px-7 md:py-8 transition-all duration-300 cursor-pointer ${
         isActive
           ? "border-white/40 bg-white/[0.055]"
-          : "border-white/12 bg-transparent hover:border-white/28 hover:bg-white/[0.03]"
+          : "border-white/10 bg-transparent hover:border-white/30 hover:bg-white/[0.03]"
       }`}
     >
       <span
@@ -312,7 +312,7 @@ const RepresentativesMapSection = () => {
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className="relative lg:col-span-7 xl:col-span-8"
           >
-            <div className="relative overflow-hidden border border-white/12 bg-neutral-950">
+            <div className="relative overflow-hidden border border-white/10 bg-neutral-950">
               {/* Corner marks */}
               <span className="pointer-events-none absolute left-3 top-3 z-10 h-4 w-4 border-l border-t border-white/35" aria-hidden />
               <span className="pointer-events-none absolute right-3 top-3 z-10 h-4 w-4 border-r border-t border-white/35" aria-hidden />
