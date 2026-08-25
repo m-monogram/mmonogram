@@ -1,9 +1,12 @@
 import * as THREE from "three";
 import {
+  CHROME_PROPS,
   GLASS_ALPHA_THRESHOLD,
-  GLASS_RULES,
+  MATERIAL_RULES,
+  MESH_RULES,
   TARGET_LENGTH,
-  WHEEL_RULES,
+  TIRE_MAX_LUMA,
+  WHEEL_ZONE_TOP,
   type PartRole,
 } from "./models";
 
@@ -62,37 +65,60 @@ export function computeFit(object: THREE.Object3D): Fit {
   };
 }
 
-/**
- * Роль меша по его габаритному ящику в мировых координатах — то есть уже
- * после разворота и нормировки, где X это длина, Y высота от земли,
- * Z ширина.
- */
-export function classifyExterior(mesh: THREE.Mesh, carSize: THREE.Vector3): PartRole {
-  const box = new THREE.Box3().setFromObject(mesh);
-  const size = box.getSize(new THREE.Vector3());
-  const center = box.getCenter(new THREE.Vector3());
-
-  const source = mesh.material;
-  const first = Array.isArray(source) ? source[0] : source;
-  if (first?.transparent && "opacity" in first && (first.opacity as number) < GLASS_ALPHA_THRESHOLD) return "glass";
-
-  const rel = Math.max(size.x, size.y, size.z) / carSize.x;
-  if (rel < WHEEL_RULES.minSizeRatio) return "trim";
-
-  const lowEnough = center.y / carSize.y < WHEEL_RULES.maxCenterY;
-  const offAxis = Math.abs(center.z) / (carSize.z / 2) > WHEEL_RULES.minCenterOffsetZ;
-  const round = size.y > 0 && Math.abs(size.x - size.y) / Math.max(size.x, size.y) < WHEEL_RULES.maxAspectSkew;
-  const narrow = size.z / Math.max(size.x, size.y) < WHEEL_RULES.maxWidthRatio;
-  if (lowEnough && offAxis && round && narrow) return "wheel";
-
-  // Остекление: тонкая панель заметного размера выше подоконной линии.
-  // Без неё кузов остаётся глухой скорлупой и интерьера не видно.
-  const thickness = Math.min(size.x, size.y, size.z);
-  const span = Math.max(size.x, size.y, size.z);
-  const highUp = center.y / carSize.y > GLASS_RULES.minCenterY;
-  const thin = span > 0 && thickness / span < GLASS_RULES.maxThicknessRatio;
-  if (highUp && thin && rel > GLASS_RULES.minSizeRatio) return "glass";
-
-  return "body";
+/** Материал в том виде, в каком его достаточно знать для классификации. */
+export interface MaterialDesc {
+  name: string;
+  metalness: number;
+  roughness: number;
+  opacity: number;
+  /** Яркость базового цвета, 0..1: отличает покрышку от диска. */
+  luma: number;
 }
 
+export function describeMaterial(material: THREE.Material | null | undefined): MaterialDesc | null {
+  if (!material) return null;
+  const std = material as THREE.MeshStandardMaterial;
+  const c = std.color;
+  return {
+    name: material.name ?? "",
+    metalness: std.metalness ?? 0,
+    roughness: std.roughness ?? 1,
+    opacity: material.transparent ? material.opacity : 1,
+    // Коэффициенты Rec. 709 — воспринимаемая яркость, а не среднее по каналам
+    luma: c ? 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b : 0.5,
+  };
+}
+
+/**
+ * Роль части сборки.
+ *
+ * Сначала имя меша — им опознаются диски, которые в обвесе покрашены
+ * кузовным материалом. Затем имя материала — оно у этих моделей осмысленное и точное. Затем
+ * свойства: полированный металл это хром, прозрачное это стекло, как бы
+ * материал ни назывался. И только под конец геометрия: что осталось
+ * неопознанным в колёсной зоне — покрышка, если тёмное, и диск, если светлое.
+ */
+export function classifyPart(
+  material: MaterialDesc | null,
+  centerY: number,
+  carHeight: number,
+  meshName = "",
+): PartRole {
+  const byName = MESH_RULES.find((r) => r.test.test(meshName));
+  if (byName) return byName.role;
+
+  if (material) {
+    const rule = MATERIAL_RULES.find((r) => r.test.test(material.name));
+    if (rule) return rule.role;
+
+    if (material.metalness >= CHROME_PROPS.minMetalness && material.roughness <= CHROME_PROPS.maxRoughness) {
+      return "chrome";
+    }
+    if (material.opacity < GLASS_ALPHA_THRESHOLD) return "glass";
+  }
+
+  if (carHeight > 0 && centerY / carHeight < WHEEL_ZONE_TOP) {
+    return !material || material.luma < TIRE_MAX_LUMA ? "tire" : "wheel";
+  }
+  return "trim";
+}

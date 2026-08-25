@@ -3,7 +3,7 @@ import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { BuildConfig, PAINTS, RIM_FINISHES } from "./config";
 import { DRACO_PATH, MODEL_FILES, type FileRole, type PartRole } from "./models";
-import { classifyExterior, computeFit, type Fit } from "./fitModel";
+import { classifyPart, computeFit, describeMaterial, type Fit } from "./fitModel";
 
 /**
  * Оцифрованная сборка G63 вместо процедурной заглушки.
@@ -50,17 +50,27 @@ function Parts({
     root.updateMatrixWorld(true);
 
     const byRole: Record<PartRole, THREE.Mesh[]> = {
-      body: [], wheel: [], tire: [], glass: [], trim: [], interior: [],
+      body: [], wheel: [], tire: [], glass: [], taillight: [],
+      light: [], chrome: [], carbon: [], interior: [], trim: [],
     };
 
+    const box = new THREE.Box3();
     root.traverse((node) => {
       const mesh = node as THREE.Mesh;
       if (!mesh.isMesh) return;
       mesh.castShadow = true;
       mesh.receiveShadow = true;
-      // Интерьер целиком уходит в свою роль: красить салон кузовной краской
-      // нельзя, а разбирать его по геометрии незачем — он не переключается.
-      byRole[kind === "interior" ? "interior" : classifyExterior(mesh, fit.carSize)].push(mesh);
+
+      if (kind === "interior") {
+        // Салон не разбираем: красить его кузовной краской нельзя,
+        // а переключаемых частей внутри нет.
+        byRole.interior.push(mesh);
+        return;
+      }
+
+      const source = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+      const centerY = box.setFromObject(mesh).getCenter(new THREE.Vector3()).y;
+      byRole[classifyPart(describeMaterial(source), centerY, fit.carSize.y, mesh.name)].push(mesh);
     });
 
     return { root, byRole, fit };
@@ -127,12 +137,30 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
         opacity: 0.5,
         side: THREE.DoubleSide,
       }),
+      taillight: new THREE.MeshStandardMaterial({
+        color: "#2a0707",
+        emissive: "#a11212",
+        emissiveIntensity: config.lights ? 1.4 : 0.2,
+      }),
+      light: new THREE.MeshStandardMaterial({
+        color: "#f2f4f6",
+        emissive: "#dfe8ff",
+        emissiveIntensity: config.lights ? 1.6 : 0.05,
+      }),
+      chrome: new THREE.MeshStandardMaterial({ color: "#cfd3d6", metalness: 1, roughness: 0.08 }),
+      carbon: new THREE.MeshPhysicalMaterial({
+        color: "#1a1b1f",
+        metalness: 0.55,
+        roughness: 0.4,
+        clearcoat: 1,
+        clearcoatRoughness: 0.1,
+      }),
       trim: new THREE.MeshStandardMaterial({ color: "#141414", metalness: 0.4, roughness: 0.6 }),
       interior: config.carbon
         ? new THREE.MeshPhysicalMaterial({ color: "#1a1b1f", metalness: 0.5, roughness: 0.42, clearcoat: 0.8 })
         : new THREE.MeshStandardMaterial({ color: "#26221f", metalness: 0.15, roughness: 0.72 }),
     };
-  }, [config.paint, config.rimFinish, config.carbon]);
+  }, [config.paint, config.rimFinish, config.carbon, config.lights]);
 
   useLayoutEffect(() => () => Object.values(materials).forEach((m) => m.dispose()), [materials]);
 
