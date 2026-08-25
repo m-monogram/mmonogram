@@ -79,6 +79,28 @@ def decimate(ratio):
             obj.modifiers.remove(mod)
 
 
+def import_fbx(path):
+    """Blender 5.x завёл нативный импортёр wm.fbx_import рядом со старым
+    import_scene.fbx; какой из них есть — зависит от версии, пробуем оба."""
+    candidates = []
+    if hasattr(bpy.ops.wm, "fbx_import"):
+        candidates.append(("wm.fbx_import", bpy.ops.wm.fbx_import))
+    if hasattr(bpy.ops.import_scene, "fbx"):
+        candidates.append(("import_scene.fbx", bpy.ops.import_scene.fbx))
+    if not candidates:
+        raise RuntimeError("в этой сборке Blender нет импортёра FBX")
+
+    errors = []
+    for name, op in candidates:
+        try:
+            op(filepath=path)
+            print(f"    импорт через {name}")
+            return
+        except Exception as exc:
+            errors.append(f"{name}: {exc}")
+    raise RuntimeError("; ".join(errors))
+
+
 def export_glb(path):
     """Экспорт с Draco. Набор параметров у экспортёра менялся между версиями
     Blender, поэтому неизвестные ключи отбрасываем и пробуем снова."""
@@ -124,7 +146,7 @@ def main():
 
         reset_scene()
         try:
-            bpy.ops.import_scene.fbx(filepath=fbx)
+            import_fbx(fbx)
         except Exception as exc:
             print(f"    импорт не удался: {exc}")
             continue
