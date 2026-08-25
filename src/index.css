@@ -429,6 +429,25 @@
     background: hsl(var(--premium-black));
   }
 
+  /* Smooth black-to-light section flow */
+  .section-flow-light {
+    background:
+      linear-gradient(
+        to bottom,
+        hsl(0 0% 0%) 0%,
+        hsl(0 0% 4%) 5%,
+        hsl(0 0% 62%) 14%,
+        hsl(0 0% 94%) 23%,
+        hsl(0 0% 100%) 36%,
+        hsl(0 0% 100%) 64%,
+        hsl(0 0% 94%) 77%,
+        hsl(0 0% 62%) 86%,
+        hsl(0 0% 4%) 95%,
+        hsl(0 0% 0%) 100%
+      );
+    color: hsl(0 0% 0%);
+  }
+
   /* Luxury Button with Sheen Animation - White accent */
   .btn-primary {
     @apply relative px-8 py-4 font-body font-normal uppercase tracking-widest text-sm overflow-hidden transition-all duration-300;

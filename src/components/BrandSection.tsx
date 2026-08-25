@@ -299,7 +299,7 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
     </section>
 
     {/* Latest Additions - Projects Section with Emphasis */}
-    <section id="projects-section" className="bg-white">
+    <section id="projects-section" className="bg-premium-black">
       <LatestAdditionsCarousel onProjectClick={handleProjectClick} />
     </section>
 
