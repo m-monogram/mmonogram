@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Camera,
@@ -124,9 +124,12 @@ export default function ConfigPanel({ config, onChange, onSectionChange }: Confi
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const [section, setSectionState] = useState<Section | null>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const setSection = (s: Section | null) => {
     setSectionState(s);
     onSectionChange?.(s);
+    // На мобильном лист прокручен — новый раздел должен открываться с начала
+    rootRef.current?.closest("aside")?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const set = (patch: Partial<BuildConfig>) => onChange({ ...config, ...patch });
@@ -171,7 +174,7 @@ export default function ConfigPanel({ config, onChange, onSectionChange }: Confi
   ];
 
   return (
-    <div className="relative overflow-hidden">
+    <div ref={rootRef} className="relative overflow-hidden">
       <AnimatePresence mode="wait" initial={false}>
         {section === null ? (
           /* ---------- Уровень 1: список категорий ---------- */

@@ -10,7 +10,7 @@ interface MissionStatementProps {
 /**
  * Mission Statement block after Hero — brand ideology moment.
  */
-const MissionStatement = memo(({}: MissionStatementProps) => {
+const MissionStatement = memo((_props: MissionStatementProps) => {
   const { content, isVisible } = useContent("mission");
 
   if (!isVisible) return null;
