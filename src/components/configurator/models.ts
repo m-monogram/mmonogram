@@ -39,7 +39,30 @@ export const WHEEL_RULES = {
   minSizeRatio: 0.08,
 } as const;
 
-/** Стекло распознаётся по прозрачности исходного материала, если она была. */
+/**
+ * Пороги распознавания остекления. Материалов в моделях нет, поэтому стекло
+ * ищется по форме: тонкая панель в верхней половине кузова.
+ */
+export const GLASS_RULES = {
+  /** Стекло начинается выше подоконной линии. */
+  minCenterY: 0.5,
+  /** Панель тонкая относительно своей площади. */
+  maxThicknessRatio: 0.06,
+  /** И при этом заметного размера — не зеркало и не поводок дворника. */
+  minSizeRatio: 0.1,
+} as const;
+
+/** Прозрачность исходного материала, ниже которой меш считается стеклом. */
 export const GLASS_ALPHA_THRESHOLD = 0.9;
 
-export type PartRole = "body" | "wheel" | "tire" | "glass" | "trim";
+export type PartRole = "body" | "wheel" | "tire" | "glass" | "trim" | "interior";
+
+/** Роль, назначаемая всем мешам файла целиком, без разбора геометрии. */
+export type FileRole = "exterior" | "interior";
+
+export const FILE_ROLES: Record<keyof typeof MODEL_FILES, FileRole> = {
+  body: "exterior",
+  kit: "exterior",
+  interior: "interior",
+  wheel: "interior",
+};
