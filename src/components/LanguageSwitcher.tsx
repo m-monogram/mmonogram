@@ -9,7 +9,12 @@ const languages: { code: Language; label: string; flag: string }[] = [
   { code: 'ar', label: 'العربية', flag: '🇦🇪' },
 ];
 
-const LanguageSwitcher = () => {
+interface LanguageSwitcherProps {
+  /* "light" — для страниц со светлым фоном: тёмный текст и иконка */
+  variant?: 'dark' | 'light';
+}
+
+const LanguageSwitcher = ({ variant = 'dark' }: LanguageSwitcherProps) => {
   const { language, setLanguage } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -19,7 +24,9 @@ const LanguageSwitcher = () => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 text-foreground/80 hover:text-foreground transition-colors duration-200"
+        className={`flex items-center gap-2 px-3 py-2 transition-colors duration-200 ${
+          variant === 'light' ? 'text-black/70 hover:text-black' : 'text-foreground/80 hover:text-foreground'
+        }`}
       >
         <Globe size={18} />
         <span className="text-sm font-body uppercase tracking-wider hidden sm:inline">
