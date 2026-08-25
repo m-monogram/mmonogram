@@ -1,6 +1,7 @@
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, Environment, Lightformer, OrbitControls } from "@react-three/drei";
+import { Bloom, BrightnessContrast, EffectComposer, HueSaturation, N8AO } from "@react-three/postprocessing";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import GClassModel from "./GClassModel";
@@ -169,11 +170,35 @@ function StudioEnvironment({ night }: { night: boolean }) {
   );
 }
 
+/* «Запечённая» подача пола: радиальный градиент затемняется к центру под машиной */
+function useFloorTexture(night: boolean) {
+  return useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 512;
+    const ctx = c.getContext("2d")!;
+    const g = ctx.createRadialGradient(256, 256, 40, 256, 256, 256);
+    if (night) {
+      g.addColorStop(0, "#050506");
+      g.addColorStop(0.45, "#0a0a0b");
+      g.addColorStop(1, "#0d0d0e");
+    } else {
+      g.addColorStop(0, "#8f9396");
+      g.addColorStop(0.45, "#a9adb0");
+      g.addColorStop(1, "#b4b8bb");
+    }
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 512, 512);
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }, [night]);
+}
+
 export default function ConfiguratorScene({ config, focus = "default" }: { config: BuildConfig; focus?: CameraFocus }) {
   const controls = useRef<OrbitControlsImpl>(null);
   const flightRef = useRef<FlightState | null>(null);
   const bg = config.night ? "#070708" : "#c7cbce";
-  const floor = config.night ? "#0b0b0c" : "#b4b8bb";
+  const floorTex = useFloorTexture(config.night);
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   return (
@@ -212,9 +237,19 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
         {/* Пол */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.001, 0]} receiveShadow>
           <circleGeometry args={[16, 64]} />
-          <meshStandardMaterial color={floor} metalness={0.15} roughness={0.85} />
+          <meshStandardMaterial map={floorTex} color="#ffffff" metalness={0.15} roughness={0.85} />
         </mesh>
         <ContactShadows position={[0, 0.01, 0]} opacity={config.night ? 0.85 : 0.6} scale={12} blur={2.2} far={3} resolution={512} />
+
+        {/* «Дорогая картинка» по пресету MANSORY — Quality: SAO в стыках,
+            аккуратный bloom только на бликах, лёгкая студийная десатурация.
+            На мобильных AO в половинном разрешении (ТЗ 6.9). */}
+        <EffectComposer multisampling={isMobile ? 0 : 4}>
+          <N8AO aoRadius={0.5} intensity={4} distanceFalloff={1} quality={isMobile ? "performance" : "medium"} halfRes={isMobile} />
+          <Bloom intensity={0.15} luminanceThreshold={0.95} luminanceSmoothing={0.2} mipmapBlur />
+          <BrightnessContrast contrast={-0.01} />
+          <HueSaturation saturation={-0.05} />
+        </EffectComposer>
       </Suspense>
 
       <OrbitControls

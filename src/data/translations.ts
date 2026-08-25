@@ -55,6 +55,7 @@ export const translations: Record<Language, any> = {
       hint: 'Drag to rotate · Scroll to zoom',
       demoNote: 'Demo model — your M-Monogram kit will be digitized here',
       eyebrow: 'Interactive Experience',
+      overview: 'Overview',
       launch: 'Launch 3D Studio',
     },
     hero: {
@@ -402,6 +403,7 @@ export const translations: Record<Language, any> = {
       hint: 'Вращайте мышью · Масштаб колесом',
       demoNote: 'Демо-модель — здесь появится оцифрованный кит M-Monogram',
       eyebrow: 'Интерактивный опыт',
+      overview: 'Обзор сборки',
       launch: 'Открыть 3D студию',
     },
     hero: {
@@ -749,6 +751,7 @@ export const translations: Record<Language, any> = {
       hint: 'اسحب للتدوير · مرر للتكبير',
       demoNote: 'نموذج تجريبي — سيظهر هنا طقم M-Monogram الرقمي',
       eyebrow: 'تجربة تفاعلية',
+      overview: 'ملخص التصميم',
       launch: 'افتح الاستوديو ثلاثي الأبعاد',
     },
     hero: {

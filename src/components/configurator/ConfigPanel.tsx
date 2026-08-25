@@ -6,6 +6,7 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  ClipboardList,
   Hexagon,
   Lightbulb,
   Link2,
@@ -16,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BuildConfig, PAINTS, RIM_DESIGNS, RIM_FINISHES, encodeConfig } from "./config";
 
-type Section = "exterior" | "wheels" | "kit" | "carbon" | "lights" | "env";
+export type Section = "exterior" | "wheels" | "kit" | "carbon" | "lights" | "env" | "overview";
 
 interface ConfigPanelProps {
   config: BuildConfig;
@@ -157,6 +158,16 @@ export default function ConfigPanel({ config, onChange, onSectionChange }: Confi
     { id: "carbon", icon: <Hexagon className="w-[18px] h-[18px]" />, label: t("config.carbon"), value: config.carbon ? t("config.carbonOn") : t("config.carbonOff") },
     { id: "lights", icon: <Lightbulb className="w-[18px] h-[18px]" />, label: t("config.lights"), value: config.lights ? t("config.lightsOn") : t("config.lightsOff") },
     { id: "env", icon: <SunMoon className="w-[18px] h-[18px]" />, label: t("config.environment"), value: config.night ? t("config.envNight") : t("config.envStudio") },
+    { id: "overview", icon: <ClipboardList className="w-[18px] h-[18px]" />, label: t("config.overview"), value: "" },
+  ];
+
+  const overviewRows: { label: string; value: string }[] = [
+    { label: t("config.exterior"), value: PAINTS[config.paint].name },
+    { label: t("config.rims"), value: `${RIM_DESIGNS[config.rim].name} · ${RIM_FINISHES[config.rimFinish].name}` },
+    { label: t("config.kit"), value: config.kit ? t("config.kitMM") : t("config.kitStandard") },
+    { label: t("config.carbon"), value: config.carbon ? t("config.carbonOn") : t("config.carbonOff") },
+    { label: t("config.lights"), value: config.lights ? t("config.lightsOn") : t("config.lightsOff") },
+    { label: t("config.environment"), value: config.night ? t("config.envNight") : t("config.envStudio") },
   ];
 
   return (
@@ -323,6 +334,23 @@ export default function ConfigPanel({ config, onChange, onSectionChange }: Confi
                     preview={<span className="text-white/40 shrink-0"><Lightbulb className="w-7 h-7" strokeWidth={1.5} /></span>}
                     label={t("config.lightsOff")}
                   />
+                </>
+              )}
+
+              {section === "overview" && (
+                <>
+                  <GroupTitle>{t("config.overview")}</GroupTitle>
+                  <div className="flex flex-col divide-y divide-white/[0.07] border border-white/10">
+                    {overviewRows.map((row) => (
+                      <div key={row.label} className="flex items-baseline justify-between gap-3 px-3.5 py-3">
+                        <span className="font-display text-[9px] uppercase tracking-[0.22em] text-white/40 shrink-0">{row.label}</span>
+                        <span className="font-body text-[12px] text-white/90 text-right">{row.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="mt-1 font-body text-[10px] text-white/30 break-all">
+                    {`${location.origin}/configurator?c=${encodeConfig(config)}`}
+                  </p>
                 </>
               )}
 

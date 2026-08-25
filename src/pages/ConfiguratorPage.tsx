@@ -82,7 +82,7 @@ const ConfiguratorPage = () => {
         <ConfigPanel
           config={config}
           onChange={handleChange}
-          onSectionChange={(s) => setFocus(s ?? "default")}
+          onSectionChange={(s) => setFocus(s && s !== "overview" ? s : "default")}
         />
       </aside>
     </div>
