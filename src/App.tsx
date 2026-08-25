@@ -16,7 +16,7 @@ const PageLoader = () => (
       width={900}
       height={212}
       decoding="async"
-      fetchPriority="high"
+      fetchpriority="high"
       className="w-56 sm:w-72 md:w-80 lg:w-96 max-w-[70vw] h-auto object-contain opacity-95 animate-logo-pulse will-change-[opacity,transform]"
     />
   </div>

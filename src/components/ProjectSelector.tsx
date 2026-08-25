@@ -67,7 +67,7 @@ const ProjectSelector = memo(({ onSelect }: ProjectSelectorProps) => {
     const newIndex = Math.min(projects.length - 1, activeIndex + 1);
     setActiveIndex(newIndex);
     scrollToIndex(newIndex);
-  }, [activeIndex, scrollToIndex]);
+  }, [activeIndex, scrollToIndex, projects.length]);
 
   // Touch/swipe handlers
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -98,7 +98,7 @@ const ProjectSelector = memo(({ onSelect }: ProjectSelectorProps) => {
     touchStartX.current = 0;
     touchEndX.current = 0;
     isDragging.current = false;
-  }, [activeIndex, goToNext, goToPrev]);
+  }, [activeIndex, goToNext, goToPrev, projects.length]);
 
   return (
     <section className="relative w-full py-8 sm:py-12">

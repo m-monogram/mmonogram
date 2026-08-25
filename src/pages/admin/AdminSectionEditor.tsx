@@ -34,27 +34,27 @@ export default function AdminSectionEditor() {
     })();
   }, [id]);
 
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); handleSave(); }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [content, isVisible]);
-
-  const updateField = useCallback((key: string, value: unknown) => {
-    setContent(prev => ({ ...prev, [key]: value }));
-    setHasChanges(true);
-  }, []);
-
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (!id) return;
     setSaving(true);
     const { error } = await queryTable('site_content').update({ content, is_visible: isVisible }).eq('id', id);
     if (error) { toast({ title: 'Ошибка', description: error.message, variant: 'destructive' }); }
     else { toast({ title: 'Сохранено ✓' }); setHasChanges(false); }
     setSaving(false);
-  };
+  }, [id, content, isVisible, toast]);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); handleSave(); }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [handleSave]);
+
+  const updateField = useCallback((key: string, value: unknown) => {
+    setContent(prev => ({ ...prev, [key]: value }));
+    setHasChanges(true);
+  }, []);
 
   const handleReset = () => {
     if (!id || !defaultContent[id]) return;
@@ -135,7 +135,7 @@ export default function AdminSectionEditor() {
             <label className="block text-foreground/40 text-xs uppercase tracking-wider mb-2">JSON контент</label>
             <textarea
               value={JSON.stringify(content, null, 2)}
-              onChange={(e) => { try { setContent(JSON.parse(e.target.value)); setHasChanges(true); } catch { } }}
+              onChange={(e) => { try { setContent(JSON.parse(e.target.value)); setHasChanges(true); } catch { /* невалидный JSON во время набора — игнорируем */ } }}
               rows={15}
               className="w-full bg-white/[0.03] border border-foreground/10 px-4 py-3 text-foreground text-sm font-body focus:border-foreground/30 focus:outline-none resize-none"
             />

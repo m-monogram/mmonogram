@@ -29,7 +29,7 @@ const LoadingScreen = memo(({ onComplete }: LoadingScreenProps) => {
         height={212}
         loading="eager"
         decoding="sync"
-        fetchPriority="high"
+        fetchpriority="high"
         className="w-64 sm:w-80 md:w-96 lg:w-[28rem] max-w-[78vw] h-auto object-contain opacity-95 animate-logo-pulse will-change-[opacity,transform]"
       />
     </motion.div>

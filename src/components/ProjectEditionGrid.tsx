@@ -38,7 +38,7 @@ const EditionCard = memo(function EditionCard({
           alt={project.title}
           loading={index === 0 ? "eager" : "lazy"}
           decoding={index === 0 ? "sync" : "async"}
-          fetchPriority={index === 0 ? "high" : "auto"}
+          fetchpriority={index === 0 ? "high" : "auto"}
           onLoad={() => setLoaded(true)}
           className={cn(
             "absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]",

@@ -99,7 +99,7 @@ const ModificationDetail = ({
     }} className="relative w-full h-[70vh] sm:h-[75vh] md:h-[80vh] overflow-hidden">
         {/* Full-width background image */}
         <div className="absolute inset-0">
-          <img src={category.coverImage} alt={category.title} loading="eager" decoding="async" fetchPriority="high" sizes="100vw" className="w-full h-full object-cover" style={{
+          <img src={category.coverImage} alt={category.title} loading="eager" decoding="async" fetchpriority="high" sizes="100vw" className="w-full h-full object-cover" style={{
           objectPosition: getImagePosition()
         }} />
         </div>
@@ -279,7 +279,7 @@ const ModificationDetail = ({
               <h2 className="font-display text-xl tracking-widest text-foreground mb-6">{t("modifications.gallery")}</h2>
               <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6">
                 {category.images.map((image, index) => <div key={index} onClick={() => openLightbox(index)} className="group relative aspect-square overflow-hidden bg-premium-black cursor-pointer border border-border/20 hover:border-border/40 transition-all duration-300">
-                    <img src={image.src} alt={image.title} loading={index < 4 ?"eager" :"lazy"} decoding={index < 4 ?"sync" :"async"} fetchPriority={index < 2 ?"high" :"auto"} sizes="(max-width: 768px) 50vw, 50vw" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    <img src={image.src} alt={image.title} loading={index < 4 ?"eager" :"lazy"} decoding={index < 4 ?"sync" :"async"} fetchpriority={index < 2 ?"high" :"auto"} sizes="(max-width: 768px) 50vw, 50vw" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   </div>)}
               </div>
             </motion.div>}

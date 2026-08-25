@@ -86,7 +86,7 @@ const MenuCard = ({
 
     {/* Background - Video or Image */}
     <div className="absolute inset-0 overflow-hidden z-0">
-      {item.video ? <video src={item.video} autoPlay muted loop playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover transition-all duration-700 will-change-transform group-hover:scale-105" /> : <img src={item.image} alt={t(item.labelKey)} loading="lazy" decoding="async" fetchPriority="low" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 will-change-transform group-hover:scale-110 group-hover:brightness-110 ${item.view === "brand" ? "object-[50%_70%]" : item.view === "contact" ? "object-[50%_52%] sm:object-[50%_60%]" : item.view === "verify" ? "object-[50%_65%]" : item.view === "home" ? "object-[50%_55%]" : "object-center"}`} />}
+      {item.video ? <video src={item.video} autoPlay muted loop playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover transition-all duration-700 will-change-transform group-hover:scale-105" /> : <img src={item.image} alt={t(item.labelKey)} loading="lazy" decoding="async" fetchpriority="low" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 will-change-transform group-hover:scale-110 group-hover:brightness-110 ${item.view === "brand" ? "object-[50%_70%]" : item.view === "contact" ? "object-[50%_52%] sm:object-[50%_60%]" : item.view === "verify" ? "object-[50%_65%]" : item.view === "home" ? "object-[50%_55%]" : "object-center"}`} />}
 
       {/* Light gradient overlay - minimal to show car */}
       <div className={`absolute inset-0 bg-gradient-to-t transition-all duration-500 ${item.video ? "from-black/50 via-black/15 to-transparent group-hover:from-black/40" : "from-black/50 via-black/20 to-transparent group-hover:from-black/40 group-hover:via-black/15"}`} />
@@ -258,7 +258,7 @@ const Header = ({
           behavior: "instant"
         });
       }} className="cursor-pointer touch-target flex items-center justify-center" type="button">
-        <img src={logoWhite} alt="M-Monogram" width={479} height={113} fetchPriority="high" decoding="sync" className="h-10 sm:h-12 md:h-14 w-auto max-w-[11rem] sm:max-w-[13rem] object-contain object-left" />
+        <img src={logoWhite} alt="M-Monogram" width={479} height={113} fetchpriority="high" decoding="sync" className="h-10 sm:h-12 md:h-14 w-auto max-w-[11rem] sm:max-w-[13rem] object-contain object-left" />
       </button>
     </div>}
 

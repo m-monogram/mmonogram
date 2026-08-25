@@ -93,7 +93,7 @@ const ForgedWheelsGrid = memo(({
 
             {/* Image - 1:1, positioned higher to show full wheels */}
             <div className="relative aspect-square overflow-hidden bg-gradient-to-b from-white/5 to-transparent">
-              <img src={image.src} alt={image.title} loading={index < 6 ? "eager" : "lazy"} decoding={index < 6 ? "sync" : "async"} fetchPriority={index < 3 ? "high" : "auto"} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]" style={{
+              <img src={image.src} alt={image.title} loading={index < 6 ? "eager" : "lazy"} decoding={index < 6 ? "sync" : "async"} fetchpriority={index < 3 ? "high" : "auto"} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]" style={{
                 objectPosition: imagePosition
               }} />
             </div>
