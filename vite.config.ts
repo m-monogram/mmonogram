@@ -40,6 +40,10 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('node_modules/framer-motion/')) {
             return 'vendor-animations';
           }
+          // 3D configurator (three.js) — loaded only on /configurator
+          if (id.includes('node_modules/three/') || id.includes('node_modules/@react-three/') || id.includes('node_modules/three-stdlib/')) {
+            return 'vendor-three';
+          }
           // Supabase
           if (id.includes('node_modules/@supabase/')) {
             return 'vendor-supabase';

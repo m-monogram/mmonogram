@@ -16,6 +16,7 @@ import menuModifications from "@/assets/commission-hero-final.webp";
 import menuVerify from "@/assets/menu/menu-verify.webp";
 import menuContact from "@/assets/menu/menu-contact-new.jpg.webp";
 import menuNews from "@/assets/hero-main-new.webp";
+import menuConfigurator from "@/assets/g63-wheel.webp";
 interface HeaderProps {
   currentView?: string;
   setCurrentView?: (view: string) => void;
@@ -195,6 +196,11 @@ const Header = ({
     image: menuModifications,
     descKey: 'nav.modificationsDesc'
   }, {
+    labelKey: 'nav.configurator',
+    view: 'configurator',
+    image: menuConfigurator,
+    descKey: 'nav.configuratorDesc'
+  }, {
     labelKey: 'nav.verify',
     view: 'verify',
     image: menuVerify,
@@ -216,6 +222,7 @@ const Header = ({
     "brand": "/brand",
     "projects": "/projects",
     "modifications": "/commission",
+    "configurator": "/configurator",
     "verify": "/verify",
     "contact": "/contact",
     "booking": "/booking",
@@ -226,6 +233,7 @@ const Header = ({
     if (path === "/brand") return "brand";
     if (path === "/projects") return "projects";
     if (path === "/commission") return "modifications";
+    if (path === "/configurator") return "configurator";
     if (path === "/verify") return "verify";
     if (path === "/contact") return "contact";
     if (path === "/booking") return "booking";
