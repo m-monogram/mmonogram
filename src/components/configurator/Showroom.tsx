@@ -174,7 +174,7 @@ function GarageRoom() {
           alphaTest={0.02}
           emissiveMap={sign}
           emissive="#ffffff"
-          emissiveIntensity={1.15}
+          emissiveIntensity={0.85}
           roughness={0.5}
         />
       </mesh>

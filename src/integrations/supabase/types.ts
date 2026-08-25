@@ -58,6 +58,54 @@ export type Database = {
           },
         ]
       }
+      bookings: {
+        Row: {
+          id: string
+          name: string
+          phone: string
+          email: string | null
+          car: string | null
+          service: string | null
+          budget: string | null
+          message: string | null
+          source: string | null
+          status: string | null
+          notes: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          phone: string
+          email?: string | null
+          car?: string | null
+          service?: string | null
+          budget?: string | null
+          message?: string | null
+          source?: string | null
+          status?: string | null
+          notes?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          phone?: string
+          email?: string | null
+          car?: string | null
+          service?: string | null
+          budget?: string | null
+          message?: string | null
+          source?: string | null
+          status?: string | null
+          notes?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       project_images: {
         Row: {
           created_at: string

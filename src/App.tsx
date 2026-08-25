@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import logoMmonogram from "@/assets/logo-mmonogram.webp";
 import ScrollToTop from "@/components/ScrollToTop";
 
@@ -40,7 +41,6 @@ const OfferAgreement = lazy(() => import("./pages/OfferAgreement"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 
 // Admin pages
-const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const AdminProjects = lazy(() => import("./pages/admin/AdminProjects"));
 const AdminSections = lazy(() => import("./pages/admin/AdminSections"));
@@ -55,50 +55,62 @@ const ProtectedRoute = lazy(() => import("./components/admin/ProtectedRoute"));
 
 const App = () => (
     <LanguageProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ScrollToTop />
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/brand" element={<BrandPage />} />
-              <Route path="/projects" element={<ProjectsPage />} />
-              <Route path="/projects/:id" element={<ProjectDetailPage />} />
-              <Route path="/commission" element={<ModificationsPage />} />
-              <Route path="/modifications" element={<ModificationsPage />} />
-              <Route path="/configurator" element={<ConfiguratorPage />} />
-              <Route path="/verify" element={<VerifyPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/booking" element={<BookingPage />} />
-              <Route path="/representatives/:id" element={<RepresentativeDetailPage />} />
-              <Route path="/press" element={<NewsPage />} />
-              <Route path="/press/:slug" element={<NewsDetailPage />} />
-              {/* Legacy /news URLs redirect to /press */}
-              <Route path="/news" element={<Navigate to="/press" replace />} />
-              <Route path="/news/:slug" element={<Navigate to="/press" replace />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/offer-agreement" element={<OfferAgreement />} />
-              {/* Admin routes */}
-              <Route path="/admin" element={<AdminLogin />} />
-              <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
-                <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="projects" element={<AdminProjects />} />
-                <Route path="sections" element={<AdminSections />} />
-                <Route path="sections/:id" element={<AdminSectionEditor />} />
-                <Route path="bookings" element={<AdminBookings />} />
-                <Route path="navigation" element={<AdminNavigation />} />
-                <Route path="media" element={<AdminMedia />} />
-                <Route path="settings" element={<AdminSettings />} />
-                <Route path="users" element={<ProtectedRoute requireAdmin><AdminUsers /></ProtectedRoute>} />
-              </Route>
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <ScrollToTop />
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/brand" element={<BrandPage />} />
+                <Route path="/projects" element={<ProjectsPage />} />
+                <Route path="/projects/:id" element={<ProjectDetailPage />} />
+                <Route path="/commission" element={<ModificationsPage />} />
+                <Route path="/modifications" element={<ModificationsPage />} />
+                <Route path="/configurator" element={<ConfiguratorPage />} />
+                <Route path="/verify" element={<VerifyPage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/booking" element={<BookingPage />} />
+                <Route path="/representatives/:id" element={<RepresentativeDetailPage />} />
+                <Route path="/press" element={<NewsPage />} />
+                <Route path="/press/:slug" element={<NewsDetailPage />} />
+                {/* Legacy /news URLs redirect to /press */}
+                <Route path="/news" element={<Navigate to="/press" replace />} />
+                <Route path="/news/:slug" element={<Navigate to="/press" replace />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/offer-agreement" element={<OfferAgreement />} />
+                {/* Admin CMS */}
+                <Route
+                  path="/admin"
+                  element={<ProtectedRoute loginFallback><AdminLayout /></ProtectedRoute>}
+                >
+                  <Route index element={<Navigate to="dashboard" replace />} />
+                  <Route path="dashboard" element={<AdminDashboard />} />
+                  <Route path="projects" element={<AdminProjects />} />
+                  <Route path="sections" element={<AdminSections />} />
+                  <Route path="sections/:id" element={<AdminSectionEditor />} />
+                  <Route path="bookings" element={<AdminBookings />} />
+                  <Route path="navigation" element={<AdminNavigation />} />
+                  <Route path="media" element={<AdminMedia />} />
+                  <Route path="settings" element={<AdminSettings />} />
+                  <Route
+                    path="users"
+                    element={
+                      <ProtectedRoute requireAdmin>
+                        <AdminUsers />
+                      </ProtectedRoute>
+                    }
+                  />
+                </Route>
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
     </LanguageProvider>
 );
 

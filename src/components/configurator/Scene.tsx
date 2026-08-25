@@ -6,9 +6,11 @@ import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import GClassModel from "./GClassModel";
 import Showroom from "./Showroom";
-import { BuildConfig } from "./config";
+import { BuildConfig, type CameraFocus } from "./config";
 
-export type CameraFocus = "default" | "exterior" | "wheels" | "kit" | "carbon" | "lights" | "env";
+export type { CameraFocus };
+
+
 
 /**
  * Пресеты камер, привязанные к разделам панели — как orbit-пресеты у Mansory:
@@ -185,6 +187,26 @@ function InvalidateOnConfig({ config }: { config: BuildConfig }) {
 }
 
 /**
+ * Прогрев demand-режима: текстуры, кубкарта окружения и буфер отражений
+ * готовы не в первом кадре. Без этого сцена может остаться пустой до первого
+ * действия пользователя, поэтому пару секунд после монтирования просим кадры.
+ */
+function WarmUpFrames() {
+  const { invalidate } = useThree();
+  useEffect(() => {
+    let raf = 0;
+    const started = performance.now();
+    const tick = () => {
+      invalidate();
+      if (performance.now() - started < 2500) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [invalidate]);
+  return null;
+}
+
+/**
  * Окружение рендерится в кубкарту локально — без загрузки HDRI с внешних CDN.
  * Studio: большой верхний софтбокс и боковые панели.
  * Showroom: три продольные потолочные панели, повторяющие LED-полосы гаража,
@@ -259,7 +281,8 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
         />
         <GClassModel config={config} />
 
-        <Showroom night={config.night} />
+        <Showroom key={config.night ? "night" : "day"} night={config.night} />
+        <WarmUpFrames />
         <ContactShadows position={[0, 0.012, 0]} opacity={config.night ? 0.9 : 0.62} scale={12} blur={2.2} far={3} resolution={512} />
 
         {/* «Дорогая картинка» по пресету MANSORY — Quality: SAO в стыках,
