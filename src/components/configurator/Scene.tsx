@@ -411,7 +411,7 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
           shadow-camera-top={6}
           shadow-camera-bottom={-6}
         />
-        <CarModel config={config} />
+        <CarModel config={config} doorsOpen={interior} />
 
         {/* Свет салона. Материалы кабины не берут свет окружения вовсе, так
             что кроме рассеянного её освещают только эти два плафона — зато
