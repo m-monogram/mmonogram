@@ -10,7 +10,7 @@
  */
 
 import * as THREE from "three";
-import { computeFit, classifyPart, isDebris, type MaterialDesc } from "../src/components/configurator/fitModel";
+import { classifyCabin, computeFit, classifyPart, isDebris, type MaterialDesc } from "../src/components/configurator/fitModel";
 import type { PartRole } from "../src/components/configurator/models";
 
 let failures = 0;
@@ -166,6 +166,23 @@ for (const [label, tris, size, expected] of debrisCases) {
   const { mesh, box } = scrap(tris, size);
   check(label, isDebris(mesh, box), expected);
 }
+
+/* ---- зоны салона ---- */
+
+// Кабина после посадки: длина по X, ширина по Z, низ на 0.63
+const CABIN = new THREE.Box3(
+  new THREE.Vector3(-2.21, 0.63, -0.79),
+  new THREE.Vector3(0.83, 1.88, 0.79),
+);
+const inCabin = (x: number, y: number, z: number) => classifyCabin(new THREE.Vector3(x, y, z), CABIN);
+
+console.log("\nзоны салона:");
+check("сиденье по осевой",   inCabin(-1.2, 1.1, 0.05), "cabinLeather");
+check("панель двери слева",  inCabin(-1.2, 1.1, -0.74), "cabinAccent");
+check("панель двери справа", inCabin(-1.2, 1.1, 0.74), "cabinAccent");
+check("передняя панель",     inCabin(0.7, 1.2, 0.1), "cabinAccent");
+check("ковролин",            inCabin(-1.0, 0.70, 0.2), "cabinFloor");
+check("потолок",             inCabin(-1.0, 1.80, 0.2), "cabinRoof");
 
 console.log(`\n${failures === 0 ? "всё сошлось" : `${failures} расхождений`}`);
 process.exit(failures === 0 ? 0 : 1);

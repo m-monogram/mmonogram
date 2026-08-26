@@ -171,11 +171,15 @@ export function classifyPart(
  */
 export function classifyCabin(center: THREE.Vector3, cabin: THREE.Box3): PartRole {
   const size = cabin.getSize(new THREE.Vector3());
+  const mid = cabin.getCenter(new THREE.Vector3());
   const up = size.y > 0 ? (center.y - cabin.min.y) / size.y : 0.5;
   const front = size.x > 0 ? (center.x - cabin.min.x) / size.x : 0.5;
+  const side = size.z > 0 ? Math.abs(center.z - mid.z) / (size.z / 2) : 0;
 
   if (up < CABIN_ZONES.floorTop) return "cabinFloor";
   if (up > CABIN_ZONES.roofBottom) return "cabinRoof";
+  // Борта и передняя панель — коньяк, сиденья по осевой — чёрная кожа
+  if (side > CABIN_ZONES.sidePanel) return "cabinAccent";
   if (front > CABIN_ZONES.dashFront) return "cabinAccent";
   return "cabinLeather";
 }
