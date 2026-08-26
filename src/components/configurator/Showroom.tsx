@@ -105,11 +105,21 @@ function Cove({ dark }: { dark: boolean }) {
 function Floor({ dark }: { dark: boolean }) {
   const tex = useFloorTexture(dark);
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-      <circleGeometry args={[COVE_RADIUS + 0.12, 96]} />
-      {/* В темноте пол чуть зеркальнее: иначе под машиной проваливается пустота */}
-      <meshStandardMaterial map={tex} roughness={dark ? 0.55 : 0.62} metalness={dark ? 0.28 : 0.2} />
-    </mesh>
+    <group>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <circleGeometry args={[COVE_RADIUS + 0.12, 128]} />
+        {/* В темноте пол чуть зеркальнее: иначе под машиной проваливается пустота */}
+        <meshStandardMaterial map={tex} roughness={dark ? 0.64 : 0.62} metalness={dark ? 0.18 : 0.2} />
+      </mesh>
+      <mesh position={[0, 0.022, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[3.1, 3.16, 160]} />
+        <meshBasicMaterial color={dark ? "#dfe8ff" : "#ffffff"} transparent opacity={dark ? 0.18 : 0.12} toneMapped={false} />
+      </mesh>
+      <mesh position={[0, 0.024, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[7.6, 7.66, 192]} />
+        <meshBasicMaterial color={dark ? "#8090a0" : "#ffffff"} transparent opacity={dark ? 0.12 : 0.1} toneMapped={false} />
+      </mesh>
+    </group>
   );
 }
 

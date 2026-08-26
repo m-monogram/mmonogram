@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { ContactShadows, Environment, Lightformer, OrbitControls } from "@react-three/drei";
+import { Environment, Lightformer, OrbitControls } from "@react-three/drei";
 import { Bloom, BrightnessContrast, EffectComposer, HueSaturation, N8AO } from "@react-three/postprocessing";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
@@ -325,6 +325,42 @@ function WarmUpFrames({ reducedMotion }: { reducedMotion: boolean }) {
   return null;
 }
 
+function useRadialShadowTexture() {
+  return useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = 512;
+    c.height = 512;
+    const ctx = c.getContext("2d")!;
+    const g = ctx.createRadialGradient(256, 256, 42, 256, 256, 256);
+    g.addColorStop(0, "rgba(0,0,0,0.62)");
+    g.addColorStop(0.34, "rgba(0,0,0,0.3)");
+    g.addColorStop(0.72, "rgba(0,0,0,0.08)");
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 512, 512);
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }, []);
+}
+
+function SoftGroundShadow({ night, interior }: { night: boolean; interior: boolean }) {
+  const shadow = useRadialShadowTexture();
+  if (interior) return null;
+  return (
+    <mesh position={[0, 0.018, 0]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={-1}>
+      <circleGeometry args={[4.8, 96]} />
+      <meshBasicMaterial
+        map={shadow}
+        transparent
+        opacity={night ? 0.58 : 0.34}
+        depthWrite={false}
+        toneMapped={false}
+      />
+    </mesh>
+  );
+}
+
 /**
  * Окружение рендерится в кубкарту локально — без загрузки HDRI с внешних CDN.
  * Studio: большой верхний софтбокс и боковые панели.
@@ -458,17 +494,7 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
 
         <Showroom key={config.night ? "night" : "day"} night={config.night} />
         <WarmUpFrames reducedMotion={reducedMotion} />
-        {!interior && (
-          <ContactShadows
-            position={[0, 0.01, 0]}
-            opacity={config.night ? 0.62 : 0.48}
-            scale={11}
-            blur={2.6}
-            far={2.8}
-            resolution={isMobile ? 192 : 384}
-            frames={1}
-          />
-        )}
+        <SoftGroundShadow night={config.night} interior={interior} />
 
         {/* «Дорогая картинка» по пресету MANSORY — Quality: SAO в стыках,
             аккуратный bloom только на бликах, лёгкая студийная десатурация.
