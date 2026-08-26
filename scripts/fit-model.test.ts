@@ -10,7 +10,14 @@
  */
 
 import * as THREE from "three";
-import { classifyCabin, computeFit, classifyPart, isDebris, type MaterialDesc } from "../src/components/configurator/fitModel";
+import {
+  cabinDashAtMax,
+  classifyCabin,
+  computeFit,
+  classifyPart,
+  isDebris,
+  type MaterialDesc,
+} from "../src/components/configurator/fitModel";
 import type { PartRole } from "../src/components/configurator/models";
 
 let failures = 0;
@@ -180,6 +187,12 @@ const debrisCases: [string, number, [number, number, number], boolean][] = [
   ["молдинг по борту",                  6, [1.58, 0.01, 0.01], false],
   ["полоса стоп-сигнала",               6, [0.53, 0.03, 0.01], false],
   ["нормальная деталь",              1200, [1.50, 0.70, 2.60], false],
+  // Призраки: объёмный габарит почти без геометрии
+  ["призрак стекла фонаря поперёк салона", 223, [1.54, 0.74, 2.65], true],
+  ["паутина вместо спиц диска",            322, [2.02, 0.55, 0.63], true],
+  ["шторка люка — плоская, но живая",       16, [0.69, 0.02, 0.41], false],
+  ["молдинг из трёхсот треугольников",     300, [1.95, 0.10, 1.16], false],
+  ["диск целиком",                       16722, [2.02, 0.65, 0.65], false],
 ];
 for (const [label, tris, size, expected] of debrisCases) {
   const { mesh, box } = scrap(tris, size);
@@ -188,20 +201,51 @@ for (const [label, tris, size, expected] of debrisCases) {
 
 /* ---- зоны салона ---- */
 
-// Кабина после посадки: длина по X, ширина по Z, низ на 0.63
+// Кабина после посадки: длина по X (торпедо в плюсе), ширина по Z, низ на 0.63
 const CABIN = new THREE.Box3(
   new THREE.Vector3(-2.21, 0.63, -0.79),
   new THREE.Vector3(0.83, 1.88, 0.79),
 );
-const inCabin = (x: number, y: number, z: number) => classifyCabin(new THREE.Vector3(x, y, z), CABIN);
+/** Деталь салона по центру и габариту — так, как её видит classifyCabin. */
+const part = (x: number, y: number, z: number, sx: number, sy: number, sz: number) =>
+  new THREE.Box3(
+    new THREE.Vector3(x - sx / 2, y - sy / 2, z - sz / 2),
+    new THREE.Vector3(x + sx / 2, y + sy / 2, z + sz / 2),
+  );
+const inCabin = (...a: Parameters<typeof part>) => classifyCabin(part(...a), CABIN, true);
+
+console.log("\nторец с торпедо:");
+{
+  // Накладки во всю ширину кабины стоят у торпедо; одиночная широкая
+  // перемычка в середине салона не должна перевешивать
+  const fascia = [
+    part(0.70, 1.30, 0, 0.05, 0.08, 1.5),
+    part(0.66, 1.22, 0, 0.06, 0.12, 1.5),
+    part(0.72, 1.36, 0, 0.04, 0.07, 1.5),
+    part(-0.80, 1.10, 0, 0.30, 0.09, 1.6),
+  ];
+  check("торпедо в плюсе по X", cabinDashAtMax(fascia, CABIN), true);
+  // Зеркалим относительно середины кабины, а не нуля: она стоит не по центру сцены
+  const midX = (CABIN.min.x + CABIN.max.x) / 2;
+  check("торпедо в минусе по X", cabinDashAtMax(fascia.map((b) => {
+    const f = b.clone();
+    [f.min.x, f.max.x] = [2 * midX - b.max.x, 2 * midX - b.min.x];
+    return f;
+  }), CABIN), false);
+  check("без накладок — по умолчанию в плюсе", cabinDashAtMax([], CABIN), true);
+}
 
 console.log("\nзоны салона:");
-check("сиденье по осевой",   inCabin(-1.2, 1.1, 0.05), "cabinLeather");
-check("панель двери слева",  inCabin(-1.2, 1.1, -0.74), "cabinAccent");
-check("панель двери справа", inCabin(-1.2, 1.1, 0.74), "cabinAccent");
-check("передняя панель",     inCabin(0.7, 1.2, 0.1), "cabinAccent");
-check("ковролин",            inCabin(-1.0, 0.70, 0.2), "cabinFloor");
-check("потолок",             inCabin(-1.0, 1.80, 0.2), "cabinRoof");
+check("сетка динамика",      inCabin(-1.2, 1.05, 0.74, 0.03, 0.02, 0.10), "cabinMetal");
+check("часы на торпедо",     inCabin(0.70, 1.30, -0.29, 0.04, 0.04, 0.02), "cabinMetal");
+check("накладка торпедо",    inCabin(0.70, 1.38, 0, 0.02, 0.07, 1.48), "cabinTrim");
+check("подушка сиденья",     inCabin(-1.2, 1.15, 0.40, 0.48, 0.36, 0.15), "cabinAccent");
+check("спинка заднего ряда", inCabin(-1.9, 1.20, 0, 0.23, 0.36, 0.22), "cabinAccent");
+check("панель двери",        inCabin(-1.2, 0.80, 0.75, 0.48, 0.34, 0.11), "cabinLeather");
+check("руль у торпедо",      inCabin(0.66, 1.28, 0.40, 0.14, 0.24, 0.35), "cabinLeather");
+check("перегородка за рядом", inCabin(-2.1, 1.27, 0, 0.25, 1.24, 1.13), "cabinLeather");
+check("ковролин",            inCabin(-1.0, 0.70, 0.2, 0.4, 0.2, 0.4), "cabinFloor");
+check("потолок",             inCabin(-1.0, 1.80, 0.2, 0.4, 0.2, 0.4), "cabinRoof");
 
 console.log(`\n${failures === 0 ? "всё сошлось" : `${failures} расхождений`}`);
 process.exit(failures === 0 ? 0 : 1);

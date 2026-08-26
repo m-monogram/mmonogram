@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import {
-  CABIN_ZONES,
+  CABIN_PARTS,
   CHROME_PROPS,
   DEBRIS,
   LIGHT_ZONE_FROM_CENTER,
@@ -165,25 +165,87 @@ export function classifyPart(
 }
 
 /**
- * Роль детали салона по её месту в габарите кабины.
+ * С какого торца кабины стоит передняя панель.
  *
- * Материалов в модели салона нет, имена мешей достались от Blender
- * (Куб.006, Плоскость.007), поэтому делим по зонам: низ — ковролин,
- * верх — потолок, передняя часть — панель, остальное — обивка.
- * Ось X направлена вдоль машины, нос в плюс.
+ * Знать это нужно, чтобы не покрасить руль в бордовый вместе с сиденьями,
+ * но снаружи направление не приходит: подгонка разворачивает модель по
+ * габариту, а не по «носу». Зато торпедо выдаёт себя само — это набор
+ * накладок во всю ширину кабины и не выше ладони. Берём медиану их
+ * положения вдоль машины: одиночные широкие полосы в середине салона
+ * (перегородка за передними креслами) её не сдвинут.
  */
-export function classifyCabin(center: THREE.Vector3, cabin: THREE.Box3): PartRole {
-  const size = cabin.getSize(new THREE.Vector3());
-  const mid = cabin.getCenter(new THREE.Vector3());
-  const up = size.y > 0 ? (center.y - cabin.min.y) / size.y : 0.5;
-  const front = size.x > 0 ? (center.x - cabin.min.x) / size.x : 0.5;
-  const side = size.z > 0 ? Math.abs(center.z - mid.z) / (size.z / 2) : 0;
+export function cabinDashAtMax(boxes: readonly THREE.Box3[], cabin: THREE.Box3): boolean {
+  const cabinSize = cabin.getSize(new THREE.Vector3());
+  if (cabinSize.x <= 0) return true;
 
-  if (up < CABIN_ZONES.floorTop) return "cabinFloor";
-  if (up > CABIN_ZONES.roofBottom) return "cabinRoof";
-  // Борта и передняя панель — коньяк, сиденья по осевой — чёрная кожа
-  if (side > CABIN_ZONES.sidePanel) return "cabinAccent";
-  if (front > CABIN_ZONES.dashFront) return "cabinAccent";
+  const along: number[] = [];
+  const size = new THREE.Vector3();
+  const center = new THREE.Vector3();
+  for (const box of boxes) {
+    box.getSize(size);
+    if (size.z < CABIN_PARTS.fasciaWidthShare * cabinSize.z) continue;
+    if (size.y > CABIN_PARTS.fasciaMaxHeight) continue;
+    box.getCenter(center);
+    along.push((center.x - cabin.min.x) / cabinSize.x);
+  }
+  if (!along.length) return true;
+
+  along.sort((a, b) => a - b);
+  const half = along.length >> 1;
+  const median = along.length % 2 ? along[half] : (along[half - 1] + along[half]) / 2;
+  return median >= 0.5;
+}
+
+/**
+ * Роль детали салона по её размеру и месту в габарите кабины.
+ *
+ * Модель интерьера пришла без единого материала — весь салон лежит в одном
+ * безымянном слоте, а имена мешей блендеровские. Значит, роль остаётся
+ * читать по геометрии, и размер здесь важнее положения: сетка динамика,
+ * накладка торпедо и подушка кресла отличаются в первую очередь габаритом.
+ *
+ * Ось X направлена вдоль машины, Z — поперёк.
+ */
+export function classifyCabin(box: THREE.Box3, cabin: THREE.Box3, dashAtMax: boolean): PartRole {
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  const cabinSize = cabin.getSize(new THREE.Vector3());
+  const cabinMid = cabin.getCenter(new THREE.Vector3());
+  const [thin, , largest] = [size.x, size.y, size.z].sort((a, b) => a - b);
+
+  // Мелочёвка — хром салона. Проверяется первой: часы и клавиши стоят
+  // ровно на торпедо и иначе ушли бы в накладки.
+  if (largest <= CABIN_PARTS.jewelMaxSize) return "cabinMetal";
+
+  // Накладка передней панели: от борта до борта и узкая
+  if (
+    cabinSize.z > 0 &&
+    size.z > CABIN_PARTS.fasciaWidthShare * cabinSize.z &&
+    size.y <= CABIN_PARTS.fasciaMaxHeight
+  ) {
+    return "cabinTrim";
+  }
+
+  const up = cabinSize.y > 0 ? (center.y - cabin.min.y) / cabinSize.y : 0.5;
+  if (up < CABIN_PARTS.floorTop) return "cabinFloor";
+  if (up > CABIN_PARTS.roofBottom) return "cabinRoof";
+
+  const alongMin = cabinSize.x > 0 ? (center.x - cabin.min.x) / cabinSize.x : 0.5;
+  const front = dashAtMax ? alongMin : 1 - alongMin;
+  const side = cabinSize.z > 0 ? Math.abs(center.z - cabinMid.z) / (cabinSize.z / 2) : 0;
+
+  // Сиденья — единственный бордовый элемент салона. Всё прочее чёрное:
+  // так контраст читается, а не расплывается по всей кабине.
+  if (
+    thin >= CABIN_PARTS.seatMinThickness &&
+    largest <= CABIN_PARTS.seatMaxSize &&
+    side < CABIN_PARTS.seatMaxSide &&
+    front < CABIN_PARTS.seatMaxFront &&
+    up < CABIN_PARTS.seatMaxUp
+  ) {
+    return "cabinAccent";
+  }
+
   return "cabinLeather";
 }
 
@@ -193,9 +255,11 @@ export function isDebris(mesh: THREE.Mesh, box: THREE.Box3): boolean {
   const count = index ? index.count : (mesh.geometry.getAttribute("position")?.count ?? 0);
   const tris = count / 3;
   if (tris <= DEBRIS.alwaysHideAtOrBelow) return true;
-  if (tris > DEBRIS.maxTriangles) return false;
 
   const size = box.getSize(new THREE.Vector3());
-  const [, median] = [size.x, size.y, size.z].sort((a, b) => a - b);
-  return median > DEBRIS.minSpan;
+  const [thin, median] = [size.x, size.y, size.z].sort((a, b) => a - b);
+  if (tris <= DEBRIS.maxTriangles) return median > DEBRIS.minSpan;
+
+  // Призрак детали: объёмный габарит почти без геометрии
+  return tris < DEBRIS.ghostMaxTriangles && thin >= DEBRIS.ghostMinThickness;
 }

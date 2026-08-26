@@ -13,7 +13,7 @@ import { NodeIO } from "@gltf-transform/core";
 import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
 import { getBounds } from "@gltf-transform/functions";
 import draco3d from "draco3dgltf";
-import { classifyCabin, classifyPart, type MaterialDesc } from "../src/components/configurator/fitModel";
+import { cabinDashAtMax, classifyCabin, classifyPart, type MaterialDesc } from "../src/components/configurator/fitModel";
 import type { PartRole } from "../src/components/configurator/models";
 
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({
@@ -36,8 +36,19 @@ for (const file of process.argv.slice(2)) {
   const swap = (v: number[]) => new THREE.Vector3(v[2], v[1], v[0]);
   const carSizeFitted = new THREE.Vector3(carSize.z, carSize.y, carSize.x);
 
-  // Салон делится по зонам, поэтому его габарит нужен целиком
+  // Салон делится по зонам, поэтому его габарит нужен целиком, а торец с
+  // торпедо вычисляется по всем деталям сразу — как и в самом конфигураторе
   const cabinBox = new THREE.Box3(swap(bounds.min), swap(bounds.max));
+  const boxes: THREE.Box3[] = [];
+  const collect = (node: ReturnType<typeof scene.listChildren>[number]) => {
+    if (node.getMesh()) {
+      const b = getBounds(node);
+      boxes.push(new THREE.Box3(swap(b.min), swap(b.max)));
+    }
+    node.listChildren().forEach(collect);
+  };
+  scene.listChildren().forEach(collect);
+  const dashAtMax = cabinDashAtMax(boxes, cabinBox);
   const byRole = new Map<PartRole | "interior", { tris: number; mats: Set<string> }>();
   let total = 0;
 
@@ -58,7 +69,7 @@ for (const file of process.argv.slice(2)) {
           luma: 0.2126 * m.getBaseColorFactor()[0] + 0.7152 * m.getBaseColorFactor()[1] + 0.0722 * m.getBaseColorFactor()[2],
         };
         const role = INTERIOR_FILES.test(file)
-          ? classifyCabin(box.getCenter(new THREE.Vector3()), cabinBox)
+          ? classifyCabin(box, cabinBox, dashAtMax)
           : classifyPart(desc, box, carSizeFitted, node.getName() || mesh.getName());
         const slot = byRole.get(role) ?? { tris: 0, mats: new Set<string>() };
         slot.tris += tris;

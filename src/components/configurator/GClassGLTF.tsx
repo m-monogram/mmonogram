@@ -4,7 +4,15 @@ import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { BuildConfig, GRILLE_FINISHES, PAINTS, RIM_FINISHES } from "./config";
 import { DRACO_PATH, MODEL_FILES, ROLE_DEBUG_COLORS, type FileRole, type PartRole } from "./models";
-import { classifyCabin, classifyPart, computeFit, describeMaterial, isDebris, type Fit } from "./fitModel";
+import {
+  cabinDashAtMax,
+  classifyCabin,
+  classifyPart,
+  computeFit,
+  describeMaterial,
+  isDebris,
+  type Fit,
+} from "./fitModel";
 
 /**
  * Оцифрованная сборка G63 вместо процедурной заглушки.
@@ -54,31 +62,37 @@ function Parts({
     const byRole: Record<PartRole, THREE.Mesh[]> = {
       body: [], wheel: [], wheelAccent: [], tire: [], glass: [], taillight: [],
       light: [], brightwork: [], carbon: [], cabinLeather: [], cabinAccent: [],
-      cabinFloor: [], cabinRoof: [], trim: [],
+      cabinTrim: [], cabinMetal: [], cabinFloor: [], cabinRoof: [], trim: [],
     };
 
-    const cabin = kind === "interior" ? new THREE.Box3().setFromObject(root) : null;
-    const box = new THREE.Box3();
+    /* Салон разбирается в два прохода: сначала собираем габариты всех
+       деталей, потому что по ним же вычисляется, с какого торца кабины
+       стоит торпедо, — а без этого руль красится как сиденье. */
+    const kept: Array<{ mesh: THREE.Mesh; box: THREE.Box3 }> = [];
     root.traverse((node) => {
       const mesh = node as THREE.Mesh;
       if (!mesh.isMesh) return;
       mesh.castShadow = true;
       mesh.receiveShadow = true;
 
-      box.setFromObject(mesh);
+      const box = new THREE.Box3().setFromObject(mesh);
       if (isDebris(mesh, box)) {
         mesh.visible = false;
         return;
       }
-      if (cabin) {
-        const center = box.getCenter(new THREE.Vector3());
-        byRole[classifyCabin(center, cabin)].push(mesh);
-        return;
-      }
-
-      const source = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
-      byRole[classifyPart(describeMaterial(source), box, fit.carSize, mesh.name)].push(mesh);
+      kept.push({ mesh, box });
     });
+
+    if (kind === "interior") {
+      const cabin = new THREE.Box3().setFromObject(root);
+      const dashAtMax = cabinDashAtMax(kept.map((k) => k.box), cabin);
+      for (const { mesh, box } of kept) byRole[classifyCabin(box, cabin, dashAtMax)].push(mesh);
+    } else {
+      for (const { mesh, box } of kept) {
+        const source = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+        byRole[classifyPart(describeMaterial(source), box, fit.carSize, mesh.name)].push(mesh);
+      }
+    }
 
     if (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("parts")) {
       for (const [role, meshes] of Object.entries(byRole)) {
@@ -210,33 +224,49 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
           }),
       trim: new THREE.MeshStandardMaterial({ color: "#141414", metalness: 0.4, roughness: 0.6 }),
       /* Палитра салона снята с фотографий проекта (g3-iconic-gold-rearseats):
-         чёрная кожа сидений #231e1d, коньячные панели #4e2a26…#613c36,
-         тёмный потолок #0f0c0d. */
-      /* Салон не берёт свет окружения вообще (envMapIntensity 0).
-         В three.js окружение ничем не загораживается, и закрытая кабина
-         светилась как под открытым небом: бордо панели уходило в лососевый,
-         а чёрная кожа в серое. Причём насколько именно — зависело от
-         видеокарты, так что подкрутить было нельзя, только отрезать.
-         Освещают кабину теперь только рассеянный свет сцены и два плафона
-         в Scene.tsx, а ими я управляю напрямую.
-         Clearcoat убран по той же причине: лаковый слой зеркалит окружение
-         белым бликом поверх базы. Кожа лаком не покрыта. */
+         чёрная кожа #241f1e, бордо сидений #4a231c, тёмный потолок #0f0c0d.
+
+         Окружение кабина берёт еле-еле. Отрезать его совсем, как было
+         раньше, оказалось перебором: в three.js окружение ничем не
+         загораживается, и на полной силе закрытый салон светился как под
+         открытым небом — бордо уходило в лососевый, а результат зависел от
+         видеокарты. Но при нуле кожа осталась вовсе без отражений и стала
+         похожа на пластилин. Доля в 0.12 даёт коже блеск, а до лососевого
+         на тёмной базе не дотягивает.
+         Clearcoat не возвращаю: лаковый слой зеркалит окружение белым
+         бликом поверх базы, а кожа лаком не покрыта. */
       cabinLeather: new THREE.MeshStandardMaterial({
         color: "#241f1e",
         metalness: 0,
-        roughness: 0.88,
-        envMapIntensity: 0,
+        roughness: 0.78,
+        envMapIntensity: 0.12,
       }),
       cabinAccent: new THREE.MeshStandardMaterial({
-        color: "#41201a",
+        color: "#4a231c",
         metalness: 0,
         // Матовая кожа: при меньшей шероховатости плафоны кладут широкий
         // белёсый блик, и бордо серело до пыльно-розового
-        roughness: 0.92,
-        envMapIntensity: 0,
+        roughness: 0.74,
+        envMapIntensity: 0.12,
       }),
-      cabinFloor: new THREE.MeshStandardMaterial({ color: "#0e0c0c", metalness: 0, roughness: 0.96, envMapIntensity: 0 }),
-      cabinRoof: new THREE.MeshStandardMaterial({ color: "#111010", metalness: 0, roughness: 0.95, envMapIntensity: 0 }),
+      /* Накладки передней панели — рояльный лак. Салону нужен хоть один
+         зеркальный материал: рядом с ним кожа читается как кожа. */
+      cabinTrim: new THREE.MeshStandardMaterial({
+        color: "#0b0b0c",
+        metalness: 0.5,
+        roughness: 0.14,
+        envMapIntensity: 0.4,
+      }),
+      /* Сетки динамиков, часы, клавиши и дефлекторы — в отделку решётки,
+         но сатиновую: полированное золото вблизи выбивается в белое. */
+      cabinMetal: new THREE.MeshStandardMaterial({
+        color: grille.color,
+        metalness: 1,
+        roughness: Math.max(grille.roughness, 0.3),
+        envMapIntensity: 0.55,
+      }),
+      cabinFloor: new THREE.MeshStandardMaterial({ color: "#0e0c0c", metalness: 0, roughness: 0.96, envMapIntensity: 0.05 }),
+      cabinRoof: new THREE.MeshStandardMaterial({ color: "#141312", metalness: 0, roughness: 0.9, envMapIntensity: 0.05 }),
     };
   }, [debugRoles, config.paint, config.rimFinish, config.grille, config.carbon, config.lights]);
 
