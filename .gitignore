@@ -32,3 +32,6 @@ dist-ssr
 # Lovable/L5e runtime asset cache — not source of truth
 public/__l5e
 src/assets/**/*.asset.json
+
+# Отладочные рендеры конфигуратора — живут в scratchpad, не в репозитории
+/*.mjs
