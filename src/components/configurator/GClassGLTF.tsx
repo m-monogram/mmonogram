@@ -215,24 +215,23 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
          envMapIntensity занижен: свет окружения в three.js ничем не
          загораживается, и закрытая кабина получала полную яркость зала —
          кожа выцветала в серое, а бордо панели уходило в розовое. */
-      cabinLeather: new THREE.MeshPhysicalMaterial({
-        color: "#1a1615",
+      /* Без clearcoat: лаковый слой отражает окружение белым бликом поверх
+         базы, и бордо передней панели уходило в лососевый. Кожа лаком не
+         покрыта — её блеск задаётся только шероховатостью. */
+      cabinLeather: new THREE.MeshStandardMaterial({
+        color: "#171313",
         metalness: 0.02,
-        roughness: 0.62,
-        clearcoat: 0.2,
-        clearcoatRoughness: 0.7,
-        envMapIntensity: 0.3,
+        roughness: 0.72,
+        envMapIntensity: 0.14,
       }),
-      cabinAccent: new THREE.MeshPhysicalMaterial({
-        color: "#43241f",
+      cabinAccent: new THREE.MeshStandardMaterial({
+        color: "#38201b",
         metalness: 0.02,
-        roughness: 0.58,
-        clearcoat: 0.25,
-        clearcoatRoughness: 0.65,
-        envMapIntensity: 0.28,
+        roughness: 0.66,
+        envMapIntensity: 0.12,
       }),
-      cabinFloor: new THREE.MeshStandardMaterial({ color: "#100d0e", metalness: 0, roughness: 0.95, envMapIntensity: 0.25 }),
-      cabinRoof: new THREE.MeshStandardMaterial({ color: "#131011", metalness: 0, roughness: 0.94, envMapIntensity: 0.25 }),
+      cabinFloor: new THREE.MeshStandardMaterial({ color: "#0e0c0c", metalness: 0, roughness: 0.96, envMapIntensity: 0.12 }),
+      cabinRoof: new THREE.MeshStandardMaterial({ color: "#111010", metalness: 0, roughness: 0.95, envMapIntensity: 0.12 }),
     };
   }, [debugRoles, config.paint, config.rimFinish, config.grille, config.carbon, config.lights]);
 
