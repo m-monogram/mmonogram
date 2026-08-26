@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { memo, useLayoutEffect, useMemo, useRef } from "react";
 import { RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
 import { CABIN_BELT_Y, CABIN_FLOOR_Y, CABIN_LEN, CABIN_MID_X, CABIN_ROOF_Y, CABIN_SIDE_Z } from "./cabin";
@@ -11,11 +11,11 @@ import { CABIN_BELT_Y, CABIN_FLOOR_Y, CABIN_LEN, CABIN_MID_X, CABIN_ROOF_Y, CABI
  */
 
 const LEATHER = new THREE.MeshPhysicalMaterial({
-  color: "#cec5b4",
-  roughness: 0.62,
+  color: "#b7aa96",
+  roughness: 0.68,
   metalness: 0.02,
-  clearcoat: 0.25,
-  clearcoatRoughness: 0.55,
+  clearcoat: 0.14,
+  clearcoatRoughness: 0.72,
 });
 const LEATHER_DARK = new THREE.MeshPhysicalMaterial({
   color: "#1a1a1c",
@@ -85,20 +85,45 @@ function Seat({
   );
 }
 
-export default function Interior() {
+const STAR_MATERIAL = new THREE.MeshStandardMaterial({
+  color: "#ffffff",
+  emissive: "#dce8ff",
+  emissiveIntensity: 1.6,
+  side: THREE.DoubleSide,
+});
+
+function Interior() {
   /* «Звёздное небо» в потолке — точки распределены детерминированно */
   const stars = useMemo(() => {
-    const pts: [number, number, number][] = [];
+    const pts: Array<{ position: [number, number, number]; scale: number }> = [];
     let seed = 7;
     const rnd = () => {
       seed = (seed * 1103515245 + 12345) % 2147483648;
       return seed / 2147483648;
     };
     for (let i = 0; i < 90; i++) {
-      pts.push([-1.95 + rnd() * 2.6, CABIN_ROOF_Y - 0.008, -0.7 + rnd() * 1.4]);
+      pts.push({
+        position: [-1.95 + rnd() * 2.6, CABIN_ROOF_Y - 0.008, -0.7 + rnd() * 1.4],
+        scale: 0.75 + rnd() * 0.65,
+      });
     }
     return pts;
   }, []);
+  const starsRef = useRef<THREE.InstancedMesh>(null);
+
+  useLayoutEffect(() => {
+    const mesh = starsRef.current;
+    if (!mesh) return;
+    const dummy = new THREE.Object3D();
+    for (let i = 0; i < stars.length; i++) {
+      dummy.position.set(...stars[i].position);
+      dummy.rotation.set(Math.PI / 2, 0, 0);
+      dummy.scale.setScalar(stars[i].scale);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+  }, [stars]);
 
   return (
     <group>
@@ -196,21 +221,20 @@ export default function Interior() {
       <mesh position={[CABIN_MID_X, CABIN_ROOF_Y, 0]} rotation={[Math.PI / 2, 0, 0]} material={ALCANTARA}>
         <planeGeometry args={[CABIN_LEN, CABIN_SIDE_Z * 2]} />
       </mesh>
-      {stars.map((p, i) => (
-        <mesh key={i} position={p} rotation={[Math.PI / 2, 0, 0]}>
-          <circleGeometry args={[0.008, 6]} />
-          <meshStandardMaterial color="#ffffff" emissive="#dce8ff" emissiveIntensity={1.6} side={THREE.DoubleSide} />
-        </mesh>
-      ))}
+      <instancedMesh ref={starsRef} args={[undefined, undefined, stars.length]} material={STAR_MATERIAL}>
+        <circleGeometry args={[0.008, 6]} />
+      </instancedMesh>
 
       {/* Свет кабины: крыша непрозрачная, поэтому салону нужны свои источники */}
       {/* Крыша непрозрачная, поэтому салон освещается сам. Источники размазаны
           вдоль потолка и с мягким decay: одна яркая точка выжигала ближнее
           кресло, оставляя остальную кабину чёрной. */}
       {[0.45, -0.1, -0.65, -1.2, -1.75].map((x) => (
-        <pointLight key={x} position={[x, 1.74, 0]} intensity={0.26} distance={3.2} decay={1.3} color="#ffeedd" />
+        <pointLight key={x} position={[x, 1.74, 0]} intensity={0.2} distance={3.0} decay={1.35} color="#ffeedd" />
       ))}
-      <pointLight position={[0.5, 1.34, 0.1]} intensity={0.18} distance={1.8} decay={1.3} color="#bcd4f0" />
+      <pointLight position={[0.5, 1.34, 0.1]} intensity={0.13} distance={1.8} decay={1.35} color="#bcd4f0" />
     </group>
   );
 }
+
+export default memo(Interior);

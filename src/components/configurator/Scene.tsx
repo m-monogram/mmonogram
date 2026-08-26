@@ -77,19 +77,19 @@ const PRESETS: Record<CameraFocus, { desktop: CameraPreset; mobile: CameraPreset
      углу — я принял её за артефакт прореживания и полдня искал обломок,
      которого там не было. */
   interiorFront: {
-    desktop: { eye: [-1.12, 1.52, 0], target: [0.5, 1.1, 0.05], fov: INTERIOR_FOV },
-    mobile: { eye: [-0.67, 1.49, 0.01], target: [0.5, 1.1, 0.05], fov: INTERIOR_FOV_MOBILE },
+    desktop: { eye: [-1.28, 1.44, 0], target: [0.52, 1.12, 0.05], fov: 60 },
+    mobile: { eye: [-0.78, 1.42, 0.01], target: [0.52, 1.12, 0.05], fov: INTERIOR_FOV_MOBILE },
   },
   /* С места водителя: точка глаза чуть впереди подголовника, взгляд поверх
      руля на приборку. Из прохода за креслами руль закрывала спинка. */
   interiorDriver: {
-    desktop: { eye: [-0.2, 1.52, 0.4], target: [0.5, 1.26, 0.36], fov: INTERIOR_FOV },
-    mobile: { eye: [0.0, 1.47, 0.39], target: [0.5, 1.26, 0.36], fov: INTERIOR_FOV_MOBILE },
+    desktop: { eye: [-0.12, 1.34, 0.42], target: [0.72, 1.08, 0.35], fov: 64 },
+    mobile: { eye: [0.02, 1.34, 0.41], target: [0.72, 1.08, 0.35], fov: INTERIOR_FOV_MOBILE },
   },
   /* Из прохода между передними креслами назад на диван */
   interiorRear: {
-    desktop: { eye: [0.3, 1.52, 0], target: [-1.45, 1.16, 0], fov: INTERIOR_FOV },
-    mobile: { eye: [-0.19, 1.49, 0], target: [-1.45, 1.16, 0], fov: INTERIOR_FOV_MOBILE },
+    desktop: { eye: [0.2, 1.43, 0], target: [-1.45, 1.14, 0], fov: 60 },
+    mobile: { eye: [-0.24, 1.42, 0], target: [-1.45, 1.14, 0], fov: INTERIOR_FOV_MOBILE },
   },
 };
 
@@ -172,7 +172,7 @@ function CameraRig({
 
   useEffect(() => {
     const controls = controlsRef.current;
-    const preset = PRESETS[focus][isMobile ? "mobile" : "desktop"];
+    const preset = (PRESETS[focus] ?? PRESETS.default)[isMobile ? "mobile" : "desktop"];
     const toPos = presetToPosition(preset);
     const toTarget = new THREE.Vector3(...preset.target);
     const cam = camera as THREE.PerspectiveCamera;
@@ -309,18 +309,19 @@ function InvalidateOnConfig({ config }: { config: BuildConfig }) {
  * готовы не в первом кадре. Без этого сцена может остаться пустой до первого
  * действия пользователя, поэтому пару секунд после монтирования просим кадры.
  */
-function WarmUpFrames() {
+function WarmUpFrames({ reducedMotion }: { reducedMotion: boolean }) {
   const { invalidate } = useThree();
   useEffect(() => {
     let raf = 0;
     const started = performance.now();
+    const duration = reducedMotion ? 450 : 1100;
     const tick = () => {
       invalidate();
-      if (performance.now() - started < 1400) raf = requestAnimationFrame(tick);
+      if (performance.now() - started < duration) raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [invalidate]);
+  }, [invalidate, reducedMotion]);
   return null;
 }
 
@@ -368,18 +369,19 @@ function SceneEnvironment({ night, isMobile }: { night: boolean; isMobile: boole
 
 export default function ConfiguratorScene({ config, focus = "default" }: { config: BuildConfig; focus?: CameraFocus }) {
   const { isMobile, reducedMotion } = useSceneQuality();
-  const interior = isInteriorFocus(focus);
+  const safeFocus = PRESETS[focus] ? focus : "default";
+  const interior = isInteriorFocus(safeFocus);
   const controls = useRef<OrbitControlsImpl>(null);
   const flightRef = useRef<FlightState | null>(null);
   const bg = config.night ? "#08090a" : "#c7cbce";
-  const enableHeavyEffects = !isMobile && !reducedMotion;
+  const enablePostEffects = !isMobile && !reducedMotion && !interior;
 
   return (
     <Canvas
       shadows={!isMobile}
       frameloop="demand"
-      dpr={isMobile ? [1, 1.2] : [1, 2]}
-      performance={{ min: 0.55 }}
+      dpr={isMobile ? [1, 1.15] : [1, 1.5]}
+      performance={{ min: 0.7 }}
       gl={{
         antialias: !isMobile,
         alpha: false,
@@ -395,7 +397,7 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
 
       <InvalidateOnConfig config={config} />
       <ConfineCamera night={config.night} controlsRef={controls} interior={interior} flightRef={flightRef} />
-      <CameraRig focus={focus} isMobile={isMobile} controlsRef={controls} flightRef={flightRef} />
+      <CameraRig focus={safeFocus} isMobile={isMobile} controlsRef={controls} flightRef={flightRef} />
 
       <Suspense fallback={null}>
         <SceneEnvironment night={config.night} isMobile={isMobile} />
@@ -455,21 +457,23 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
         )}
 
         <Showroom key={config.night ? "night" : "day"} night={config.night} />
-        <WarmUpFrames />
-        <ContactShadows
-          position={[0, 0.01, 0]}
-          opacity={config.night ? 0.62 : 0.48}
-          scale={11}
-          blur={2.6}
-          far={2.8}
-          resolution={isMobile ? 192 : 512}
-          frames={1}
-        />
+        <WarmUpFrames reducedMotion={reducedMotion} />
+        {!interior && (
+          <ContactShadows
+            position={[0, 0.01, 0]}
+            opacity={config.night ? 0.62 : 0.48}
+            scale={11}
+            blur={2.6}
+            far={2.8}
+            resolution={isMobile ? 192 : 384}
+            frames={1}
+          />
+        )}
 
         {/* «Дорогая картинка» по пресету MANSORY — Quality: SAO в стыках,
             аккуратный bloom только на бликах, лёгкая студийная десатурация.
             На мобильных AO в половинном разрешении (ТЗ 6.9). */}
-        {enableHeavyEffects && <EffectComposer multisampling={isMobile ? 2 : 4}>
+        {enablePostEffects && <EffectComposer multisampling={2}>
           {/* В салоне радиус AO меньше: с «уличными» 0.5 м вся кабина попадает
               в затенение и уходит в чёрное. */}
           <N8AO
