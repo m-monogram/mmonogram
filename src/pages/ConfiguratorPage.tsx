@@ -13,6 +13,7 @@ import {
 } from "@/components/configurator/config";
 import ConfigPanel from "@/components/configurator/ConfigPanel";
 import SceneErrorBoundary from "@/components/configurator/SceneErrorBoundary";
+import { CARS } from "@/components/configurator/models";
 
 // three.js подтягивается только на этой странице — остальной сайт не тяжелеет
 const ConfiguratorScene = lazy(() => import("@/components/configurator/Scene"));
@@ -82,7 +83,9 @@ const ConfiguratorPage = () => {
         }`}
       >
         <p className="font-body text-[11px]">{t("config.hint")}</p>
-        <p className="font-body text-[10px] mt-1 opacity-70">{t("config.demoNote")}</p>
+        <p className="font-body text-[10px] mt-1 opacity-70">
+          {t("config.demoNote")} — {CARS[config.model].name}
+        </p>
       </div>
 
       {/* Стрелка открытия — справа, как в референсе Mansory */}
@@ -169,7 +172,7 @@ const ConfiguratorPage = () => {
                 <ConfigPanel
                   config={config}
                   onChange={handleChange}
-                  onSectionChange={(s) => setFocus(s && s !== "overview" && s !== "interior" ? s : "default")}
+                  onSectionChange={(s) => setFocus(s && s !== "model" && s !== "overview" && s !== "interior" ? s : "default")}
                   onInteriorView={setFocus}
                 />
               </div>

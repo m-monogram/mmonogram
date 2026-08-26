@@ -40,6 +40,7 @@ function Parts({
   fit: shared,
   kind,
   materials,
+  sourceMaterials = false,
   visible = true,
   onGround,
 }: {
@@ -47,6 +48,7 @@ function Parts({
   fit?: Fit;
   kind: FileRole;
   materials: Materials;
+  sourceMaterials?: boolean;
   visible?: boolean;
   /** Нижняя точка файла после посадки — по ней выставляется уровень пола. */
   onGround?: (url: string, minY: number) => void;
@@ -78,6 +80,8 @@ function Parts({
       mesh.castShadow = true;
       mesh.receiveShadow = true;
 
+      if (sourceMaterials) return;
+
       const box = new THREE.Box3().setFromObject(mesh);
       if (isDebris(mesh, box)) {
         mesh.visible = false;
@@ -85,6 +89,8 @@ function Parts({
       }
       kept.push({ mesh, box });
     });
+
+    if (sourceMaterials) return { root, byRole, fit, minY: new THREE.Box3().setFromObject(root).min.y };
 
     if (kind === "interior") {
       const cabin = new THREE.Box3().setFromObject(root);
@@ -106,13 +112,14 @@ function Parts({
     }
 
     return { root, byRole, fit, minY: new THREE.Box3().setFromObject(root).min.y };
-  }, [scene, shared, kind, url]);
+  }, [scene, shared, kind, url, sourceMaterials]);
 
   useLayoutEffect(() => {
     onGround?.(url, prepared.minY);
   }, [url, prepared, onGround]);
 
   useLayoutEffect(() => {
+    if (sourceMaterials) return;
     for (const [role, meshes] of Object.entries(prepared.byRole)) {
       if (role === "debris") {
         for (const mesh of meshes) mesh.visible = false;
@@ -120,7 +127,7 @@ function Parts({
       }
       for (const mesh of meshes) mesh.material = materials[role as PaintedRole];
     }
-  }, [prepared, materials]);
+  }, [prepared, materials, sourceMaterials]);
 
   return <primitive object={prepared.root} visible={visible} />;
 }
@@ -143,7 +150,7 @@ class OptionalBoundary extends Component<{ children: ReactNode; label: string },
 }
 
 export default function GClassGLTF({ config }: { config: BuildConfig }) {
-  const car = CARS[DEFAULT_CAR];
+  const car = CARS[config.model] ?? CARS[DEFAULT_CAR];
   const body = useGLTF(car.files.body, DRACO_PATH);
   const fit = useMemo(() => computeFit(body.scene.clone(true), car.length), [body.scene, car.length]);
 
@@ -305,7 +312,14 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
 
   return (
     <group position-y={groundOffset}>
-      <Parts url={car.files.body} fit={fit} kind="exterior" materials={materials} onGround={reportGround} />
+      <Parts
+        url={car.files.body}
+        fit={fit}
+        kind="exterior"
+        materials={materials}
+        sourceMaterials={car.sourceMaterials}
+        onGround={reportGround}
+      />
 
       {/* Обвеса и салона у машины может не быть — тогда собирается из того, что есть */}
       {car.files.kit && (

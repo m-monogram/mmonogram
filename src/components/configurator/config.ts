@@ -1,8 +1,10 @@
 /**
  * Пресеты и состояние 3D-конфигуратора.
- * Состояние кодируется в URL (?c=colorIdx-rimIdx-rimColorIdx-kit-carbon-lights-env),
+ * Состояние кодируется в URL (?c=version-model-color-rim-rimColor-kit-carbon-lights-env-grille),
  * чтобы сборкой можно было делиться ссылкой — как у Mansory.
  */
+
+import { CAR_IDS, DEFAULT_CAR, type CarId } from "./models";
 
 export interface PaintOption {
   id: string;
@@ -62,6 +64,7 @@ export const GRILLE_FINISHES: GrilleFinish[] = [
 ];
 
 export interface BuildConfig {
+  model: CarId;
   paint: number;
   rim: number;
   rimFinish: number;
@@ -85,6 +88,7 @@ export const isInteriorFocus = (f: CameraFocus) => INTERIOR_FOCUS.includes(f);
 /* По умолчанию машина собирается в тёмном гараже: чёрный лак на светлом фоне
    терялся, а тёмный зал — фирменная подача ателье. */
 export const DEFAULT_CONFIG: BuildConfig = {
+  model: DEFAULT_CAR,
   paint: 0,
   rim: 1,
   rimFinish: 0,
@@ -96,25 +100,39 @@ export const DEFAULT_CONFIG: BuildConfig = {
 };
 
 /* Первый сегмент — версия схемы: старые ссылки не ломаются при добавлении опций */
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 3;
 
 export function encodeConfig(c: BuildConfig): string {
-  return [SCHEMA_VERSION, c.paint, c.rim, c.rimFinish, +c.kit, +c.carbon, +c.lights, +c.night, c.grille].join("-");
+  const model = Math.max(CAR_IDS.indexOf(c.model), 0);
+  return [SCHEMA_VERSION, model, c.paint, c.rim, c.rimFinish, +c.kit, +c.carbon, +c.lights, +c.night, c.grille].join("-");
 }
 
 export function decodeConfig(raw: string | null): BuildConfig {
   if (!raw) return DEFAULT_CONFIG;
-  const parts = raw.split("-").map((n) => parseInt(n, 10));
-  if (parts.some((n) => Number.isNaN(n))) return DEFAULT_CONFIG;
+  const rawParts = raw.split("-");
 
-  /* Три поколения ссылок: 7 сегментов без версии, 8 с версией 1,
+  /* Четвёртое поколение ссылок: версия 3 добавила выбор 3D-модели.
+     Старые ссылки сохраняют модель по умолчанию. */
+  let model = DEFAULT_CONFIG.model;
+  let p: number[];
+  if (rawParts[0] === "3") {
+    const modelIdx = parseInt(rawParts[1], 10);
+    model = CAR_IDS[modelIdx] ?? DEFAULT_CONFIG.model;
+    p = rawParts.slice(2).map((n) => parseInt(n, 10));
+  } else {
+    p = rawParts.map((n) => parseInt(n, 10));
+  }
+
+  if (p.some((n) => Number.isNaN(n))) return DEFAULT_CONFIG;
+
+  /* Старые поколения: 7 сегментов без версии, 8 с версией 1,
      9 с версией 2 и отделкой решётки. Недостающее берётся из умолчаний. */
-  let p = parts;
   if ((p.length === 9 && p[0] === 2) || (p.length === 8 && p[0] === 1)) p = p.slice(1);
   if (p.length !== 7 && p.length !== 8) return DEFAULT_CONFIG;
 
   const clamp = (v: number, max: number) => Math.min(Math.max(v, 0), max);
   return {
+    model,
     paint: clamp(p[0], PAINTS.length - 1),
     rim: clamp(p[1], RIM_DESIGNS.length - 1),
     rimFinish: clamp(p[2], RIM_FINISHES.length - 1),

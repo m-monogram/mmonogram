@@ -17,6 +17,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BuildConfig, GRILLE_FINISHES, PAINTS, RIM_DESIGNS, RIM_FINISHES, encodeConfig } from "./config";
+import { CAR_IDS, CARS } from "./models";
 
 /* Превью опций — кадры реальной 3D-модели (§ ТЗ: картинки вместо кружков).
    Генерируются скриптом скриншотов по ?c=...&v=... */
@@ -30,7 +31,7 @@ const FINISH_PREVIEWS = Object.values(
   import.meta.glob("@/assets/previews/finish-*.jpg", { eager: true, import: "default" })
 ) as string[];
 
-export type Section = "exterior" | "wheels" | "kit" | "carbon" | "lights" | "env" | "interior" | "overview";
+export type Section = "model" | "exterior" | "wheels" | "kit" | "carbon" | "lights" | "env" | "interior" | "overview";
 
 /* Раздел «Интерьер» — это не опции, а три ракурса внутри салона, как у Mansory */
 export type InteriorView = "interiorFront" | "interiorDriver" | "interiorRear";
@@ -190,6 +191,7 @@ export default function ConfigPanel({ config, onChange, onSectionChange, onInter
   };
 
   const rootItems: { id: Section; icon: React.ReactNode; label: string; value: string }[] = [
+    { id: "model", icon: <Car className="w-[18px] h-[18px]" />, label: t("config.model"), value: CARS[config.model].name },
     { id: "exterior", icon: <Palette className="w-[18px] h-[18px]" />, label: t("config.exterior"), value: `${PAINTS[config.paint].name} · ${GRILLE_FINISHES[config.grille].name}` },
     { id: "wheels", icon: <WheelIcon design={config.rim} className="w-5 h-5" />, label: t("config.rims"), value: RIM_DESIGNS[config.rim].name },
     { id: "kit", icon: <Car className="w-[18px] h-[18px]" />, label: t("config.kit"), value: config.kit ? t("config.kitMM") : t("config.kitStandard") },
@@ -201,6 +203,7 @@ export default function ConfigPanel({ config, onChange, onSectionChange, onInter
   ];
 
   const overviewRows: { label: string; value: string }[] = [
+    { label: t("config.model"), value: CARS[config.model].name },
     { label: t("config.exterior"), value: PAINTS[config.paint].name },
     { label: t("config.rims"), value: `${RIM_DESIGNS[config.rim].name} · ${RIM_FINISHES[config.rimFinish].name}` },
     { label: t("config.kit"), value: config.kit ? t("config.kitMM") : t("config.kitStandard") },
@@ -281,6 +284,22 @@ export default function ConfigPanel({ config, onChange, onSectionChange, onInter
             className="flex flex-col p-4"
           >
             <div className="flex flex-col gap-2 max-h-[52vh] md:max-h-[58vh] overflow-y-auto pr-0.5">
+              {section === "model" && (
+                <>
+                  <GroupTitle>{t("config.model")}</GroupTitle>
+                  {CAR_IDS.map((id) => (
+                    <OptionRow
+                      key={id}
+                      selected={config.model === id}
+                      onClick={() => set({ model: id })}
+                      preview={<span className="text-white/60 shrink-0"><Car className="w-7 h-7" strokeWidth={1.5} /></span>}
+                      label={CARS[id].name}
+                      sub={id === "base-basic-pbr" ? t("config.modelSourcePbr") : t("config.modelMain")}
+                    />
+                  ))}
+                </>
+              )}
+
               {section === "exterior" && (
                 <>
                   <GroupTitle>{t("config.exterior")}</GroupTitle>

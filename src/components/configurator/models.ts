@@ -23,7 +23,7 @@ export const DRACO_PATH = "/draco/";
  */
 
 /** Какая машина собрана в конфигураторе. */
-export type CarId = "g63-iconic";
+export type CarId = "g63-iconic" | "base-basic-pbr";
 
 export type CarModel = {
   /** Подпись в панели выбора. */
@@ -40,6 +40,8 @@ export type CarModel = {
     readonly kit?: string;
     readonly interior?: string;
   };
+  /** Монолитные референс-модели оставляем со встроенными PBR-текстурами. */
+  readonly sourceMaterials?: boolean;
 };
 
 export const CARS = {
@@ -52,8 +54,17 @@ export const CARS = {
       interior: `${MODEL_BASE}/custom-interior.glb`,
     },
   },
+  "base-basic-pbr": {
+    name: "Base Basic PBR",
+    length: 4.82,
+    sourceMaterials: true,
+    files: {
+      body: `${MODEL_BASE}/variants/base-basic-pbr.glb`,
+    },
+  },
 } as const satisfies Record<CarId, CarModel>;
 
+export const CAR_IDS = Object.keys(CARS) as CarId[];
 export const DEFAULT_CAR: CarId = "g63-iconic";
 
 /** Длина G63 по кузову, метры. Значение по умолчанию для computeFit. */

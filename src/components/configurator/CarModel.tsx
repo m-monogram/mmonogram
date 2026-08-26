@@ -2,6 +2,7 @@ import { Component, Suspense, type ReactNode } from "react";
 import GClassModel from "./GClassModel";
 import GClassGLTF from "./GClassGLTF";
 import { BuildConfig } from "./config";
+import { DEFAULT_CAR } from "./models";
 
 /**
  * Точка подключения машины в сцену.
@@ -31,7 +32,7 @@ class ModelBoundary extends Component<{ children: ReactNode; fallback: ReactNode
 export default function CarModel({ config, doorsOpen = false }: { config: BuildConfig; doorsOpen?: boolean }) {
   const placeholder = <GClassModel config={config} doorsOpen={doorsOpen} />;
 
-  if (doorsOpen) return placeholder;
+  if (doorsOpen && config.model === DEFAULT_CAR) return placeholder;
 
   return (
     <ModelBoundary fallback={placeholder}>
