@@ -420,22 +420,26 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
           color="#fff3e8"
         />
 
-        {/* Пол и моторный щит: у модели салона их нет, и камера изнутри
-            смотрит сквозь торпедо прямо на колёса и пружины подвески. */}
-        <group>
-          <mesh position={[CABIN_MID_X, CABIN_FLOOR_Y - 0.28, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[CABIN_LEN + 0.6, CABIN_SIDE_Z * 2]} />
-            <meshStandardMaterial color="#0b0a0a" roughness={0.95} metalness={0} side={THREE.DoubleSide} />
-          </mesh>
-          <mesh position={[CABIN_FRONT_X + 0.28, CABIN_FLOOR_Y + 0.1, 0]} rotation={[0, Math.PI / 2, 0]}>
-            <planeGeometry args={[CABIN_SIDE_Z * 2, 1.1]} />
-            <meshStandardMaterial color="#0b0a0a" roughness={0.95} metalness={0} side={THREE.DoubleSide} />
-          </mesh>
-          <mesh position={[CABIN_REAR_X - 0.2, CABIN_FLOOR_Y + 0.2, 0]} rotation={[0, Math.PI / 2, 0]}>
-            <planeGeometry args={[CABIN_SIDE_Z * 2, 1.3]} />
-            <meshStandardMaterial color="#0b0a0a" roughness={0.95} metalness={0} side={THREE.DoubleSide} />
-          </mesh>
-        </group>
+        {/* Пол, моторный щит и задняя стенка: у модели салона их нет, и камера
+            изнутри смотрит сквозь торпедо на колёса и пружины подвески.
+            Только в интерьерном режиме — снаружи эти плоскости торчали бы
+            сквозь кузов, что и случилось в первой версии. */}
+        {interior && (
+          <group>
+            <mesh position={[CABIN_MID_X, CABIN_FLOOR_Y - 0.28, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+              <planeGeometry args={[CABIN_LEN, CABIN_SIDE_Z * 1.7]} />
+              <meshStandardMaterial color="#0b0a0a" roughness={0.95} metalness={0} side={THREE.DoubleSide} />
+            </mesh>
+            <mesh position={[CABIN_FRONT_X + 0.1, CABIN_FLOOR_Y + 0.05, 0]} rotation={[0, Math.PI / 2, 0]}>
+              <planeGeometry args={[CABIN_SIDE_Z * 1.7, 0.9]} />
+              <meshStandardMaterial color="#0b0a0a" roughness={0.95} metalness={0} side={THREE.DoubleSide} />
+            </mesh>
+            <mesh position={[CABIN_REAR_X + 0.05, CABIN_FLOOR_Y + 0.15, 0]} rotation={[0, Math.PI / 2, 0]}>
+              <planeGeometry args={[CABIN_SIDE_Z * 1.7, 1.1]} />
+              <meshStandardMaterial color="#0b0a0a" roughness={0.95} metalness={0} side={THREE.DoubleSide} />
+            </mesh>
+          </group>
+        )}
 
         <Showroom key={config.night ? "night" : "day"} night={config.night} />
         <WarmUpFrames />
