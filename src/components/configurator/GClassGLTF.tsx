@@ -3,7 +3,7 @@ import { useGLTF } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { BuildConfig, GRILLE_FINISHES, PAINTS, RIM_FINISHES } from "./config";
-import { DRACO_PATH, MODEL_FILES, ROLE_DEBUG_COLORS, type FileRole, type PartRole } from "./models";
+import { CARS, DEFAULT_CAR, DRACO_PATH, ROLE_DEBUG_COLORS, type FileRole, type PartRole } from "./models";
 import {
   cabinDashAtMax,
   classifyCabin,
@@ -136,8 +136,9 @@ class OptionalBoundary extends Component<{ children: ReactNode; label: string },
 }
 
 export default function GClassGLTF({ config }: { config: BuildConfig }) {
-  const body = useGLTF(MODEL_FILES.body, DRACO_PATH);
-  const fit = useMemo(() => computeFit(body.scene.clone(true)), [body.scene]);
+  const car = CARS[DEFAULT_CAR];
+  const body = useGLTF(car.files.body, DRACO_PATH);
+  const fit = useMemo(() => computeFit(body.scene.clone(true), car.length), [body.scene, car.length]);
 
   const debugRoles = useMemo(
     () => typeof window !== "undefined" && new URLSearchParams(window.location.search).has("parts"),
@@ -222,7 +223,10 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
             clearcoat: 1,
             clearcoatRoughness: 0.05,
           }),
-      trim: new THREE.MeshStandardMaterial({ color: "#141414", metalness: 0.4, roughness: 0.6 }),
+      /* Рамки окон, рейлинги и водосток. На g3-iconic-gold-side они чёрные
+         глянцевые заодно с кузовом, а не матовые: матовая серая полоса вдоль
+         крыши рядом с глянцевым чёрным читалась как отдельная деталь. */
+      trim: new THREE.MeshStandardMaterial({ color: "#0d0d0e", metalness: 0.3, roughness: 0.3 }),
       /* Палитра салона снята с фотографий проекта (g3-iconic-gold-rearseats):
          чёрная кожа #241f1e, бордо сидений #4a231c, тёмный потолок #0f0c0d.
 
@@ -284,9 +288,9 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
   }, []);
 
   const groundOffset = useMemo(() => {
-    const active = Object.entries(grounds).filter(([url]) => url !== MODEL_FILES.kit || config.kit);
+    const active = Object.entries(grounds).filter(([url]) => url !== car.files.kit || config.kit);
     return active.length ? -Math.min(...active.map(([, y]) => y)) : 0;
-  }, [grounds, config.kit]);
+  }, [grounds, config.kit, car.files.kit]);
 
   // frameloop="demand": без явного запроса сдвиг пола не попал бы в кадр
   const invalidate = useThree((s) => s.invalidate);
@@ -294,25 +298,32 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
 
   return (
     <group position-y={groundOffset}>
-      <Parts url={MODEL_FILES.body} fit={fit} kind="exterior" materials={materials} onGround={reportGround} />
+      <Parts url={car.files.body} fit={fit} kind="exterior" materials={materials} onGround={reportGround} />
 
-      <OptionalBoundary label="обвес и колёса">
-        <Parts
-          url={MODEL_FILES.kit}
-          fit={fit}
-          kind="exterior"
-          materials={materials}
-          visible={config.kit}
-          onGround={reportGround}
-        />
-      </OptionalBoundary>
+      {/* Обвеса и салона у машины может не быть — тогда собирается из того, что есть */}
+      {car.files.kit && (
+        <OptionalBoundary label="обвес и колёса">
+          <Parts
+            url={car.files.kit}
+            fit={fit}
+            kind="exterior"
+            materials={materials}
+            visible={config.kit}
+            onGround={reportGround}
+          />
+        </OptionalBoundary>
+      )}
 
-      <OptionalBoundary label="интерьер">
-        <Parts url={MODEL_FILES.interior} fit={fit} kind="interior" materials={materials} />
-      </OptionalBoundary>
+      {car.files.interior && (
+        <OptionalBoundary label="интерьер">
+          <Parts url={car.files.interior} fit={fit} kind="interior" materials={materials} />
+        </OptionalBoundary>
+      )}
     </group>
   );
 }
 
-useGLTF.preload(MODEL_FILES.body, DRACO_PATH);
-useGLTF.preload(MODEL_FILES.kit, DRACO_PATH);
+for (const car of Object.values(CARS)) {
+  useGLTF.preload(car.files.body, DRACO_PATH);
+  if (car.files.kit) useGLTF.preload(car.files.kit, DRACO_PATH);
+}

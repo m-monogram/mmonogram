@@ -38,7 +38,7 @@ const AXIS_Z = new THREE.Vector3(0, 0, 1);
  * Считает разворот и масштаб сборки: высота машины — самый короткий габарит,
  * длина идёт вдоль X, колёса стоят на нулевой отметке.
  */
-export function computeFit(object: THREE.Object3D): Fit {
+export function computeFit(object: THREE.Object3D, targetLength = TARGET_LENGTH): Fit {
   const raw = new THREE.Box3().setFromObject(object);
   const size = raw.getSize(new THREE.Vector3());
 
@@ -61,7 +61,7 @@ export function computeFit(object: THREE.Object3D): Fit {
     fitted = box.getSize(new THREE.Vector3());
   }
 
-  const scale = fitted.x > 0 ? TARGET_LENGTH / fitted.x : 1;
+  const scale = fitted.x > 0 ? targetLength / fitted.x : 1;
   const center = box.getCenter(new THREE.Vector3());
 
   return {

@@ -21,14 +21,43 @@ export const DRACO_PATH = "/draco/";
  * steering-wheel.glb — та же деталь без прореживания, 135 682 треугольника
  * против 6 600, и при загрузке поверх салона давала два руля друг в друге.
  */
-export const MODEL_FILES = {
-  body: `${MODEL_BASE}/stock-body.glb`,
-  kit: `${MODEL_BASE}/body-kit-wheels.glb`,
-  interior: `${MODEL_BASE}/custom-interior.glb`,
-} as const;
 
-/** Длина G63 по кузову, метры: под неё нормируется масштаб всей сборки. */
-export const TARGET_LENGTH = 4.82;
+/** Какая машина собрана в конфигураторе. */
+export type CarId = "g63-iconic";
+
+export type CarModel = {
+  /** Подпись в панели выбора. */
+  readonly name: string;
+  /** Длина кузова в метрах: под неё нормируется масштаб всей сборки. */
+  readonly length: number;
+  /**
+   * Кузов обязателен — по нему считается трансформ, к которому подгоняется
+   * всё остальное. Обвес и салон необязательны: не у каждой машины они
+   * оцифрованы, и без них сборка должна просто собраться из того, что есть.
+   */
+  readonly files: {
+    readonly body: string;
+    readonly kit?: string;
+    readonly interior?: string;
+  };
+};
+
+export const CARS = {
+  "g63-iconic": {
+    name: "G63 Iconic",
+    length: 4.82,
+    files: {
+      body: `${MODEL_BASE}/stock-body.glb`,
+      kit: `${MODEL_BASE}/body-kit-wheels.glb`,
+      interior: `${MODEL_BASE}/custom-interior.glb`,
+    },
+  },
+} as const satisfies Record<CarId, CarModel>;
+
+export const DEFAULT_CAR: CarId = "g63-iconic";
+
+/** Длина G63 по кузову, метры. Значение по умолчанию для computeFit. */
+export const TARGET_LENGTH = CARS[DEFAULT_CAR].length;
 
 /** Роль части в сборке: определяет, каким материалом она будет покрашена. */
 export type PartRole =
@@ -142,7 +171,7 @@ export const GLASS_PANEL = {
 /** Роль, назначаемая всем мешам файла целиком, без разбора материалов. */
 export type FileRole = "exterior" | "interior";
 
-export const FILE_ROLES: Record<keyof typeof MODEL_FILES, FileRole> = {
+export const FILE_ROLES: Record<keyof CarModel["files"], FileRole> = {
   body: "exterior",
   kit: "exterior",
   interior: "interior",
