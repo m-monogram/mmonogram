@@ -10,6 +10,7 @@ import {
   MESH_RULES,
   TARGET_LENGTH,
   TIRE_MAX_LUMA,
+  TIRE_MIN_HEIGHT,
   WHEEL_ACCENT_MIN_LUMA,
   WHEEL_MAX_SPAN,
   WHEEL_ZONE_TOP,
@@ -140,9 +141,10 @@ export function classifyPart(
     if (material.opacity < GLASS_ALPHA_THRESHOLD) return "glass";
   }
 
-  // Стекло по форме: тонкая широкая панель выше подоконной линии
+  // Стекло по форме — только для деталей без материала
   const [thickness, width, span] = [size.x, size.y, size.z].sort((a, b) => a - b);
   if (
+    !material &&
     carSize.y > 0 &&
     center.y / carSize.y > GLASS_PANEL.minCenterY &&
     span > 0 &&
@@ -154,10 +156,11 @@ export function classifyPart(
 
   const low = carSize.y > 0 && center.y / carSize.y < WHEEL_ZONE_TOP;
   const compact = Math.max(size.x, size.z) < WHEEL_MAX_SPAN;
+  const dark = !material || material.luma < TIRE_MAX_LUMA;
 
-  if (low && compact) {
-    return !material || material.luma < TIRE_MAX_LUMA ? "tire" : refineWheel("wheel", material);
-  }
+  if (low && compact) return dark ? "tire" : refineWheel("wheel", material);
+  // Покрышки идут одним мешем на всю длину машины: их выдаёт рост
+  if (low && dark && size.y > TIRE_MIN_HEIGHT) return "tire";
   return "trim";
 }
 
