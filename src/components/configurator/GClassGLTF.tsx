@@ -211,27 +211,32 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
       trim: new THREE.MeshStandardMaterial({ color: "#141414", metalness: 0.4, roughness: 0.6 }),
       /* Палитра салона снята с фотографий проекта (g3-iconic-gold-rearseats):
          чёрная кожа сидений #231e1d, коньячные панели #4e2a26…#613c36,
-         тёмный потолок #0f0c0d.
-         envMapIntensity занижен: свет окружения в three.js ничем не
-         загораживается, и закрытая кабина получала полную яркость зала —
-         кожа выцветала в серое, а бордо панели уходило в розовое. */
-      /* Без clearcoat: лаковый слой отражает окружение белым бликом поверх
-         базы, и бордо передней панели уходило в лососевый. Кожа лаком не
-         покрыта — её блеск задаётся только шероховатостью. */
+         тёмный потолок #0f0c0d. */
+      /* Салон не берёт свет окружения вообще (envMapIntensity 0).
+         В three.js окружение ничем не загораживается, и закрытая кабина
+         светилась как под открытым небом: бордо панели уходило в лососевый,
+         а чёрная кожа в серое. Причём насколько именно — зависело от
+         видеокарты, так что подкрутить было нельзя, только отрезать.
+         Освещают кабину теперь только рассеянный свет сцены и два плафона
+         в Scene.tsx, а ими я управляю напрямую.
+         Clearcoat убран по той же причине: лаковый слой зеркалит окружение
+         белым бликом поверх базы. Кожа лаком не покрыта. */
       cabinLeather: new THREE.MeshStandardMaterial({
-        color: "#171313",
-        metalness: 0.02,
-        roughness: 0.72,
-        envMapIntensity: 0.14,
+        color: "#241f1e",
+        metalness: 0,
+        roughness: 0.88,
+        envMapIntensity: 0,
       }),
       cabinAccent: new THREE.MeshStandardMaterial({
-        color: "#38201b",
-        metalness: 0.02,
-        roughness: 0.66,
-        envMapIntensity: 0.12,
+        color: "#41201a",
+        metalness: 0,
+        // Матовая кожа: при меньшей шероховатости плафоны кладут широкий
+        // белёсый блик, и бордо серело до пыльно-розового
+        roughness: 0.92,
+        envMapIntensity: 0,
       }),
-      cabinFloor: new THREE.MeshStandardMaterial({ color: "#0e0c0c", metalness: 0, roughness: 0.96, envMapIntensity: 0.12 }),
-      cabinRoof: new THREE.MeshStandardMaterial({ color: "#111010", metalness: 0, roughness: 0.95, envMapIntensity: 0.12 }),
+      cabinFloor: new THREE.MeshStandardMaterial({ color: "#0e0c0c", metalness: 0, roughness: 0.96, envMapIntensity: 0 }),
+      cabinRoof: new THREE.MeshStandardMaterial({ color: "#111010", metalness: 0, roughness: 0.95, envMapIntensity: 0 }),
     };
   }, [debugRoles, config.paint, config.rimFinish, config.grille, config.carbon, config.lights]);
 
