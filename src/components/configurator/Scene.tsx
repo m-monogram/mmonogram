@@ -5,7 +5,7 @@ import { Bloom, BrightnessContrast, EffectComposer, HueSaturation, N8AO } from "
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import CarModel from "./CarModel";
-import { CABIN_MID_X, CABIN_ROOF_Y } from "./cabin";
+import { CABIN_FLOOR_Y, CABIN_FRONT_X, CABIN_LEN, CABIN_MID_X, CABIN_REAR_X, CABIN_ROOF_Y, CABIN_SIDE_Z } from "./cabin";
 import Showroom from "./Showroom";
 import { BuildConfig, isInteriorFocus, type CameraFocus } from "./config";
 
@@ -407,15 +407,35 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
         />
         <CarModel config={config} />
 
-        {/* Мягкий плафон в салоне: зальный свет внутрь кабины не попадает,
-            и без него интерьер через стёкла читается чёрной дырой. */}
+        {/* Плафон в салоне: зальный свет внутрь кабины не попадает, и без него
+            интерьер через стёкла читается чёрной дырой. Светит слабо и с
+            быстрым спадом — интерьерная камера подходит к подголовникам на
+            десятки сантиметров, и сильный источник выбивает кожу в серое,
+            а бордо передней панели — в розовое. */}
         <pointLight
-          position={[CABIN_MID_X, CABIN_ROOF_Y - 0.18, 0]}
-          intensity={1.1}
-          distance={4.2}
-          decay={1.8}
+          position={[CABIN_MID_X, CABIN_ROOF_Y - 0.1, 0]}
+          intensity={0.28}
+          distance={3.2}
+          decay={2}
           color="#fff3e8"
         />
+
+        {/* Пол и моторный щит: у модели салона их нет, и камера изнутри
+            смотрит сквозь торпедо прямо на колёса и пружины подвески. */}
+        <group>
+          <mesh position={[CABIN_MID_X, CABIN_FLOOR_Y - 0.28, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[CABIN_LEN + 0.6, CABIN_SIDE_Z * 2]} />
+            <meshStandardMaterial color="#0b0a0a" roughness={0.95} metalness={0} side={THREE.DoubleSide} />
+          </mesh>
+          <mesh position={[CABIN_FRONT_X + 0.28, CABIN_FLOOR_Y + 0.1, 0]} rotation={[0, Math.PI / 2, 0]}>
+            <planeGeometry args={[CABIN_SIDE_Z * 2, 1.1]} />
+            <meshStandardMaterial color="#0b0a0a" roughness={0.95} metalness={0} side={THREE.DoubleSide} />
+          </mesh>
+          <mesh position={[CABIN_REAR_X - 0.2, CABIN_FLOOR_Y + 0.2, 0]} rotation={[0, Math.PI / 2, 0]}>
+            <planeGeometry args={[CABIN_SIDE_Z * 2, 1.3]} />
+            <meshStandardMaterial color="#0b0a0a" roughness={0.95} metalness={0} side={THREE.DoubleSide} />
+          </mesh>
+        </group>
 
         <Showroom key={config.night ? "night" : "day"} night={config.night} />
         <WarmUpFrames />

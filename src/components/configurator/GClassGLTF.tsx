@@ -211,13 +211,17 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
       trim: new THREE.MeshStandardMaterial({ color: "#141414", metalness: 0.4, roughness: 0.6 }),
       /* Палитра салона снята с фотографий проекта (g3-iconic-gold-rearseats):
          чёрная кожа сидений #231e1d, коньячные панели #4e2a26…#613c36,
-         тёмный потолок #0f0c0d. */
+         тёмный потолок #0f0c0d.
+         envMapIntensity занижен: свет окружения в three.js ничем не
+         загораживается, и закрытая кабина получала полную яркость зала —
+         кожа выцветала в серое, а бордо панели уходило в розовое. */
       cabinLeather: new THREE.MeshPhysicalMaterial({
         color: "#1a1615",
         metalness: 0.02,
         roughness: 0.62,
         clearcoat: 0.2,
         clearcoatRoughness: 0.7,
+        envMapIntensity: 0.3,
       }),
       cabinAccent: new THREE.MeshPhysicalMaterial({
         color: "#43241f",
@@ -225,9 +229,10 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
         roughness: 0.58,
         clearcoat: 0.25,
         clearcoatRoughness: 0.65,
+        envMapIntensity: 0.28,
       }),
-      cabinFloor: new THREE.MeshStandardMaterial({ color: "#100d0e", metalness: 0, roughness: 0.95 }),
-      cabinRoof: new THREE.MeshStandardMaterial({ color: "#131011", metalness: 0, roughness: 0.94 }),
+      cabinFloor: new THREE.MeshStandardMaterial({ color: "#100d0e", metalness: 0, roughness: 0.95, envMapIntensity: 0.25 }),
+      cabinRoof: new THREE.MeshStandardMaterial({ color: "#131011", metalness: 0, roughness: 0.94, envMapIntensity: 0.25 }),
     };
   }, [debugRoles, config.paint, config.rimFinish, config.grille, config.carbon, config.lights]);
 
