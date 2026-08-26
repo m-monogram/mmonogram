@@ -5,6 +5,7 @@ import {
   DEBRIS,
   LIGHT_ZONE_FROM_CENTER,
   GLASS_ALPHA_THRESHOLD,
+  GLASS_PANEL,
   MATERIAL_RULES,
   MESH_RULES,
   TARGET_LENGTH,
@@ -137,6 +138,18 @@ export function classifyPart(
       return "brightwork";
     }
     if (material.opacity < GLASS_ALPHA_THRESHOLD) return "glass";
+  }
+
+  // Стекло по форме: тонкая широкая панель выше подоконной линии
+  const [thickness, width, span] = [size.x, size.y, size.z].sort((a, b) => a - b);
+  if (
+    carSize.y > 0 &&
+    center.y / carSize.y > GLASS_PANEL.minCenterY &&
+    span > 0 &&
+    thickness / span < GLASS_PANEL.maxThicknessRatio &&
+    width > GLASS_PANEL.minWidth
+  ) {
+    return "glass";
   }
 
   const low = carSize.y > 0 && center.y / carSize.y < WHEEL_ZONE_TOP;

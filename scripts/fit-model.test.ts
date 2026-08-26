@@ -114,6 +114,23 @@ check(
   "brightwork",
 );
 
+// Люк в крыше приезжает без материала: широкая тонкая панель наверху — стекло,
+// а рейлинг той же толщины, но узкий, — нет
+check(
+  "люк в крыше без материала",
+  classifyPart(null, new THREE.Box3(
+    new THREE.Vector3(-0.35, 1.74, -0.21), new THREE.Vector3(0.35, 1.76, 0.21),
+  ), CAR_SIZE, "Group_8"),
+  "glass",
+);
+check(
+  "рейлинг на крыше",
+  classifyPart(null, new THREE.Box3(
+    new THREE.Vector3(-0.8, 1.76, 0.5), new THREE.Vector3(0.8, 1.81, 0.55),
+  ), CAR_SIZE, "Group_24"),
+  "trim",
+);
+
 // Порог лежит на высоте колеса, но тянется вдоль всей машины — не колесо
 check(
   "порог вдоль борта",
