@@ -29,7 +29,10 @@ import {
  * уносило с собой уже загруженный кузов.
  */
 
-type Materials = Record<PartRole, THREE.Material>;
+/* Роль debris сюда не входит: такие меши прячутся, а не красятся, и
+   материала для них не существует. */
+type PaintedRole = Exclude<PartRole, "debris">;
+type Materials = Record<PaintedRole, THREE.Material>;
 
 /** Один загруженный файл: клон сцены, общий трансформ, материалы по ролям. */
 function Parts({
@@ -62,7 +65,7 @@ function Parts({
     const byRole: Record<PartRole, THREE.Mesh[]> = {
       body: [], wheel: [], wheelAccent: [], tire: [], glass: [], taillight: [],
       light: [], brightwork: [], carbon: [], cabinLeather: [], cabinAccent: [],
-      cabinTrim: [], cabinMetal: [], cabinFloor: [], cabinRoof: [], trim: [],
+      cabinTrim: [], cabinMetal: [], cabinFloor: [], cabinRoof: [], trim: [], debris: [],
     };
 
     /* Салон разбирается в два прохода: сначала собираем габариты всех
@@ -111,7 +114,11 @@ function Parts({
 
   useLayoutEffect(() => {
     for (const [role, meshes] of Object.entries(prepared.byRole)) {
-      for (const mesh of meshes) mesh.material = materials[role as PartRole];
+      if (role === "debris") {
+        for (const mesh of meshes) mesh.visible = false;
+        continue;
+      }
+      for (const mesh of meshes) mesh.material = materials[role as PaintedRole];
     }
   }, [prepared, materials]);
 
@@ -149,7 +156,7 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
     if (debugRoles) {
       const debug = {} as Materials;
       for (const [role, color] of Object.entries(ROLE_DEBUG_COLORS)) {
-        debug[role as PartRole] = new THREE.MeshBasicMaterial({ color });
+        debug[role as PaintedRole] = new THREE.MeshBasicMaterial({ color });
       }
       return debug;
     }

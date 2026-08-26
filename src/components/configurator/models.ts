@@ -76,7 +76,8 @@ export type PartRole =
   | "cabinMetal"   // мелочь салона: динамики, часы, клавиши
   | "cabinFloor"   // ковролин
   | "cabinRoof"    // потолок
-  | "trim";     // остальной чёрный пластик и мелочь
+  | "trim"      // остальной чёрный пластик и мелочь
+  | "debris";   // обломок прореживания: не красится, а прячется
 
 /**
  * Роль по имени материала. Модели пришли с осмысленными именами
@@ -253,6 +254,7 @@ export const ROLE_DEBUG_COLORS: Record<PartRole, string> = {
   cabinFloor: "#155e3f",
   cabinRoof: "#7f8c1a",
   trim: "#6b4f2a",
+  debris: "#ff0000",
 };
 
 /**

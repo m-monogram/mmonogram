@@ -133,7 +133,15 @@ export function classifyPart(
 
   if (material) {
     const rule = MATERIAL_RULES.find((r) => r.test.test(material.name));
-    if (rule && (!isLight(rule.role) || atEnd)) return refineWheel(rule.role, material);
+    if (rule && isLight(rule.role) && !atEnd) {
+      /* Материал говорит «стекло фонаря», а деталь сидит посреди машины.
+         Фонарей там не бывает: это обломок, разлетевшийся при прореживании.
+         Раньше он просто переставал светиться и уходил в trim — и тёмный
+         лоскут 29 x 18 см оставался висеть в проходе между рядами, прямо
+         перед интерьерной камерой. Прячем. */
+      return "debris";
+    }
+    if (rule) return refineWheel(rule.role, material);
 
     if (material.metalness >= CHROME_PROPS.minMetalness && material.roughness <= CHROME_PROPS.maxRoughness) {
       return "brightwork";
