@@ -249,7 +249,7 @@ export function classifyCabin(box: THREE.Box3, cabin: THREE.Box3, dashAtMax: boo
   return "cabinLeather";
 }
 
-/** Схлопнутый прореживанием меш: пара треугольников на объёмный габарит. */
+/** Обломок прореживания: лоскут без плотности или объём без геометрии. */
 export function isDebris(mesh: THREE.Mesh, box: THREE.Box3): boolean {
   const index = mesh.geometry.getIndex();
   const count = index ? index.count : (mesh.geometry.getAttribute("position")?.count ?? 0);
@@ -257,9 +257,10 @@ export function isDebris(mesh: THREE.Mesh, box: THREE.Box3): boolean {
   if (tris <= DEBRIS.alwaysHideAtOrBelow) return true;
 
   const size = box.getSize(new THREE.Vector3());
-  const [thin, median] = [size.x, size.y, size.z].sort((a, b) => a - b);
-  if (tris <= DEBRIS.maxTriangles) return median > DEBRIS.minSpan;
+  const [thin, median, largest] = [size.x, size.y, size.z].sort((a, b) => a - b);
 
-  // Призрак детали: объёмный габарит почти без геометрии
+  // Видимую площадь считаем по двум большим измерениям: у лоскута третье нулевое
+  if (tris / Math.max(median * largest, 1e-4) < DEBRIS.minDensity) return true;
+
   return tris < DEBRIS.ghostMaxTriangles && thin >= DEBRIS.ghostMinThickness;
 }
