@@ -207,6 +207,9 @@ def main():
         if tris > max_tris:
             ratio = max_tris / tris
             print(f"    децимация до {ratio:.4f} от исходного")
+            print(f"    {tris:,} треугольников — это молчание на несколько минут,")
+            print("    не прерывайте и не вводите ничего в это окно")
+            sys.stdout.flush()
             decimate(ratio)
             print(f"    треугольников после децимации: {scene_tris()}")
 
