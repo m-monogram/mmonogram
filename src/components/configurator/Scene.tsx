@@ -334,10 +334,14 @@ function useRadialShadowTexture() {
     c.width = 512;
     c.height = 512;
     const ctx = c.getContext("2d")!;
-    const g = ctx.createRadialGradient(256, 256, 42, 256, 256, 256);
-    g.addColorStop(0, "rgba(0,0,0,0.62)");
-    g.addColorStop(0.34, "rgba(0,0,0,0.3)");
-    g.addColorStop(0.72, "rgba(0,0,0,0.08)");
+    /* Ядро держим плотным и коротким: на светлом полу растянутый на девять
+       метров полупрозрачный круг не читался тенью вовсе — машина висела в
+       воздухе. Тень должна лежать под кузовом, а не заливать площадку. */
+    const g = ctx.createRadialGradient(256, 256, 20, 256, 256, 256);
+    g.addColorStop(0, "rgba(0,0,0,0.78)");
+    g.addColorStop(0.26, "rgba(0,0,0,0.52)");
+    g.addColorStop(0.58, "rgba(0,0,0,0.16)");
+    g.addColorStop(0.84, "rgba(0,0,0,0.03)");
     g.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, 512, 512);
@@ -354,12 +358,14 @@ function SoftGroundShadow({ night, interior }: { night: boolean; interior: boole
   const shadow = useRadialShadowTexture();
   if (interior) return null;
   return (
-    <mesh position={[0, 0.018, 0]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={-1}>
-      <circleGeometry args={[4.8, 96]} />
+    /* Сжимаем круг по ширине: машина вчетверо длиннее, чем широка, и круглая
+       тень выпирала из-под порогов как блин. */
+    <mesh position={[0, 0.018, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={[1, 0.62, 1]} renderOrder={-1}>
+      <circleGeometry args={[3.9, 96]} />
       <meshBasicMaterial
         map={shadow}
         transparent
-        opacity={night ? 0.58 : 0.5}
+        opacity={night ? 0.58 : 0.66}
         depthWrite={false}
         toneMapped={false}
       />
@@ -376,7 +382,10 @@ function SoftGroundShadow({ night, interior }: { night: boolean; interior: boole
 function SceneEnvironment({ night, isMobile }: { night: boolean; isMobile: boolean }) {
   return (
     <Environment resolution={isMobile ? 256 : 512} frames={1}>
-      <color attach="background" args={[night ? "#08090a" : "#3a3d40"]} />
+      {/* Фон кубкарты — то, что отражается в лаке. Днём студия светлая, и на
+          тёмно-сером борта чёрной машины оставались без отражений: кузов
+          читался плоским силуэтом. */}
+      <color attach="background" args={[night ? "#08090a" : "#5c6165"]} />
       {night ? (
         <>
           {[-5.4, 0, 5.4].map((z) => (
@@ -415,7 +424,7 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
   const interior = isInteriorFocus(safeFocus);
   const controls = useRef<OrbitControlsImpl>(null);
   const flightRef = useRef<FlightState | null>(null);
-  const bg = config.night ? "#08090a" : "#c7cbce";
+  const bg = config.night ? "#08090a" : "#d5d8db";
   const enablePostEffects = !isMobile && !reducedMotion && !interior;
 
   return (

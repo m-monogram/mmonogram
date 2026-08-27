@@ -155,7 +155,7 @@ export const DEFAULT_CONFIG: BuildConfig = {
   kit: true,
   carbon: true,
   lights: true,
-  night: true,
+  night: false,
   grille: 0,
   interior: 0,
   doors: false,
