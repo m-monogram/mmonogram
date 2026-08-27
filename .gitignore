@@ -35,6 +35,10 @@ dist-ssr
 .env.local
 .env.*.local
 
+# Выгрузка содержимого Supabase (scripts/supabase-transfer.mjs): в ней лежат
+# заявки клиентов с телефонами — в репозиторий это не кладётся.
+supabase-dump/
+
 # Lovable/L5e runtime asset cache — not source of truth
 public/__l5e
 src/assets/**/*.asset.json
