@@ -161,7 +161,7 @@ export function getListingProjects<T extends { id: string; slug?: string; editio
 export const projects: Project[] = [
   {
     id: "g3-iconic",
-    title: "G-Wagen",
+    title: "ICONIC",
     subtitle: "Black Edition",
     year: "2024",
     duration: "12 weeks",
@@ -170,10 +170,10 @@ export const projects: Project[] = [
     coverImage: g3Black,
     isHub: true,
     images: [{ src: g3Black, title: "Black edition" }],
-    description: "An ultra-limited G-Class transformation in three exclusive editions — Black, Gold and Grey.",
+    description: "An ultra-limited G-Class transformation in three exclusive packages — Black, Gold and Silver.",
     modifications: [
       "M Monogram exterior identity package",
-      "Three exclusive editions: Black, Gold, Grey",
+      "Three exclusive packages: Black, Gold, Silver",
     ],
     specs: {
       exterior: "Three exclusive finishes",
@@ -187,7 +187,7 @@ export const projects: Project[] = [
   {
     id: "g3-iconic-black",
     editionOf: "g3-iconic",
-    title: "Black",
+    title: "Black Package",
     subtitle: "ICONIC",
     year: "2024",
     duration: "12 weeks",
@@ -202,7 +202,7 @@ export const projects: Project[] = [
       { src: g3BlackSide, title: "Side profile" },
       { src: g3BlackRear, title: "Rear three-quarter" },
     ],
-    description: "Black Edition — a pure dark signature. Discreet, aggressive and uncompromising, with a commanding collector-level presence.",
+    description: "Black Package — a pure dark signature. Discreet, aggressive and uncompromising, with a commanding collector-level presence.",
     modifications: [
       "M Monogram exterior identity package",
       "Full stealth black-out: grille, trim and wheels",
@@ -221,7 +221,7 @@ export const projects: Project[] = [
   {
     id: "g3-iconic-gold",
     editionOf: "g3-iconic",
-    title: "Gold",
+    title: "Gold Package",
     subtitle: "ICONIC",
     year: "2024",
     duration: "12 weeks",
@@ -241,7 +241,7 @@ export const projects: Project[] = [
       { src: g3GoldCabin, title: "Rear cabin & door detail" },
       { src: g3GoldRearSeats, title: "Rear seats" },
     ],
-    description: "Gold Edition — a bold black-and-gold statement for those who choose visibility, power and ultimate luxury.",
+    description: "Gold Package — a bold black-and-gold statement for those who choose visibility, power and ultimate luxury.",
     modifications: [
       "M Monogram exterior identity package",
       "24K gold-accented forged wheels",
@@ -261,7 +261,7 @@ export const projects: Project[] = [
   {
     id: "g3-iconic-grey",
     editionOf: "g3-iconic",
-    title: "Grey",
+    title: "Silver Package",
     subtitle: "ICONIC",
     year: "2024",
     duration: "12 weeks",
@@ -275,7 +275,7 @@ export const projects: Project[] = [
       { src: greyDetail, title: "Front detail" },
       { src: greyOverhead, title: "Overhead front" },
     ],
-    description: "Grey Edition — a refined monochrome interpretation with a sharper, colder and more futuristic character.",
+    description: "Silver Package — a refined monochrome interpretation with a sharper, colder and more futuristic character.",
     modifications: [
       "M Monogram exterior identity package",
       "Maybach-style chrome grille",
@@ -283,7 +283,7 @@ export const projects: Project[] = [
       "24'' forged chrome wheels",
     ],
     specs: {
-      exterior: "Graphite Grey / chrome",
+      exterior: "Graphite Silver / chrome",
       interior: "Black Nappa, silver accents",
       carbon: "Dark carbon detailing",
       spoilers: "Integrated roof spoiler",

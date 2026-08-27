@@ -7,10 +7,11 @@
  * значит, что каждая страница объявляет каноническим адрес на чужом домене:
  * такие страницы выпадают из индекса.
  *
- * Домен задаётся переменной VITE_SITE_URL при сборке. Значение по умолчанию
- * совпадает с тем, что уже стоит в robots.txt и sitemap.xml.
+ * Домен задаётся переменной VITE_SITE_URL при сборке. По умолчанию — боевой
+ * домен mmonogram.com, на который смотрит Vercel: служебный адрес вида
+ * *.vercel.app каноническим быть не должен, иначе в индекс попадёт он.
  */
-const FALLBACK_SITE_URL = "https://mmonogram.lovable.app";
+const FALLBACK_SITE_URL = "https://mmonogram.com";
 
 const configured = (import.meta.env.VITE_SITE_URL as string | undefined)?.trim();
 
