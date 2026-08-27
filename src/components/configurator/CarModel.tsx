@@ -31,8 +31,9 @@ class ModelBoundary extends Component<{ children: ReactNode; fallback: ReactNode
 
 export default function CarModel({ config, doorsOpen = false }: { config: BuildConfig; doorsOpen?: boolean }) {
   const placeholder = <GClassModel config={config} doorsOpen={doorsOpen} />;
+  const interactiveOpenings = doorsOpen || config.doors || config.hood || config.trunk;
 
-  if (doorsOpen && config.model === DEFAULT_CAR) return placeholder;
+  if (interactiveOpenings && config.model === DEFAULT_CAR) return placeholder;
 
   return (
     <ModelBoundary fallback={placeholder}>

@@ -1,10 +1,10 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, type ReactNode } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
 import Interior from "./Interior";
 import { CABIN_BELT_Y, CABIN_FLOOR_Y, CABIN_FRONT_X, CABIN_REAR_X } from "./cabin";
-import { BuildConfig, PAINTS, RIM_FINISHES } from "./config";
+import { BuildConfig, CALIPER_FINISHES, PAINTS, RIM_FINISHES } from "./config";
 
 /* Стойки стоят по краю остекления (оно доходит до z = ±0.82) */
 const PILLAR_Z = 0.83;
@@ -125,10 +125,12 @@ interface WheelProps {
   position: [number, number, number];
   design: number;
   finishIdx: number;
+  caliperIdx: number;
 }
 
-function Wheel({ position, design, finishIdx }: WheelProps) {
+function Wheel({ position, design, finishIdx, caliperIdx }: WheelProps) {
   const finish = RIM_FINISHES[finishIdx];
+  const caliper = CALIPER_FINISHES[caliperIdx] ?? CALIPER_FINISHES[0];
   const rimMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
@@ -137,6 +139,10 @@ function Wheel({ position, design, finishIdx }: WheelProps) {
         roughness: finish.roughness,
       }),
     [finish]
+  );
+  const caliperMat = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: caliper.color, metalness: 0.42, roughness: 0.36 }),
+    [caliper]
   );
 
   const spokes = useMemo(() => {
@@ -149,6 +155,10 @@ function Wheel({ position, design, finishIdx }: WheelProps) {
         arr.push({ rot: base - 0.15, tilt: 0.24 });
         arr.push({ rot: base + 0.15, tilt: -0.24 });
       }
+    } else if (design === 3) {
+      for (let i = 0; i < 10; i++) arr.push({ rot: (i / 10) * Math.PI * 2, tilt: 0.42 });
+    } else if (design === 4) {
+      for (let i = 0; i < 18; i++) arr.push({ rot: (i / 18) * Math.PI * 2, tilt: i % 2 ? -0.18 : 0.18 });
     }
     return arr;
   }, [design]);
@@ -177,9 +187,8 @@ function Wheel({ position, design, finishIdx }: WheelProps) {
       <mesh material={CHROME} position={[0, 0.05, 0]}>
         <cylinderGeometry args={[0.24, 0.24, 0.025, 40]} />
       </mesh>
-      <mesh position={[0.24, 0.065, 0.1]} rotation={[0, 0.45, 0]}>
+      <mesh position={[0.24, 0.065, 0.1]} rotation={[0, 0.45, 0]} material={caliperMat}>
         <boxGeometry args={[0.13, 0.06, 0.1]} />
-        <meshStandardMaterial color="#7a1616" metalness={0.4} roughness={0.4} />
       </mesh>
       {/* Обод и внешняя губа */}
       <mesh material={rimMat} position={[0, 0.04, 0]}>
@@ -190,9 +199,9 @@ function Wheel({ position, design, finishIdx }: WheelProps) {
       </mesh>
       {/* Тарелка монолитного диска — у самого устья обода: в глубине бочонка
           дизайн съедали AO и тень, и любой диск выглядел чёрным блином */}
-      {design === 0 && (
+      {(design === 0 || design === 4) && (
         <mesh material={rimMat} position={[0, 0.15, 0]}>
-          <cylinderGeometry args={[0.35, 0.35, 0.05, 48]} />
+          <cylinderGeometry args={[design === 4 ? 0.31 : 0.35, design === 4 ? 0.31 : 0.35, 0.05, 48]} />
         </mesh>
       )}
       {holes.map((a, i) => (
@@ -232,7 +241,7 @@ function Door({
 }) {
   const ref = useRef<THREE.Group>(null);
   const { invalidate } = useThree();
-  const target = open ? -side * spec.angle : 0;
+  const target = open ? side * spec.angle : 0;
 
   useFrame(() => {
     const group = ref.current;
@@ -302,6 +311,46 @@ function DoorAperture({ side }: { side: 1 | -1 }) {
   );
 }
 
+function OpeningPanel({
+  open,
+  target,
+  children,
+  position,
+}: {
+  open: boolean;
+  target: [number, number, number];
+  children: ReactNode;
+  position: [number, number, number];
+}) {
+  const ref = useRef<THREE.Group>(null);
+  const { invalidate } = useThree();
+
+  useFrame(() => {
+    const group = ref.current;
+    if (!group) return;
+    const tx = open ? target[0] : 0;
+    const ty = open ? target[1] : 0;
+    const tz = open ? target[2] : 0;
+    const nx = THREE.MathUtils.damp(group.rotation.x, tx, 7.2, 1 / 60);
+    const ny = THREE.MathUtils.damp(group.rotation.y, ty, 7.2, 1 / 60);
+    const nz = THREE.MathUtils.damp(group.rotation.z, tz, 7.2, 1 / 60);
+    if (
+      Math.abs(nx - group.rotation.x) > 0.0005 ||
+      Math.abs(ny - group.rotation.y) > 0.0005 ||
+      Math.abs(nz - group.rotation.z) > 0.0005
+    ) {
+      group.rotation.set(nx, ny, nz);
+      invalidate();
+    }
+  });
+
+  return (
+    <group ref={ref} position={position}>
+      {children}
+    </group>
+  );
+}
+
 const LEATHER_DOOR = new THREE.MeshPhysicalMaterial({
   color: "#171719",
   roughness: 0.62,
@@ -331,6 +380,9 @@ function HeadlightBeam({ z }: { z: number }) {
 
 export default function GClassModel({ config, doorsOpen = false }: { config: BuildConfig; doorsOpen?: boolean }) {
   const paint = PAINTS[config.paint];
+  const kitLevel = config.kitPackage;
+  const hasKit = kitLevel > 0 || config.kit;
+  const doorsActive = doorsOpen || config.doors;
   const bodyMat = useMemo(
     () =>
       new THREE.MeshPhysicalMaterial({
@@ -343,7 +395,7 @@ export default function GClassModel({ config, doorsOpen = false }: { config: Bui
     [paint]
   );
   const glassMat = useMemo(() => GLASS.clone(), []);
-  glassMat.opacity = doorsOpen ? 0.18 : 0.42;
+  glassMat.opacity = doorsActive ? 0.18 : 0.42;
   const accentMat = config.carbon ? CARBON : bodyMat;
   const bodyGeom = useBodyGeometry();
   const glassGeom = useGlassGeometry();
@@ -366,8 +418,8 @@ export default function GClassModel({ config, doorsOpen = false }: { config: Bui
       <mesh geometry={bodyGeom} material={bodyMat} castShadow receiveShadow />
 
       {[1, -1].map((side) => <DoorAperture key={`aperture-${side}`} side={side as 1 | -1} />)}
-      {[1, -1].map((side) => DOORS.map((spec) => <Door key={`${side}-${spec.id}`} side={side as 1 | -1} spec={spec} bodyMat={bodyMat} open={doorsOpen} />))}
-      <Interior />
+      {[1, -1].map((side) => DOORS.map((spec) => <Door key={`${side}-${spec.id}`} side={side as 1 | -1} spec={spec} bodyMat={bodyMat} open={doorsActive} />))}
+      <Interior finishIdx={config.interior} />
       <mesh geometry={glassGeom} material={glassMat} renderOrder={2} />
 
       {/* Крыша */}
@@ -388,18 +440,20 @@ export default function GClassModel({ config, doorsOpen = false }: { config: Bui
       ))}
 
       {/* Капот-«ракушка» — шире кузова, фирменная черта G-Class */}
-      <RoundedBox args={[1.44, 0.05, 1.88]} radius={0.02} position={[1.62, 1.11, 0]} material={accentMat} castShadow />
-      <mesh material={TRIM} position={[1.6, 1.145, 0]}>
-        <boxGeometry args={[1.12, 0.012, 0.018]} />
-      </mesh>
-      {[0.62, -0.62].map((z) => (
-        <mesh key={`hood-line-${z}`} material={TRIM} position={[1.6, 1.148, z]}>
-          <boxGeometry args={[1.08, 0.012, 0.014]} />
+      <OpeningPanel open={config.hood} target={[-0.72, 0, 0]} position={[0.94, 1.06, 0]}>
+        <RoundedBox args={[1.44, 0.05, 1.88]} radius={0.02} position={[0.68, 0.05, 0]} material={accentMat} castShadow />
+        <mesh material={TRIM} position={[0.66, 0.085, 0]}>
+          <boxGeometry args={[1.12, 0.012, 0.018]} />
         </mesh>
-      ))}
-      {config.kit && (
-        <RoundedBox args={[0.6, 0.07, 0.55]} radius={0.02} position={[1.55, 1.14, 0]} material={CARBON} />
-      )}
+        {[0.62, -0.62].map((z) => (
+          <mesh key={`hood-line-${z}`} material={TRIM} position={[0.66, 0.088, z]}>
+            <boxGeometry args={[1.08, 0.012, 0.014]} />
+          </mesh>
+        ))}
+        {hasKit && (
+          <RoundedBox args={[0.6, 0.07, 0.55]} radius={0.02} position={[0.61, 0.08, 0]} material={CARBON} />
+        )}
+      </OpeningPanel>
 
       {/* Поворотники на крыльях — фирменная черта */}
       {[0.79, -0.79].map((z) => (
@@ -437,8 +491,9 @@ export default function GClassModel({ config, doorsOpen = false }: { config: Bui
       {config.lights && [0.66, -0.66].map((z) => <HeadlightBeam key={z} z={z} />)}
 
       {/* Передний бампер */}
-      <RoundedBox args={[0.3, 0.3, 1.86]} radius={0.05} position={[2.42, 0.44, 0]} material={config.kit ? accentMat : TRIM} castShadow />
-      {config.kit && <RoundedBox args={[0.24, 0.09, 1.66]} radius={0.03} position={[2.52, 0.26, 0]} material={CARBON} />}
+      <RoundedBox args={[0.3, 0.3, 1.86]} radius={0.05} position={[2.42, 0.44, 0]} material={hasKit ? accentMat : TRIM} castShadow />
+      {hasKit && <RoundedBox args={[0.24, 0.09, 1.66]} radius={0.03} position={[2.52, 0.26, 0]} material={CARBON} />}
+      {kitLevel >= 2 && <RoundedBox args={[0.18, 0.06, 1.42]} radius={0.025} position={[2.57, 0.68, 0]} material={CARBON} />}
       <mesh material={TRIM} position={[2.575, 0.52, 0]}>
         <boxGeometry args={[0.035, 0.06, 1.22]} />
       </mesh>
@@ -448,22 +503,22 @@ export default function GClassModel({ config, doorsOpen = false }: { config: Bui
         [1, -1].map((side) => (
           <mesh
             key={`${x}${side}`}
-            position={[x, 0.42, side * (config.kit ? 0.97 : 0.94)]}
-            material={config.kit ? accentMat : bodyMat}
+            position={[x, 0.42, side * (hasKit ? 0.97 : 0.94)]}
+            material={hasKit ? accentMat : bodyMat}
             castShadow
           >
-            <torusGeometry args={[config.kit ? 0.65 : 0.62, config.kit ? 0.075 : 0.05, 10, 32, Math.PI]} />
+            <torusGeometry args={[hasKit ? 0.65 : 0.62, hasKit ? 0.075 : 0.05, 10, 32, Math.PI]} />
           </mesh>
         ))
       )}
 
       {/* Пороги / подножки */}
       {[1, -1].map((side) => (
-        <RoundedBox key={side} args={[2.35, 0.08, 0.22]} radius={0.03} position={[-0.13, 0.34, side * 1.01]} material={config.kit ? CARBON : TRIM} />
+        <RoundedBox key={side} args={[2.35, 0.08, 0.22]} radius={0.03} position={[-0.13, 0.34, side * 1.01]} material={hasKit ? CARBON : TRIM} />
       ))}
 
       {/* Кит: боковые выхлопы перед задними арками, как у G63 */}
-      {config.kit &&
+      {hasKit &&
         [1, -1].map((side) =>
           [-0.62, -0.82].map((x) => (
             <mesh key={`${side}${x}`} material={CHROME} position={[x, 0.4, side * 1.0]} rotation={[Math.PI / 2, 0, 0]}>
@@ -471,7 +526,7 @@ export default function GClassModel({ config, doorsOpen = false }: { config: Bui
             </mesh>
           ))
         )}
-      {!config.kit &&
+      {!hasKit &&
         [0.45, -0.45].map((z) => (
           <mesh key={z} material={TRIM} position={[-2.48, 0.34, z]} rotation={[0, 0, Math.PI / 2]}>
             <cylinderGeometry args={[0.05, 0.05, 0.14, 20]} />
@@ -479,7 +534,7 @@ export default function GClassModel({ config, doorsOpen = false }: { config: Bui
         ))}
 
       {/* Кит: LED-козырёк на крыше */}
-      {config.kit && (
+      {hasKit && (
         <>
           <RoundedBox args={[0.16, 0.1, 1.56]} radius={0.03} position={[0.5, 1.92, 0]} material={CARBON} />
           {config.lights &&
@@ -490,10 +545,15 @@ export default function GClassModel({ config, doorsOpen = false }: { config: Bui
             ))}
         </>
       )}
+      {kitLevel >= 3 && (
+        <RoundedBox args={[1.1, 0.08, 1.3]} radius={0.035} position={[-1.12, 1.98, 0]} material={CARBON} />
+      )}
 
       {/* Задний бампер, запаска, фонари */}
-      <RoundedBox args={[0.045, 1.08, 1.18]} radius={0.02} position={[-2.505, 0.97, 0]} material={SHADOW_GAP} />
-      <RoundedBox args={[0.26, 0.3, 1.86]} radius={0.05} position={[-2.44, 0.44, 0]} material={config.kit ? accentMat : TRIM} />
+      <OpeningPanel open={config.trunk} target={[0, 0.76, 0]} position={[-2.5, 0.42, 0]}>
+        <RoundedBox args={[0.045, 1.08, 1.18]} radius={0.02} position={[-0.005, 0.55, 0]} material={SHADOW_GAP} />
+      </OpeningPanel>
+      <RoundedBox args={[0.26, 0.3, 1.86]} radius={0.05} position={[-2.44, 0.44, 0]} material={hasKit ? accentMat : TRIM} />
       <group position={[-2.6, 0.95, 0]} rotation={[0, 0, Math.PI / 2]}>
         <mesh material={TIRE}>
           <cylinderGeometry args={[0.4, 0.4, 0.24, 40]} />
@@ -517,7 +577,7 @@ export default function GClassModel({ config, doorsOpen = false }: { config: Bui
       ))}
 
       {/* Дверные ручки */}
-      {!doorsOpen &&
+      {!doorsActive &&
         [0.32, -0.72].map((x) =>
           [0.925, -0.925].map((z) => (
             <RoundedBox key={`${x}${z}`} args={[0.22, 0.045, 0.035]} radius={0.015} position={[x, 1.04, z]} material={CHROME} />
@@ -525,7 +585,7 @@ export default function GClassModel({ config, doorsOpen = false }: { config: Bui
         )}
 
       {/* Швы дверей — тонкие тёмные линии по борту */}
-      {!doorsOpen && [0.78, -0.12, -1.02].map((x) =>
+      {!doorsActive && [0.78, -0.12, -1.02].map((x) =>
         [0.948, -0.948].map((z) => (
           <mesh key={`seam${x}${z}`} material={TRIM} position={[x, 0.8, z]}>
             <boxGeometry args={[0.014, 0.72, 0.012]} />
@@ -543,10 +603,10 @@ export default function GClassModel({ config, doorsOpen = false }: { config: Bui
       ))}
 
       {/* Колёса — внутри арок */}
-      <Wheel position={[WHEEL_X, WHEEL_Y, WHEEL_Z]} design={config.rim} finishIdx={config.rimFinish} />
-      <Wheel position={[WHEEL_X, WHEEL_Y, -WHEEL_Z]} design={config.rim} finishIdx={config.rimFinish} />
-      <Wheel position={[-WHEEL_X, WHEEL_Y, WHEEL_Z]} design={config.rim} finishIdx={config.rimFinish} />
-      <Wheel position={[-WHEEL_X, WHEEL_Y, -WHEEL_Z]} design={config.rim} finishIdx={config.rimFinish} />
+      <Wheel position={[WHEEL_X, WHEEL_Y, WHEEL_Z]} design={config.rim} finishIdx={config.rimFinish} caliperIdx={config.caliper} />
+      <Wheel position={[WHEEL_X, WHEEL_Y, -WHEEL_Z]} design={config.rim} finishIdx={config.rimFinish} caliperIdx={config.caliper} />
+      <Wheel position={[-WHEEL_X, WHEEL_Y, WHEEL_Z]} design={config.rim} finishIdx={config.rimFinish} caliperIdx={config.caliper} />
+      <Wheel position={[-WHEEL_X, WHEEL_Y, -WHEEL_Z]} design={config.rim} finishIdx={config.rimFinish} caliperIdx={config.caliper} />
     </group>
   );
 }

@@ -2,7 +2,7 @@ import { Component, Suspense, useCallback, useLayoutEffect, useMemo, useState, t
 import { useGLTF } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { BuildConfig, GRILLE_FINISHES, PAINTS, RIM_FINISHES } from "./config";
+import { BuildConfig, GRILLE_FINISHES, INTERIOR_FINISHES, PAINTS, RIM_FINISHES } from "./config";
 import { CARS, DEFAULT_CAR, DRACO_PATH, ROLE_DEBUG_COLORS, type FileRole, type PartRole } from "./models";
 import {
   cabinDashAtMax,
@@ -171,6 +171,7 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
     const paint = PAINTS[config.paint];
     const finish = RIM_FINISHES[config.rimFinish];
     const grille = GRILLE_FINISHES[config.grille];
+    const interior = INTERIOR_FINISHES[config.interior] ?? INTERIOR_FINISHES[0];
     return {
       body: new THREE.MeshPhysicalMaterial({
         color: paint.color,
@@ -254,13 +255,13 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
          Clearcoat не возвращаю: лаковый слой зеркалит окружение белым
          бликом поверх базы, а кожа лаком не покрыта. */
       cabinLeather: new THREE.MeshStandardMaterial({
-        color: "#241f1e",
+        color: interior.primary,
         metalness: 0,
         roughness: 0.78,
         envMapIntensity: 0.12,
       }),
       cabinAccent: new THREE.MeshStandardMaterial({
-        color: "#4a231c",
+        color: interior.accent,
         metalness: 0,
         // Матовая кожа: при меньшей шероховатости плафоны кладут широкий
         // белёсый блик, и бордо серело до пыльно-розового
@@ -286,7 +287,7 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
       cabinFloor: new THREE.MeshStandardMaterial({ color: "#0e0c0c", metalness: 0, roughness: 0.96, envMapIntensity: 0.05 }),
       cabinRoof: new THREE.MeshStandardMaterial({ color: "#141312", metalness: 0, roughness: 0.9, envMapIntensity: 0.05 }),
     };
-  }, [debugRoles, config.paint, config.rimFinish, config.grille, config.carbon, config.lights]);
+  }, [debugRoles, config.paint, config.rimFinish, config.grille, config.carbon, config.lights, config.interior]);
 
   useLayoutEffect(() => () => Object.values(materials).forEach((m) => m.dispose()), [materials]);
 
@@ -302,9 +303,9 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
   }, []);
 
   const groundOffset = useMemo(() => {
-    const active = Object.entries(grounds).filter(([url]) => url !== car.files.kit || config.kit);
+    const active = Object.entries(grounds).filter(([url]) => url !== car.files.kit || config.kitPackage > 0 || config.kit);
     return active.length ? -Math.min(...active.map(([, y]) => y)) : 0;
-  }, [grounds, config.kit, car.files.kit]);
+  }, [grounds, config.kit, config.kitPackage, car.files.kit]);
 
   // frameloop="demand": без явного запроса сдвиг пола не попал бы в кадр
   const invalidate = useThree((s) => s.invalidate);
@@ -329,7 +330,7 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
             fit={fit}
             kind="exterior"
             materials={materials}
-            visible={config.kit}
+            visible={config.kitPackage > 0 || config.kit}
             onGround={reportGround}
           />
         </OptionalBoundary>

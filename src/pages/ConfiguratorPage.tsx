@@ -6,12 +6,16 @@ import {
   Car,
   Check,
   ClipboardList,
+  DollarSign,
+  DoorOpen,
   Disc3,
   Gem,
   Lightbulb,
   Maximize2,
+  Package,
   Palette,
   RotateCcw,
+  Save,
   Share2,
   Sparkles,
   SunMoon,
@@ -22,13 +26,17 @@ import SEOHead from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   BuildConfig,
+  CALIPER_FINISHES,
   DEFAULT_CONFIG,
   GRILLE_FINISHES,
+  INTERIOR_FINISHES,
+  KIT_PACKAGES,
   PAINTS,
   RIM_DESIGNS,
   RIM_FINISHES,
   decodeConfig,
   encodeConfig,
+  getBuildPrice,
   type CameraFocus,
 } from "@/components/configurator/config";
 import SceneErrorBoundary from "@/components/configurator/SceneErrorBoundary";
@@ -47,13 +55,26 @@ const FINISH_PREVIEWS = Object.values(
   import.meta.glob("@/assets/previews/finish-*.jpg", { eager: true, import: "default" })
 ) as string[];
 
-type StudioSection = "model" | "exterior" | "wheels" | "kit" | "carbon" | "lights" | "env" | "interior" | "overview";
+type StudioSection =
+  | "model"
+  | "exterior"
+  | "wheels"
+  | "calipers"
+  | "kit"
+  | "carbon"
+  | "openings"
+  | "lights"
+  | "env"
+  | "interior"
+  | "overview";
 
 const SECTION_FOCUS: Partial<Record<StudioSection, CameraFocus>> = {
   exterior: "exterior",
   wheels: "wheels",
+  calipers: "wheels",
   kit: "kit",
   carbon: "carbon",
+  openings: "kit",
   lights: "lights",
   env: "env",
 };
@@ -149,6 +170,7 @@ const ConfiguratorPage = () => {
   const [config, setConfig] = useState<BuildConfig>(() => decodeConfig(searchParams.get("c")));
   const [activeSection, setActiveSection] = useState<StudioSection>("exterior");
   const [copied, setCopied] = useState(false);
+  const [savedFlash, setSavedFlash] = useState(false);
   const [focus, setFocus] = useState<CameraFocus>(() => {
     const v = searchParams.get("v");
     const allowed: CameraFocus[] = [
@@ -188,6 +210,22 @@ const ConfiguratorPage = () => {
     window.setTimeout(() => setCopied(false), 1800);
   }, [config]);
 
+  const price = getBuildPrice(config);
+  const formattedPrice = useMemo(
+    () => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(price),
+    [price]
+  );
+
+  const handleSave = useCallback(() => {
+    const saved = JSON.parse(localStorage.getItem("mmonogram-builds") ?? "[]") as Array<{ code: string; savedAt: string; price: number }>;
+    const code = encodeConfig(config);
+    const next = [{ code, savedAt: new Date().toISOString(), price }, ...saved.filter((item) => item.code !== code)].slice(0, 12);
+    localStorage.setItem("mmonogram-builds", JSON.stringify(next));
+    handleChange({ ...config, saved: true });
+    setSavedFlash(true);
+    window.setTimeout(() => setSavedFlash(false), 1800);
+  }, [config, handleChange, price]);
+
   const handleScreenshot = useCallback(() => {
     const canvas = document.querySelector<HTMLCanvasElement>("#configurator-canvas canvas");
     if (!canvas) return;
@@ -213,11 +251,13 @@ const ConfiguratorPage = () => {
       { id: "model" as const, label: t("config.model"), value: CARS[config.model].name, icon: Car },
       { id: "exterior" as const, label: t("config.exterior"), value: PAINTS[config.paint].name, icon: Palette },
       { id: "wheels" as const, label: t("config.rims"), value: RIM_DESIGNS[config.rim].name, icon: Disc3 },
-      { id: "kit" as const, label: t("config.kit"), value: config.kit ? t("config.kitMM") : t("config.kitStandard"), icon: Car },
+      { id: "calipers" as const, label: "Calipers", value: CALIPER_FINISHES[config.caliper].name, icon: Disc3 },
+      { id: "kit" as const, label: t("config.kit"), value: KIT_PACKAGES[config.kitPackage].name, icon: Package },
       { id: "carbon" as const, label: t("config.carbon"), value: config.carbon ? t("config.carbonOn") : t("config.carbonOff"), icon: Gem },
+      { id: "openings" as const, label: "Openings", value: [config.doors && "Doors", config.hood && "Hood", config.trunk && "Trunk"].filter(Boolean).join(" · ") || "Closed", icon: DoorOpen },
       { id: "lights" as const, label: t("config.lights"), value: config.lights ? t("config.lightsOn") : t("config.lightsOff"), icon: Lightbulb },
       { id: "env" as const, label: t("config.environment"), value: config.night ? t("config.envNight") : t("config.envStudio"), icon: SunMoon },
-      { id: "interior" as const, label: t("config.interior"), value: t("config.interiorDriver"), icon: Armchair },
+      { id: "interior" as const, label: t("config.interior"), value: INTERIOR_FINISHES[config.interior].name, icon: Armchair },
       { id: "overview" as const, label: t("config.overview"), value: "", icon: ClipboardList },
     ],
     [config, t]
@@ -227,10 +267,14 @@ const ConfiguratorPage = () => {
     { label: t("config.model"), value: CARS[config.model].name },
     { label: t("config.exterior"), value: `${PAINTS[config.paint].name} · ${GRILLE_FINISHES[config.grille].name}` },
     { label: t("config.rims"), value: `${RIM_DESIGNS[config.rim].name} · ${RIM_FINISHES[config.rimFinish].name}` },
-    { label: t("config.kit"), value: config.kit ? t("config.kitMM") : t("config.kitStandard") },
+    { label: "Calipers", value: CALIPER_FINISHES[config.caliper].name },
+    { label: t("config.kit"), value: KIT_PACKAGES[config.kitPackage].name },
     { label: t("config.carbon"), value: config.carbon ? t("config.carbonOn") : t("config.carbonOff") },
     { label: t("config.lights"), value: config.lights ? t("config.lightsOn") : t("config.lightsOff") },
     { label: t("config.environment"), value: config.night ? t("config.envNight") : t("config.envStudio") },
+    { label: t("config.interior"), value: INTERIOR_FINISHES[config.interior].name },
+    { label: "Openings", value: [config.doors && "4 doors", config.hood && "hood", config.trunk && "trunk"].filter(Boolean).join(" · ") || "closed" },
+    { label: "Price", value: formattedPrice },
   ];
 
   const interiorViews: [InteriorView, string][] = [
@@ -272,6 +316,9 @@ const ConfiguratorPage = () => {
           <ToolbarButton label={t("config.screenshot")} onClick={handleScreenshot}>
             <Camera className="h-[18px] w-[18px]" />
           </ToolbarButton>
+          <ToolbarButton label={savedFlash || config.saved ? "Saved" : "Save car"} onClick={handleSave}>
+            {savedFlash || config.saved ? <Check className="h-[18px] w-[18px]" /> : <Save className="h-[18px] w-[18px]" />}
+          </ToolbarButton>
           <ToolbarButton label="Fullscreen" onClick={handleFullscreen}>
             <Maximize2 className="h-[18px] w-[18px]" />
           </ToolbarButton>
@@ -289,6 +336,11 @@ const ConfiguratorPage = () => {
         <p className="font-body text-[10px] uppercase tracking-[0.14em]">
           {t("config.demoNote")} · {CARS[config.model].name}
         </p>
+      </div>
+
+      <div className="pointer-events-none absolute bottom-[10.75rem] right-4 z-20 hidden md:flex items-center gap-2 rounded-md border border-white/10 bg-black/45 px-3 py-2 text-white/85 backdrop-blur-xl">
+        <DollarSign className="h-4 w-4 text-white/48" />
+        <span className="font-body text-[12px] uppercase tracking-[0.12em]">{formattedPrice}</span>
       </div>
 
       <motion.div
@@ -393,22 +445,37 @@ const ConfiguratorPage = () => {
               </>
             )}
 
+            {activeSection === "calipers" && (
+              <>
+                {CALIPER_FINISHES.map((caliper, index) => (
+                  <OptionCard
+                    key={caliper.id}
+                    selected={config.caliper === index}
+                    onClick={() => set({ caliper: index })}
+                    preview={<Swatch color={caliper.color} />}
+                    title={caliper.name}
+                    subtitle="Brake calipers"
+                  />
+                ))}
+              </>
+            )}
+
             {activeSection === "kit" && (
               <>
-                <OptionCard
-                  selected={!config.kit}
-                  onClick={() => set({ kit: false })}
-                  preview={<Car className="h-9 w-9" strokeWidth={1.4} />}
-                  title={t("config.kitStandard")}
-                  subtitle={t("config.kit")}
-                />
-                <OptionCard
-                  selected={config.kit}
-                  onClick={() => set({ kit: true })}
-                  preview={<Sparkles className="h-9 w-9" strokeWidth={1.4} />}
-                  title={t("config.kitMM")}
-                  subtitle={t("config.kit")}
-                />
+                {KIT_PACKAGES.map((pack, index) => (
+                  <OptionCard
+                    key={pack.id}
+                    selected={config.kitPackage === index}
+                    onClick={() => set({ kitPackage: index, kit: index > 0 })}
+                    preview={index === 0 ? <Car className="h-9 w-9" strokeWidth={1.4} /> : <Sparkles className="h-9 w-9" strokeWidth={1.4} />}
+                    title={pack.name}
+                    subtitle={
+                      index === 0
+                        ? "Stock version"
+                        : `+${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(pack.price)}`
+                    }
+                  />
+                ))}
               </>
             )}
 
@@ -427,6 +494,32 @@ const ConfiguratorPage = () => {
                   preview={<Swatch color="#15161a" />}
                   title={t("config.carbonOn")}
                   subtitle={t("config.carbon")}
+                />
+              </>
+            )}
+
+            {activeSection === "openings" && (
+              <>
+                <OptionCard
+                  selected={config.doors}
+                  onClick={() => set({ doors: !config.doors })}
+                  preview={<DoorOpen className="h-9 w-9" strokeWidth={1.35} />}
+                  title="Open 4 Doors"
+                  subtitle={config.doors ? "Open" : "Closed"}
+                />
+                <OptionCard
+                  selected={config.hood}
+                  onClick={() => set({ hood: !config.hood })}
+                  preview={<Car className="h-9 w-9" strokeWidth={1.35} />}
+                  title="Open Hood"
+                  subtitle={config.hood ? "Open" : "Closed"}
+                />
+                <OptionCard
+                  selected={config.trunk}
+                  onClick={() => set({ trunk: !config.trunk })}
+                  preview={<Package className="h-9 w-9" strokeWidth={1.35} />}
+                  title="Open Trunk"
+                  subtitle={config.trunk ? "Open" : "Closed"}
                 />
               </>
             )}
@@ -471,6 +564,25 @@ const ConfiguratorPage = () => {
 
             {activeSection === "interior" && (
               <>
+                {INTERIOR_FINISHES.map((finish, index) => (
+                  <OptionCard
+                    key={finish.id}
+                    selected={config.interior === index}
+                    onClick={() => set({ interior: index })}
+                    preview={
+                      <span className="flex">
+                        <Swatch color={finish.primary} className="relative z-10" />
+                        <Swatch color={finish.accent} className="-ml-4" />
+                      </span>
+                    }
+                    title={finish.name}
+                    subtitle={
+                      index === 0
+                        ? t("config.interior")
+                        : `+${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(finish.price)}`
+                    }
+                  />
+                ))}
                 {interiorViews.map(([view, label]) => (
                   <OptionCard
                     key={view}
@@ -491,8 +603,16 @@ const ConfiguratorPage = () => {
                   onClick={() => navigate(`/booking?build=${encodeConfig(config)}`)}
                   className="flex h-[116px] min-w-[210px] flex-col justify-center rounded-md bg-white px-5 text-left text-black transition-colors hover:bg-white/90"
                 >
-                  <span className="font-body text-[12px] uppercase tracking-[0.18em]">{t("config.book")}</span>
-                  <span className="mt-2 font-body text-[11px] text-black/48">{CARS[config.model].name}</span>
+                  <span className="font-body text-[12px] uppercase tracking-[0.18em]">Request this build</span>
+                  <span className="mt-2 font-body text-[11px] text-black/48">{formattedPrice}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  className="flex h-[116px] min-w-[188px] flex-col justify-center rounded-md border border-white/12 bg-black/35 px-5 text-left text-white transition-colors hover:border-white/35 hover:bg-white/[0.07]"
+                >
+                  <span className="font-body text-[12px] uppercase tracking-[0.18em]">{config.saved ? "Saved car" : "Save car"}</span>
+                  <span className="mt-2 font-body text-[11px] text-white/42">Local garage</span>
                 </button>
                 {overviewRows.map((row) => (
                   <div

@@ -2,6 +2,7 @@ import { memo, useLayoutEffect, useMemo, useRef } from "react";
 import { RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
 import { CABIN_BELT_Y, CABIN_FLOOR_Y, CABIN_LEN, CABIN_MID_X, CABIN_ROOF_Y, CABIN_SIDE_Z } from "./cabin";
+import { INTERIOR_FINISHES } from "./config";
 
 /**
  * Салон: торпедо, руль, приборка, сиденья, центральный тоннель, потолок
@@ -190,7 +191,16 @@ const STAR_MATERIAL = new THREE.MeshStandardMaterial({
   side: THREE.DoubleSide,
 });
 
-function Interior() {
+function Interior({ finishIdx = 0 }: { finishIdx?: number }) {
+  const finish = INTERIOR_FINISHES[finishIdx] ?? INTERIOR_FINISHES[0];
+
+  useLayoutEffect(() => {
+    LEATHER_DARK.color.set(finish.primary);
+    LEATHER_DEEP.color.set(finish.primary).lerp(new THREE.Color("#000000"), 0.28);
+    LEATHER.color.set(finish.accent);
+    ALCANTARA.color.set(finish.primary).lerp(new THREE.Color("#050506"), 0.45);
+  }, [finish]);
+
   /* «Звёздное небо» в потолке — точки распределены детерминированно */
   const stars = useMemo(() => {
     const pts: Array<{ position: [number, number, number]; scale: number }> = [];
