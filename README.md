@@ -190,7 +190,7 @@ npm run lint             # Проверка кода ESLint
 
 - **Телефон:** +971 54 507 7707, +971 4 228 4177
 - **Адрес:** Dubai, UAE
-- **Сайт:** https://m-monogram.com
+- **Сайт:** https://mmonogram.com
 
 ---
 
