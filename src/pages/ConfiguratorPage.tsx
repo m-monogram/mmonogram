@@ -1,29 +1,154 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { motion } from "framer-motion";
+import {
+  Armchair,
+  Camera,
+  Car,
+  Check,
+  ClipboardList,
+  Disc3,
+  Gem,
+  Lightbulb,
+  Maximize2,
+  Palette,
+  RotateCcw,
+  Share2,
+  Sparkles,
+  SunMoon,
+} from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   BuildConfig,
+  DEFAULT_CONFIG,
+  GRILLE_FINISHES,
+  PAINTS,
+  RIM_DESIGNS,
+  RIM_FINISHES,
   decodeConfig,
   encodeConfig,
   type CameraFocus,
 } from "@/components/configurator/config";
-import ConfigPanel from "@/components/configurator/ConfigPanel";
 import SceneErrorBoundary from "@/components/configurator/SceneErrorBoundary";
-import { CARS } from "@/components/configurator/models";
+import { CAR_IDS, CARS } from "@/components/configurator/models";
+import type { InteriorView } from "@/components/configurator/ConfigPanel";
 
-// three.js подтягивается только на этой странице — остальной сайт не тяжелеет
 const ConfiguratorScene = lazy(() => import("@/components/configurator/Scene"));
+
+const PAINT_PREVIEWS = Object.values(
+  import.meta.glob("@/assets/previews/paint-*.jpg", { eager: true, import: "default" })
+) as string[];
+const RIM_PREVIEWS = Object.values(
+  import.meta.glob("@/assets/previews/rim-*.jpg", { eager: true, import: "default" })
+) as string[];
+const FINISH_PREVIEWS = Object.values(
+  import.meta.glob("@/assets/previews/finish-*.jpg", { eager: true, import: "default" })
+) as string[];
+
+type StudioSection = "model" | "exterior" | "wheels" | "kit" | "carbon" | "lights" | "env" | "interior" | "overview";
+
+const SECTION_FOCUS: Partial<Record<StudioSection, CameraFocus>> = {
+  exterior: "exterior",
+  wheels: "wheels",
+  kit: "kit",
+  carbon: "carbon",
+  lights: "lights",
+  env: "env",
+};
+
+function Swatch({ color, className = "" }: { color: string; className?: string }) {
+  return (
+    <span
+      className={`block h-10 w-10 shrink-0 rounded-full ring-1 ring-white/20 ${className}`}
+      style={{ backgroundColor: color }}
+    />
+  );
+}
+
+function OptionCard({
+  selected,
+  onClick,
+  title,
+  subtitle,
+  preview,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  title: string;
+  subtitle?: string;
+  preview: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group relative flex h-[116px] min-w-[168px] max-w-[184px] flex-col justify-between overflow-hidden rounded-md border p-3 text-left transition-all duration-200 ${
+        selected
+          ? "border-white/70 bg-white/[0.12] shadow-[0_12px_34px_rgba(255,255,255,0.08)]"
+          : "border-white/12 bg-black/35 hover:border-white/35 hover:bg-white/[0.07]"
+      }`}
+    >
+      <span className="flex min-h-10 items-center gap-3 text-white/75">{preview}</span>
+      <span className="min-w-0">
+        <span className="block truncate font-body text-[13px] text-white">{title}</span>
+        {subtitle && (
+          <span className="mt-1 block truncate font-body text-[10px] uppercase tracking-[0.14em] text-white/38">
+            {subtitle}
+          </span>
+        )}
+      </span>
+      {selected && (
+        <span className="absolute right-2.5 top-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-white text-black">
+          <Check className="h-3.5 w-3.5" strokeWidth={2.4} />
+        </span>
+      )}
+    </button>
+  );
+}
+
+function PreviewImage({ src, alt, fallback }: { src?: string; alt: string; fallback: string }) {
+  if (!src) return <Swatch color={fallback} />;
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      className="h-12 w-[82px] shrink-0 rounded-md object-cover ring-1 ring-white/15"
+    />
+  );
+}
+
+function ToolbarButton({
+  label,
+  onClick,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={label}
+      aria-label={label}
+      className="flex h-10 w-10 items-center justify-center rounded-md border border-white/12 bg-black/55 text-white/80 shadow-[0_12px_34px_rgba(0,0,0,0.32)] backdrop-blur-xl transition-colors hover:border-white/36 hover:bg-white/12 hover:text-white"
+    >
+      {children}
+    </button>
+  );
+}
 
 const ConfiguratorPage = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [config, setConfig] = useState<BuildConfig>(() => decodeConfig(searchParams.get("c")));
-  /* ?v=wheels|kit|... — стартовый ракурс камеры. Используется генератором
-     превью опций (скриншоты с реальной модели) и удобен для прямых ссылок. */
+  const [activeSection, setActiveSection] = useState<StudioSection>("exterior");
+  const [copied, setCopied] = useState(false);
   const [focus, setFocus] = useState<CameraFocus>(() => {
     const v = searchParams.get("v");
     const allowed: CameraFocus[] = [
@@ -32,8 +157,6 @@ const ConfiguratorPage = () => {
     ];
     return v && (allowed as string[]).includes(v) ? (v as CameraFocus) : "default";
   });
-  // Меню скрыто по умолчанию — машина видна целиком, открывается стрелкой
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleChange = useCallback(
     (next: BuildConfig) => {
@@ -43,14 +166,78 @@ const ConfiguratorPage = () => {
     [setSearchParams]
   );
 
+  const set = useCallback((patch: Partial<BuildConfig>) => handleChange({ ...config, ...patch }), [config, handleChange]);
+
+  const chooseSection = useCallback((section: StudioSection) => {
+    setActiveSection(section);
+    setFocus(section === "interior" ? "interiorDriver" : SECTION_FOCUS[section] ?? "default");
+  }, []);
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, []);
 
-  const closeMenu = useCallback(() => {
-    setMenuOpen(false);
-    setFocus("default");
+  const handleShare = useCallback(async () => {
+    const url = `${location.origin}/configurator?c=${encodeConfig(config)}`;
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      /* Clipboard can be unavailable in some embedded contexts. */
+    }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1800);
+  }, [config]);
+
+  const handleScreenshot = useCallback(() => {
+    const canvas = document.querySelector<HTMLCanvasElement>("#configurator-canvas canvas");
+    if (!canvas) return;
+    const a = document.createElement("a");
+    a.href = canvas.toDataURL("image/png");
+    a.download = `m-monogram-build-${encodeConfig(config)}.png`;
+    a.click();
+  }, [config]);
+
+  const handleReset = useCallback(() => {
+    handleChange(DEFAULT_CONFIG);
+    chooseSection("exterior");
+  }, [chooseSection, handleChange]);
+
+  const handleFullscreen = useCallback(() => {
+    const root = document.documentElement;
+    if (!document.fullscreenElement) root.requestFullscreen?.();
+    else document.exitFullscreen?.();
   }, []);
+
+  const sections = useMemo(
+    () => [
+      { id: "model" as const, label: t("config.model"), value: CARS[config.model].name, icon: Car },
+      { id: "exterior" as const, label: t("config.exterior"), value: PAINTS[config.paint].name, icon: Palette },
+      { id: "wheels" as const, label: t("config.rims"), value: RIM_DESIGNS[config.rim].name, icon: Disc3 },
+      { id: "kit" as const, label: t("config.kit"), value: config.kit ? t("config.kitMM") : t("config.kitStandard"), icon: Car },
+      { id: "carbon" as const, label: t("config.carbon"), value: config.carbon ? t("config.carbonOn") : t("config.carbonOff"), icon: Gem },
+      { id: "lights" as const, label: t("config.lights"), value: config.lights ? t("config.lightsOn") : t("config.lightsOff"), icon: Lightbulb },
+      { id: "env" as const, label: t("config.environment"), value: config.night ? t("config.envNight") : t("config.envStudio"), icon: SunMoon },
+      { id: "interior" as const, label: t("config.interior"), value: t("config.interiorDriver"), icon: Armchair },
+      { id: "overview" as const, label: t("config.overview"), value: "", icon: ClipboardList },
+    ],
+    [config, t]
+  );
+
+  const overviewRows = [
+    { label: t("config.model"), value: CARS[config.model].name },
+    { label: t("config.exterior"), value: `${PAINTS[config.paint].name} · ${GRILLE_FINISHES[config.grille].name}` },
+    { label: t("config.rims"), value: `${RIM_DESIGNS[config.rim].name} · ${RIM_FINISHES[config.rimFinish].name}` },
+    { label: t("config.kit"), value: config.kit ? t("config.kitMM") : t("config.kitStandard") },
+    { label: t("config.carbon"), value: config.carbon ? t("config.carbonOn") : t("config.carbonOff") },
+    { label: t("config.lights"), value: config.lights ? t("config.lightsOn") : t("config.lightsOff") },
+    { label: t("config.environment"), value: config.night ? t("config.envNight") : t("config.envStudio") },
+  ];
+
+  const interiorViews: [InteriorView, string][] = [
+    ["interiorFront", t("config.interiorFront")],
+    ["interiorDriver", t("config.interiorDriver")],
+    ["interiorRear", t("config.interiorRear")],
+  ];
 
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden bg-premium-black">
@@ -65,7 +252,7 @@ const ConfiguratorPage = () => {
         <SceneErrorBoundary>
           <Suspense
             fallback={
-              <div className="w-full h-full flex items-center justify-center">
+              <div className="flex h-full w-full items-center justify-center">
                 <p className="font-display text-xs uppercase tracking-[0.3em] text-foreground/40 animate-pulse">
                   {t("hero.loading")}...
                 </p>
@@ -77,120 +264,250 @@ const ConfiguratorPage = () => {
         </SceneErrorBoundary>
       </div>
 
+      <div className="pointer-events-none absolute inset-x-0 top-[5.25rem] z-20 flex justify-center px-4 sm:top-[5.75rem]">
+        <div className="pointer-events-auto flex items-center gap-2">
+          <ToolbarButton label={copied ? t("config.shareCopied") : t("config.share")} onClick={handleShare}>
+            {copied ? <Check className="h-[18px] w-[18px]" /> : <Share2 className="h-[18px] w-[18px]" />}
+          </ToolbarButton>
+          <ToolbarButton label={t("config.screenshot")} onClick={handleScreenshot}>
+            <Camera className="h-[18px] w-[18px]" />
+          </ToolbarButton>
+          <ToolbarButton label="Fullscreen" onClick={handleFullscreen}>
+            <Maximize2 className="h-[18px] w-[18px]" />
+          </ToolbarButton>
+          <ToolbarButton label="Reset" onClick={handleReset}>
+            <RotateCcw className="h-[18px] w-[18px]" />
+          </ToolbarButton>
+        </div>
+      </div>
+
       <div
-        className={`absolute left-4 sm:left-6 md:left-12 bottom-4 z-20 pointer-events-none hidden md:block ${
+        className={`pointer-events-none absolute bottom-[10.75rem] left-4 z-20 hidden md:block ${
           config.night ? "text-white/40" : "text-black/40"
         }`}
       >
-        <p className="font-body text-[11px]">{t("config.hint")}</p>
-        <p className="font-body text-[10px] mt-1 opacity-70">
-          {t("config.demoNote")} — {CARS[config.model].name}
+        <p className="font-body text-[10px] uppercase tracking-[0.14em]">
+          {t("config.demoNote")} · {CARS[config.model].name}
         </p>
       </div>
 
-      {/* Стрелка открытия — справа, как в референсе Mansory */}
-      <AnimatePresence>
-        {!menuOpen && (
-          <motion.div
-            key="open-toggle"
-            initial={{ opacity: 0, x: 12 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 12 }}
-            transition={{ duration: 0.25 }}
-            className="absolute z-40 right-3 sm:right-5 top-[max(6.75rem,18%)] flex flex-col items-center gap-2"
-          >
-            <button
-              type="button"
-              onClick={() => setMenuOpen(true)}
-              aria-label={t("config.openMenu")}
-              className={`group relative flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-md shadow-lg transition-transform hover:scale-[1.04] active:scale-[0.98] cursor-pointer ${
-                config.night
-                  ? "bg-white text-black hover:bg-white/90"
-                  : "bg-[#ececec] text-black hover:bg-white border border-black/10"
-              }`}
-            >
-              <ChevronLeft className="w-5 h-5" strokeWidth={2.25} />
-            </button>
-            <span
-              className={`pointer-events-none hidden sm:block max-w-[7.5rem] text-center font-body text-[9px] uppercase tracking-[0.14em] leading-tight px-2 py-1.5 rounded-sm ${
-                config.night ? "bg-black/70 text-white/85" : "bg-[#1a1a1a]/85 text-white/90"
-              }`}
-            >
-              {t("config.openMenu")}
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <motion.div
+        initial={{ y: 38, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.38, ease: "easeOut" }}
+        className="absolute inset-x-0 bottom-0 z-30 border-t border-white/10 bg-[rgba(8,8,9,0.88)] shadow-[0_-22px_70px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
+      >
+        <div className="mx-auto w-full max-w-[1560px] px-3 pb-[max(0.8rem,env(safe-area-inset-bottom))] pt-3 sm:px-5">
+          <div className="no-scrollbar flex gap-2 overflow-x-auto pb-2">
+            {sections.map((item) => {
+              const Icon = item.icon;
+              const active = activeSection === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => chooseSection(item.id)}
+                  className={`flex h-[58px] min-w-[170px] items-center gap-2 rounded-md border px-3 text-left transition-all ${
+                    active
+                      ? "border-white/70 bg-white text-black"
+                      : "border-white/12 bg-white/[0.045] text-white hover:border-white/32 hover:bg-white/[0.08]"
+                  }`}
+                >
+                  <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.8} />
+                  <span className="min-w-0">
+                    <span className="block truncate font-body text-[12px] uppercase tracking-[0.12em]">{item.label}</span>
+                    {item.value && (
+                      <span className={`mt-0.5 block truncate font-body text-[10px] ${active ? "text-black/55" : "text-white/38"}`}>
+                        {item.value}
+                      </span>
+                    )}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
-      {/* Выезжающая панель конфигурации */}
-      <AnimatePresence>
-        {menuOpen && (
-          <>
-            {/* Лёгкий затемняющий слой только на мобиле */}
-            <motion.button
-              type="button"
-              tabIndex={-1}
-              aria-label={t("config.closeMenu")}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={closeMenu}
-              className="absolute inset-0 z-30 bg-black/35 md:bg-transparent md:pointer-events-none cursor-pointer md:cursor-default"
-            />
+          <div className="no-scrollbar flex h-[132px] gap-2 overflow-x-auto pt-1">
+            {activeSection === "model" && (
+              <>
+                {CAR_IDS.map((id) => (
+                  <OptionCard
+                    key={id}
+                    selected={config.model === id}
+                    onClick={() => set({ model: id })}
+                    preview={<Car className="h-9 w-9" strokeWidth={1.4} />}
+                    title={CARS[id].name}
+                    subtitle={id === "base-basic-pbr" ? t("config.modelSourcePbr") : t("config.modelMain")}
+                  />
+                ))}
+              </>
+            )}
 
-            {/* Позиционирование и центрирование — на обёртке.
-                На самой панели их держать нельзя: framer-motion пишет свой
-                inline transform и затирает -translate-y-1/2, из-за чего
-                панель уезжала вниз от центра. */}
-            <div
-              className="absolute z-40 flex flex-col justify-end md:justify-center pointer-events-none
-                right-3 sm:right-5
-                top-[max(5.5rem,env(safe-area-inset-top)+4.5rem)]
-                bottom-[max(1rem,env(safe-area-inset-bottom))]
-                md:top-0 md:bottom-0
-                w-[min(292px,calc(100vw-1.5rem))]"
-            >
-            <motion.aside
-              initial={{ x: "110%", opacity: 0.6 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "110%", opacity: 0.6 }}
-              transition={{ type: "spring", stiffness: 380, damping: 36 }}
-              className="pointer-events-auto relative flex flex-col gap-2.5 w-full
-                min-h-0 max-h-full md:max-h-[min(78vh,640px)]"
-            >
-              {/* Кнопка свернуть — на самом aside, иначе её обрезает прокрутка панели */}
-              <button
-                type="button"
-                onClick={closeMenu}
-                aria-label={t("config.closeMenu")}
-                className="absolute -left-3.5 top-1/2 -translate-y-1/2 z-50 hidden md:flex h-9 w-9 items-center justify-center rounded-md bg-white text-black shadow-lg hover:bg-white/90 transition-colors cursor-pointer"
-              >
-                <ChevronRight className="w-4 h-4" strokeWidth={2.25} />
-              </button>
+            {activeSection === "exterior" && (
+              <>
+                {PAINTS.map((paint, index) => (
+                  <OptionCard
+                    key={paint.id}
+                    selected={config.paint === index}
+                    onClick={() => set({ paint: index })}
+                    preview={<PreviewImage src={PAINT_PREVIEWS[index]} alt={paint.name} fallback={paint.color} />}
+                    title={paint.name}
+                    subtitle={t("config.exterior")}
+                  />
+                ))}
+                {GRILLE_FINISHES.map((finish, index) => (
+                  <OptionCard
+                    key={finish.id}
+                    selected={config.grille === index}
+                    onClick={() => set({ grille: index })}
+                    preview={<Swatch color={finish.color} />}
+                    title={finish.name}
+                    subtitle={t("config.grille")}
+                  />
+                ))}
+              </>
+            )}
 
-              <div className="relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain rounded-xl border border-white/10 bg-[rgba(15,15,16,0.94)] backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.55)]">
-                <ConfigPanel
-                  config={config}
-                  onChange={handleChange}
-                  onSectionChange={(s) => setFocus(s && s !== "model" && s !== "overview" && s !== "interior" ? s : "default")}
-                  onInteriorView={setFocus}
+            {activeSection === "wheels" && (
+              <>
+                {RIM_DESIGNS.map((rim, index) => (
+                  <OptionCard
+                    key={rim.id}
+                    selected={config.rim === index}
+                    onClick={() => set({ rim: index })}
+                    preview={<PreviewImage src={RIM_PREVIEWS[index]} alt={rim.name} fallback="#26282b" />}
+                    title={rim.name}
+                    subtitle={'24"'}
+                  />
+                ))}
+                {RIM_FINISHES.map((finish, index) => (
+                  <OptionCard
+                    key={finish.id}
+                    selected={config.rimFinish === index}
+                    onClick={() => set({ rimFinish: index })}
+                    preview={<PreviewImage src={FINISH_PREVIEWS[index]} alt={finish.name} fallback={finish.color} />}
+                    title={finish.name}
+                    subtitle={t("config.rimColor")}
+                  />
+                ))}
+              </>
+            )}
+
+            {activeSection === "kit" && (
+              <>
+                <OptionCard
+                  selected={!config.kit}
+                  onClick={() => set({ kit: false })}
+                  preview={<Car className="h-9 w-9" strokeWidth={1.4} />}
+                  title={t("config.kitStandard")}
+                  subtitle={t("config.kit")}
                 />
-              </div>
+                <OptionCard
+                  selected={config.kit}
+                  onClick={() => set({ kit: true })}
+                  preview={<Sparkles className="h-9 w-9" strokeWidth={1.4} />}
+                  title={t("config.kitMM")}
+                  subtitle={t("config.kit")}
+                />
+              </>
+            )}
 
-              {/* Отдельная кнопка закрытия под меню — как в референсе */}
-              <button
-                type="button"
-                onClick={closeMenu}
-                aria-label={t("config.closeMenu")}
-                className="flex h-11 w-full shrink-0 items-center justify-center rounded-xl bg-[#2a2a2a]/95 border border-white/10 text-white hover:bg-[#353535] transition-colors cursor-pointer shadow-lg"
-              >
-                <X className="w-4 h-4" strokeWidth={2} />
-              </button>
-            </motion.aside>
-            </div>
-          </>
-        )}
-      </AnimatePresence>
+            {activeSection === "carbon" && (
+              <>
+                <OptionCard
+                  selected={!config.carbon}
+                  onClick={() => set({ carbon: false })}
+                  preview={<Swatch color={PAINTS[config.paint].color} />}
+                  title={t("config.carbonOff")}
+                  subtitle={t("config.carbon")}
+                />
+                <OptionCard
+                  selected={config.carbon}
+                  onClick={() => set({ carbon: true })}
+                  preview={<Swatch color="#15161a" />}
+                  title={t("config.carbonOn")}
+                  subtitle={t("config.carbon")}
+                />
+              </>
+            )}
+
+            {activeSection === "lights" && (
+              <>
+                <OptionCard
+                  selected={config.lights}
+                  onClick={() => set({ lights: true })}
+                  preview={<Lightbulb className="h-9 w-9 text-white" strokeWidth={1.4} />}
+                  title={t("config.lightsOn")}
+                  subtitle={t("config.lights")}
+                />
+                <OptionCard
+                  selected={!config.lights}
+                  onClick={() => set({ lights: false })}
+                  preview={<Lightbulb className="h-9 w-9 text-white/42" strokeWidth={1.4} />}
+                  title={t("config.lightsOff")}
+                  subtitle={t("config.lights")}
+                />
+              </>
+            )}
+
+            {activeSection === "env" && (
+              <>
+                <OptionCard
+                  selected={!config.night}
+                  onClick={() => set({ night: false })}
+                  preview={<Swatch color="#c7cbce" />}
+                  title={t("config.envStudio")}
+                  subtitle={t("config.environment")}
+                />
+                <OptionCard
+                  selected={config.night}
+                  onClick={() => set({ night: true })}
+                  preview={<Swatch color="#0a0a0c" />}
+                  title={t("config.envNight")}
+                  subtitle={t("config.environment")}
+                />
+              </>
+            )}
+
+            {activeSection === "interior" && (
+              <>
+                {interiorViews.map(([view, label]) => (
+                  <OptionCard
+                    key={view}
+                    selected={focus === view}
+                    onClick={() => setFocus(view)}
+                    preview={<Armchair className="h-9 w-9" strokeWidth={1.35} />}
+                    title={label}
+                    subtitle={t("config.interior")}
+                  />
+                ))}
+              </>
+            )}
+
+            {activeSection === "overview" && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => navigate(`/booking?build=${encodeConfig(config)}`)}
+                  className="flex h-[116px] min-w-[210px] flex-col justify-center rounded-md bg-white px-5 text-left text-black transition-colors hover:bg-white/90"
+                >
+                  <span className="font-body text-[12px] uppercase tracking-[0.18em]">{t("config.book")}</span>
+                  <span className="mt-2 font-body text-[11px] text-black/48">{CARS[config.model].name}</span>
+                </button>
+                {overviewRows.map((row) => (
+                  <div
+                    key={row.label}
+                    className="flex h-[116px] min-w-[188px] max-w-[220px] flex-col justify-between rounded-md border border-white/12 bg-black/35 p-3"
+                  >
+                    <span className="truncate font-body text-[10px] uppercase tracking-[0.16em] text-white/38">{row.label}</span>
+                    <span className="line-clamp-3 font-body text-[13px] leading-snug text-white">{row.value}</span>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 };
