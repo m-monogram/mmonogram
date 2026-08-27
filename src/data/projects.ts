@@ -170,10 +170,10 @@ export const projects: Project[] = [
     coverImage: g3Black,
     isHub: true,
     images: [{ src: g3Black, title: "Black edition" }],
-    description: "An ultra-limited G-Class transformation in three exclusive editions — Black, Gold and Grey.",
+    description: "An ultra-limited G-Class transformation in three exclusive editions — Black, Gold and Silver.",
     modifications: [
       "M Monogram exterior identity package",
-      "Three exclusive editions: Black, Gold, Grey",
+      "Three exclusive editions: Black, Gold, Silver",
     ],
     specs: {
       exterior: "Three exclusive finishes",
@@ -261,7 +261,7 @@ export const projects: Project[] = [
   {
     id: "g3-iconic-grey",
     editionOf: "g3-iconic",
-    title: "Grey",
+    title: "Silver",
     subtitle: "ICONIC",
     year: "2024",
     duration: "12 weeks",
@@ -275,7 +275,7 @@ export const projects: Project[] = [
       { src: greyDetail, title: "Front detail" },
       { src: greyOverhead, title: "Overhead front" },
     ],
-    description: "Grey Edition — a refined monochrome interpretation with a sharper, colder and more futuristic character.",
+    description: "Silver Edition — a refined monochrome interpretation with a sharper, colder and more futuristic character.",
     modifications: [
       "M Monogram exterior identity package",
       "Maybach-style chrome grille",
