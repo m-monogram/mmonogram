@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { defaultContent } from '@/lib/defaultContent';
 import { queryTable } from '@/lib/supabase-admin';
@@ -8,6 +9,12 @@ export function useContent(sectionId: string) {
   const [content, setContent] = useState<Record<string, unknown> | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [loading, setLoading] = useState(true);
+  /* Живое обновление секции нужно тому, кто её правит: редактор смотрит сайт
+     в соседней вкладке и видит правку сразу. Обычному посетителю оно не нужно
+     совсем, а стоило дорого — по постоянному веб-сокету на каждую секцию
+     страницы (на главной их две) у каждого посетителя, и всё это идёт в
+     квоту Supabase Realtime. */
+  const { canEdit } = useAuth();
 
   useEffect(() => {
     let cancelled = false;
@@ -40,6 +47,12 @@ export function useContent(sectionId: string) {
 
     fetchContent();
 
+    if (!canEdit) {
+      return () => {
+        cancelled = true;
+      };
+    }
+
     const channel = supabase
       .channel(`site-content-${sectionId}`)
       .on('postgres_changes', {
@@ -62,7 +75,7 @@ export function useContent(sectionId: string) {
       cancelled = true;
       supabase.removeChannel(channel);
     };
-  }, [sectionId]);
+  }, [canEdit, sectionId]);
 
   return { content, loading, isVisible };
 }

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import Footer from "@/components/Footer";
+import SEOHead from "@/components/SEOHead";
 
 const OfferAgreement = () => {
   useEffect(() => {
@@ -10,6 +11,11 @@ const OfferAgreement = () => {
 
   return (
     <div className="min-h-screen luxury-bg text-foreground">
+      <SEOHead
+        title="Offer Agreement — M-Monogram"
+        description="Public offer agreement covering M-Monogram bespoke vehicle commissions and services."
+        path="/offer-agreement"
+      />
       {/* Back Button - positioned below logo */}
       <div className="absolute left-4 sm:left-6 md:left-12 z-20" style={{ top: `calc(env(safe-area-inset-top, 0px) + 6rem)` }}>
         <Link 

@@ -9,6 +9,7 @@ import NewsContentRenderer from "@/components/news/NewsContentRenderer";
 import NewsCard from "@/components/news/NewsCard";
 import { getNewsBySlug, getRelatedNews } from "@/data/news";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { SITE_URL } from "@/lib/site";
 
 const NewsDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -99,9 +100,8 @@ const NewsDetailPage = () => {
   };
 
   // SEO: Article + BreadcrumbList structured data
-  const baseUrl = "https://m-monogram.com";
-  const articleUrl = `${baseUrl}/press/${item.slug}`;
-  const coverAbs = item.cover.startsWith("http") ? item.cover : `${baseUrl}${item.cover}`;
+  const articleUrl = `${SITE_URL}/press/${item.slug}`;
+  const coverAbs = item.cover.startsWith("http") ? item.cover : `${SITE_URL}${item.cover}`;
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -120,7 +120,7 @@ const NewsDetailPage = () => {
         name: "M-Monogram",
         logo: {
           "@type": "ImageObject",
-          url: `${baseUrl}/og-image.jpg`,
+          url: `${SITE_URL}/og-image.jpg`,
         },
       },
       mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },
@@ -131,8 +131,8 @@ const NewsDetailPage = () => {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: baseUrl },
-        { "@type": "ListItem", position: 2, name: t("news.title"), item: `${baseUrl}/press` },
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+        { "@type": "ListItem", position: 2, name: t("news.title"), item: `${SITE_URL}/press` },
         { "@type": "ListItem", position: 3, name: title, item: articleUrl },
       ],
     },

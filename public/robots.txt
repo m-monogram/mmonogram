@@ -1,9 +1,9 @@
 User-agent: *
 Allow: /
 
-# Sitemap
-Sitemap: https://mmonogram.lovable.app/sitemap.xml
-
-# Disallow admin or private areas if any
-Disallow: /api/
+# Админка сайта в индекс не идёт
+Disallow: /admin
 Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://mmonogram.lovable.app/sitemap.xml

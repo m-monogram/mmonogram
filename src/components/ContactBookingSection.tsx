@@ -9,6 +9,7 @@ import contactBuildingImage from "@/assets/menu/menu-contact-new.jpg.webp";
 import MediaEdgeFade, { mediaFadeMask } from "@/components/MediaEdgeFade";
 import { useContent } from "@/hooks/useContent";
 import { submitLead } from "@/lib/leads";
+import { useLeadGuard } from "@/components/LeadGuard";
 import { defaultContent } from "@/lib/defaultContent";
 
 interface ContactBookingSectionProps {
@@ -46,6 +47,7 @@ const ContactBookingSection = memo(({ setCurrentView, prefilledModel }: ContactB
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const { trap, trapValue, isAutomated } = useLeadGuard();
   const [imagePosition, setImagePosition] = useState("center center");
   const [isMobile, setIsMobile] = useState(false);
 
@@ -123,9 +125,15 @@ const ContactBookingSection = memo(({ setCurrentView, prefilledModel }: ContactB
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError("");
+    /* Боту показываем ровно то же, что человеку, но заявку не отправляем. */
+    if (isAutomated()) {
+      setIsSubmitted(true);
+      return;
+    }
     setIsSubmitting(true);
 
     const result = await submitLead({
+      companyWebsite: trapValue,
       name: formData.name,
       phone: formData.phone,
       email: formData.email.trim() || null,
@@ -242,7 +250,8 @@ const ContactBookingSection = memo(({ setCurrentView, prefilledModel }: ContactB
                       <p className="font-body text-xs text-white/40">Request a consultation</p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="relative space-y-4">
+                      {trap}
                       <div>
                         <label className="font-body text-[10px] text-white/50 block mb-1.5 uppercase tracking-widest">
                           Name *

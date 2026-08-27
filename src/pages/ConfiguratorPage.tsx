@@ -40,10 +40,17 @@ import {
   type CameraFocus,
 } from "@/components/configurator/config";
 import SceneErrorBoundary from "@/components/configurator/SceneErrorBoundary";
-import { CAR_IDS, CARS } from "@/components/configurator/models";
-import type { InteriorView } from "@/components/configurator/ConfigPanel";
+import { CARS, DEFAULT_CAR, selectableCarIds } from "@/components/configurator/models";
 
 const ConfiguratorScene = lazy(() => import("@/components/configurator/Scene"));
+
+/** Ракурсы, доступные в разделе «Салон». */
+type InteriorView = Extract<CameraFocus, "interiorFront" | "interiorDriver" | "interiorRear">;
+
+const FOCUS_VALUES: CameraFocus[] = [
+  "default", "exterior", "wheels", "kit", "carbon", "lights", "env",
+  "interiorFront", "interiorDriver", "interiorRear",
+];
 
 const PAINT_PREVIEWS = Object.values(
   import.meta.glob("@/assets/previews/paint-*.jpg", { eager: true, import: "default" })
@@ -170,45 +177,82 @@ const ConfiguratorPage = () => {
   const [config, setConfig] = useState<BuildConfig>(() => decodeConfig(searchParams.get("c")));
   const [activeSection, setActiveSection] = useState<StudioSection>("exterior");
   const [copied, setCopied] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [savedFlash, setSavedFlash] = useState(false);
   const [focus, setFocus] = useState<CameraFocus>(() => {
     const v = searchParams.get("v");
-    const allowed: CameraFocus[] = [
-      "default", "exterior", "wheels", "kit", "carbon", "lights", "env",
-      "interiorFront", "interiorDriver", "interiorRear",
-    ];
-    return v && (allowed as string[]).includes(v) ? (v as CameraFocus) : "default";
+    return v && (FOCUS_VALUES as string[]).includes(v) ? (v as CameraFocus) : "default";
   });
 
-  const handleChange = useCallback(
-    (next: BuildConfig) => {
-      setConfig(next);
-      setSearchParams({ c: encodeConfig(next) }, { replace: true });
+  /** Машины в публичном выборе; референсные — только с ?dev=1. */
+  const carIds = useMemo(() => selectableCarIds(), []);
+  const car = CARS[config.model] ?? CARS[DEFAULT_CAR];
+  /* У оцифрованного кузова двери из одного меша не вынуть, и раздел
+     «Openings» раньше подменял всю машину процедурной заглушкой. */
+  const canOpen = !!car.supportsOpenings;
+
+  /* Ракурс держим в адресе рядом со сборкой: страница его читает при загрузке,
+     а до этого записывала только код сборки — присланная ссылка открывалась
+     не с того вида, с которого её отправили. */
+  const syncUrl = useCallback(
+    (next: BuildConfig, nextFocus: CameraFocus) => {
+      const params: Record<string, string> = { c: encodeConfig(next) };
+      if (nextFocus !== "default") params.v = nextFocus;
+      setSearchParams(params, { replace: true });
     },
     [setSearchParams]
   );
 
+  /* Одна точка применения состояния: и сборка, и ракурс кладутся в адрес
+     вместе. Раздельные обработчики читали config из замыкания, и «Сброс»,
+     менявший то и другое за один тик, записывал в ссылку сборку, которую
+     только что сбросил, — обновление страницы возвращало её обратно. */
+  const apply = useCallback(
+    (nextConfig: BuildConfig, nextFocus: CameraFocus) => {
+      setConfig(nextConfig);
+      setFocus(nextFocus);
+      syncUrl(nextConfig, nextFocus);
+    },
+    [syncUrl]
+  );
+
+  const handleChange = useCallback((next: BuildConfig) => apply(next, focus), [apply, focus]);
+
+  const changeFocus = useCallback((next: CameraFocus) => apply(config, next), [apply, config]);
+
   const set = useCallback((patch: Partial<BuildConfig>) => handleChange({ ...config, ...patch }), [config, handleChange]);
 
-  const chooseSection = useCallback((section: StudioSection) => {
-    setActiveSection(section);
-    setFocus(section === "interior" ? "interiorDriver" : SECTION_FOCUS[section] ?? "default");
-  }, []);
+  const focusForSection = (section: StudioSection): CameraFocus =>
+    section === "interior" ? "interiorDriver" : SECTION_FOCUS[section] ?? "default";
+
+  const chooseSection = useCallback(
+    (section: StudioSection) => {
+      setActiveSection(section);
+      changeFocus(focusForSection(section));
+    },
+    [changeFocus]
+  );
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, []);
 
   const handleShare = useCallback(async () => {
-    const url = `${location.origin}/configurator?c=${encodeConfig(config)}`;
+    const params = new URLSearchParams({ c: encodeConfig(config) });
+    if (focus !== "default") params.set("v", focus);
+    const url = `${location.origin}/configurator?${params}`;
     try {
       await navigator.clipboard.writeText(url);
     } catch {
-      /* Clipboard can be unavailable in some embedded contexts. */
+      /* Буфер обмена недоступен во встроенных контекстах и без https.
+         Раньше кнопка всё равно показывала «скопировано», и посетитель
+         вставлял в мессенджер то, что было в буфере до неё. */
+      setShareUrl(url);
+      return;
     }
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
-  }, [config]);
+  }, [config, focus]);
 
   const price = getBuildPrice(config);
   const formattedPrice = useMemo(
@@ -217,10 +261,23 @@ const ConfiguratorPage = () => {
   );
 
   const handleSave = useCallback(() => {
-    const saved = JSON.parse(localStorage.getItem("mmonogram-builds") ?? "[]") as Array<{ code: string; savedAt: string; price: number }>;
+    /* Чужая запись под тем же ключом или приватный режим не должны ронять
+       страницу: раньше JSON.parse на мусоре выбрасывал прямо из обработчика
+       и «Сохранить» переставало работать до очистки хранилища. */
+    let saved: Array<{ code: string; savedAt: string; price: number }> = [];
+    try {
+      const parsed = JSON.parse(localStorage.getItem("mmonogram-builds") ?? "[]");
+      if (Array.isArray(parsed)) saved = parsed.filter((item) => item && typeof item.code === "string");
+    } catch {
+      saved = [];
+    }
     const code = encodeConfig(config);
     const next = [{ code, savedAt: new Date().toISOString(), price }, ...saved.filter((item) => item.code !== code)].slice(0, 12);
-    localStorage.setItem("mmonogram-builds", JSON.stringify(next));
+    try {
+      localStorage.setItem("mmonogram-builds", JSON.stringify(next));
+    } catch {
+      /* Квота или запрет хранилища — сборка всё равно живёт в ссылке. */
+    }
     handleChange({ ...config, saved: true });
     setSavedFlash(true);
     window.setTimeout(() => setSavedFlash(false), 1800);
@@ -236,9 +293,9 @@ const ConfiguratorPage = () => {
   }, [config]);
 
   const handleReset = useCallback(() => {
-    handleChange(DEFAULT_CONFIG);
-    chooseSection("exterior");
-  }, [chooseSection, handleChange]);
+    setActiveSection("exterior");
+    apply(DEFAULT_CONFIG, focusForSection("exterior"));
+  }, [apply]);
 
   const handleFullscreen = useCallback(() => {
     const root = document.documentElement;
@@ -247,24 +304,30 @@ const ConfiguratorPage = () => {
   }, []);
 
   const sections = useMemo(
-    () => [
-      { id: "model" as const, label: t("config.model"), value: CARS[config.model].name, icon: Car },
+    () => ([
+      /* Раздел выбора машины прячем, когда выбирать не из чего: одна карточка
+         с единственной моделью занимала место и выглядела недоделкой. */
+      ...(carIds.length > 1
+        ? [{ id: "model" as const, label: t("config.model"), value: car.name, icon: Car }]
+        : []),
       { id: "exterior" as const, label: t("config.exterior"), value: PAINTS[config.paint].name, icon: Palette },
       { id: "wheels" as const, label: t("config.rims"), value: RIM_DESIGNS[config.rim].name, icon: Disc3 },
       { id: "calipers" as const, label: "Calipers", value: CALIPER_FINISHES[config.caliper].name, icon: Disc3 },
       { id: "kit" as const, label: t("config.kit"), value: KIT_PACKAGES[config.kitPackage].name, icon: Package },
       { id: "carbon" as const, label: t("config.carbon"), value: config.carbon ? t("config.carbonOn") : t("config.carbonOff"), icon: Gem },
-      { id: "openings" as const, label: "Openings", value: [config.doors && "Doors", config.hood && "Hood", config.trunk && "Trunk"].filter(Boolean).join(" · ") || "Closed", icon: DoorOpen },
+      ...(canOpen
+        ? [{ id: "openings" as const, label: "Openings", value: [config.doors && "Doors", config.hood && "Hood", config.trunk && "Trunk"].filter(Boolean).join(" · ") || "Closed", icon: DoorOpen }]
+        : []),
       { id: "lights" as const, label: t("config.lights"), value: config.lights ? t("config.lightsOn") : t("config.lightsOff"), icon: Lightbulb },
       { id: "env" as const, label: t("config.environment"), value: config.night ? t("config.envNight") : t("config.envStudio"), icon: SunMoon },
       { id: "interior" as const, label: t("config.interior"), value: INTERIOR_FINISHES[config.interior].name, icon: Armchair },
       { id: "overview" as const, label: t("config.overview"), value: "", icon: ClipboardList },
-    ],
-    [config, t]
+    ]),
+    [canOpen, car.name, carIds.length, config, t]
   );
 
   const overviewRows = [
-    { label: t("config.model"), value: CARS[config.model].name },
+    { label: t("config.model"), value: car.name },
     { label: t("config.exterior"), value: `${PAINTS[config.paint].name} · ${GRILLE_FINISHES[config.grille].name}` },
     { label: t("config.rims"), value: `${RIM_DESIGNS[config.rim].name} · ${RIM_FINISHES[config.rimFinish].name}` },
     { label: "Calipers", value: CALIPER_FINISHES[config.caliper].name },
@@ -273,7 +336,9 @@ const ConfiguratorPage = () => {
     { label: t("config.lights"), value: config.lights ? t("config.lightsOn") : t("config.lightsOff") },
     { label: t("config.environment"), value: config.night ? t("config.envNight") : t("config.envStudio") },
     { label: t("config.interior"), value: INTERIOR_FINISHES[config.interior].name },
-    { label: "Openings", value: [config.doors && "4 doors", config.hood && "hood", config.trunk && "trunk"].filter(Boolean).join(" · ") || "closed" },
+    ...(canOpen
+      ? [{ label: "Openings", value: [config.doors && "4 doors", config.hood && "hood", config.trunk && "trunk"].filter(Boolean).join(" · ") || "closed" }]
+      : []),
     { label: "Price", value: formattedPrice },
   ];
 
@@ -329,19 +394,40 @@ const ConfiguratorPage = () => {
       </div>
 
       <div
-        className={`pointer-events-none absolute bottom-[10.75rem] left-4 z-20 hidden md:block ${
-          config.night ? "text-white/40" : "text-black/40"
+        className={`pointer-events-none absolute bottom-[15.5rem] left-4 z-20 hidden md:block ${
+          config.night ? "text-white/40" : "text-black/45"
         }`}
       >
         <p className="font-body text-[10px] uppercase tracking-[0.14em]">
-          {t("config.demoNote")} · {CARS[config.model].name}
+          {t("config.demoNote")} · {car.name}
         </p>
       </div>
 
-      <div className="pointer-events-none absolute bottom-[10.75rem] right-4 z-20 hidden md:flex items-center gap-2 rounded-md border border-white/10 bg-black/45 px-3 py-2 text-white/85 backdrop-blur-xl">
+      <div className="pointer-events-none absolute bottom-[15.25rem] right-4 z-20 hidden md:flex items-center gap-2 rounded-md border border-white/10 bg-black/45 px-3 py-2 text-white/85 backdrop-blur-xl">
         <DollarSign className="h-4 w-4 text-white/48" />
         <span className="font-body text-[12px] uppercase tracking-[0.12em]">{formattedPrice}</span>
       </div>
+
+      {shareUrl && (
+        <div className="absolute inset-x-0 top-[8.5rem] z-30 flex justify-center px-4">
+          <div className="flex w-full max-w-lg items-center gap-2 rounded-md border border-white/15 bg-black/85 px-3 py-2 backdrop-blur-xl">
+            <input
+              readOnly
+              value={shareUrl}
+              onFocus={(e) => e.currentTarget.select()}
+              aria-label={t("config.share")}
+              className="min-w-0 flex-1 bg-transparent font-body text-[11px] text-white/80 outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => setShareUrl(null)}
+              className="shrink-0 font-body text-[10px] uppercase tracking-[0.16em] text-white/50 hover:text-white"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
 
       <motion.div
         initial={{ y: 38, opacity: 0 }}
@@ -359,7 +445,7 @@ const ConfiguratorPage = () => {
                   key={item.id}
                   type="button"
                   onClick={() => chooseSection(item.id)}
-                  className={`flex h-[58px] min-w-[170px] items-center gap-2 rounded-md border px-3 text-left transition-all ${
+                  className={`flex h-[58px] min-w-[196px] items-center gap-2 rounded-md border px-3 text-left transition-all ${
                     active
                       ? "border-white/70 bg-white text-black"
                       : "border-white/12 bg-white/[0.045] text-white hover:border-white/32 hover:bg-white/[0.08]"
@@ -382,7 +468,7 @@ const ConfiguratorPage = () => {
           <div className="no-scrollbar flex h-[132px] gap-2 overflow-x-auto pt-1">
             {activeSection === "model" && (
               <>
-                {CAR_IDS.map((id) => (
+                {carIds.map((id) => (
                   <OptionCard
                     key={id}
                     selected={config.model === id}
@@ -498,7 +584,7 @@ const ConfiguratorPage = () => {
               </>
             )}
 
-            {activeSection === "openings" && (
+            {activeSection === "openings" && canOpen && (
               <>
                 <OptionCard
                   selected={config.doors}
@@ -587,7 +673,7 @@ const ConfiguratorPage = () => {
                   <OptionCard
                     key={view}
                     selected={focus === view}
-                    onClick={() => setFocus(view)}
+                    onClick={() => changeFocus(view)}
                     preview={<Armchair className="h-9 w-9" strokeWidth={1.35} />}
                     title={label}
                     subtitle={t("config.interior")}

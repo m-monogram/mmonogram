@@ -11,6 +11,19 @@ interface FooterProps {
   setCurrentView?: (view: string) => void;
 }
 
+/** Раздел → адрес. Нужен и для перехода, и для href самой ссылки. */
+const viewToPath: Record<string, string> = {
+  "home": "/",
+  "brand": "/brand",
+  "projects": "/projects",
+  "modifications": "/commission",
+  "verify": "/verify",
+  "contact": "/contact",
+  "booking": "/booking",
+  "press": "/press",
+  "news": "/press",
+};
+
 const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -38,19 +51,7 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
     if (propSetCurrentView) {
       propSetCurrentView(view);
     } else {
-      const viewToPath: Record<string, string> = {
-        "home": "/",
-        "brand": "/brand",
-        "projects": "/projects",
-        "modifications": "/commission",
-        "verify": "/verify",
-        "contact": "/contact",
-        "booking": "/booking",
-        "press": "/press",
-        "news": "/press",
-      };
-      const path = viewToPath[view] || "/";
-      navigate(path);
+      navigate(viewToPath[view] || "/");
     }
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -94,12 +95,20 @@ const Footer = ({ setCurrentView: propSetCurrentView }: FooterProps) => {
               <ul className="space-y-2">
                 {quickLinks.map((link) => (
                   <li key={link.labelKey}>
-                    <button
-                      onClick={() => handleNavClick(link.view)}
+                    {/* Ссылка, а не кнопка: подвал — основная перелинковка
+                        сайта, а роботы и «открыть в новой вкладке» видят
+                        только href. */}
+                    <a
+                      href={viewToPath[link.view] || "/"}
+                      onClick={(e) => {
+                        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                        e.preventDefault();
+                        handleNavClick(link.view);
+                      }}
                       className="text-white/60 hover:text-white transition-colors font-body text-caption cursor-pointer"
                     >
                       {t(link.labelKey)}
-                    </button>
+                    </a>
                   </li>
                 ))}
               </ul>

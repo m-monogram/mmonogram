@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { MessageCircle, Phone, Car, Wrench, User, CheckCircle2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { submitLead } from "@/lib/leads";
+import { useLeadGuard } from "@/components/LeadGuard";
 
 /* Код сборки из 3D-конфигуратора (?build=…) — только цифры и дефисы */
 const getBuildFromUrl = (): string | null => {
@@ -34,13 +35,20 @@ const BookingForm = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const { trap, trapValue, isAutomated } = useLeadGuard();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    /* Боту показываем ровно то же, что человеку, но заявку не отправляем. */
+    if (isAutomated()) {
+      setSubmitted(true);
+      return;
+    }
     setSubmitting(true);
 
     const result = await submitLead({
+      companyWebsite: trapValue,
       name: formData.name,
       phone: formData.phone,
       car: formData.car,
@@ -106,8 +114,9 @@ const BookingForm = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
           onSubmit={handleSubmit}
-          className="glass-panel p-6 sm:p-8"
+          className="relative glass-panel p-6 sm:p-8"
         >
+          {trap}
           <div className="space-y-4 sm:space-y-5">
             <div className="relative">
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

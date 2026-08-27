@@ -1,12 +1,18 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import SEOHead from "@/components/SEOHead";
 
 const PrivacyPolicy = () => {
   const { t } = useLanguage();
 
   return (
     <div className="min-h-screen luxury-bg text-white">
+      <SEOHead
+        title="Privacy Policy — M-Monogram"
+        description="How M-Monogram collects, stores and uses the personal data you submit through the site."
+        path="/privacy-policy"
+      />
       {/* Back Button - positioned below logo */}
       <div className="absolute left-4 sm:left-6 md:left-12 z-20" style={{ top: `calc(env(safe-area-inset-top, 0px) + 6rem)` }}>
         <Link

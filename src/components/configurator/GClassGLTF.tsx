@@ -3,7 +3,7 @@ import { useGLTF } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { BuildConfig, GRILLE_FINISHES, INTERIOR_FINISHES, PAINTS, RIM_FINISHES } from "./config";
-import { CARS, DEFAULT_CAR, DRACO_PATH, ROLE_DEBUG_COLORS, type FileRole, type PartRole } from "./models";
+import { CARS, DEFAULT_CAR, DRACO_PATH, ROLE_DEBUG_COLORS, type CarModel, type FileRole, type PartRole } from "./models";
 import {
   cabinDashAtMax,
   classifyCabin,
@@ -150,7 +150,7 @@ class OptionalBoundary extends Component<{ children: ReactNode; label: string },
 }
 
 export default function GClassGLTF({ config }: { config: BuildConfig }) {
-  const car = CARS[config.model] ?? CARS[DEFAULT_CAR];
+  const car: CarModel = CARS[config.model] ?? CARS[DEFAULT_CAR];
   const body = useGLTF(car.files.body, DRACO_PATH);
   const fit = useMemo(() => computeFit(body.scene.clone(true), car.length), [body.scene, car.length]);
 
@@ -303,9 +303,15 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
   }, []);
 
   const groundOffset = useMemo(() => {
-    const active = Object.entries(grounds).filter(([url]) => url !== car.files.kit || config.kitPackage > 0 || config.kit);
+    const kitVisible = config.kitPackage > 0 || config.kit;
+    const active = Object.entries(grounds).filter(([url]) => {
+      /* Только файлы текущей машины: замеры предыдущей остаются в Record,
+         и без этой проверки пол считался по объединению двух сборок. */
+      if (url !== car.files.body && url !== car.files.kit && url !== car.files.interior) return false;
+      return url !== car.files.kit || kitVisible;
+    });
     return active.length ? -Math.min(...active.map(([, y]) => y)) : 0;
-  }, [grounds, config.kit, config.kitPackage, car.files.kit]);
+  }, [grounds, config.kit, config.kitPackage, car.files.body, car.files.kit, car.files.interior]);
 
   // frameloop="demand": без явного запроса сдвиг пола не попал бы в кадр
   const invalidate = useThree((s) => s.invalidate);
@@ -345,7 +351,11 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
   );
 }
 
-for (const car of Object.values(CARS)) {
+/* Предзагружаем только машину по умолчанию: остальные — по факту выбора.
+   Раньше цикл шёл по всем CARS и тянул referenсe-модель, которой нет в
+   публичном списке, — лишние 1.9 МБ на каждом заходе. */
+{
+  const car = CARS[DEFAULT_CAR];
   useGLTF.preload(car.files.body, DRACO_PATH);
   if (car.files.kit) useGLTF.preload(car.files.kit, DRACO_PATH);
 }

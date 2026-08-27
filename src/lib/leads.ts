@@ -4,6 +4,14 @@ import { sanitizePhone, sanitizeText } from "@/lib/validation";
 export interface LeadPayload {
   name: string;
   phone: string;
+  /**
+   * Ловушка для ботов: поле скрыто от человека, но видно автозаполнению
+   * скриптов. Заполнено — заявка молча отбрасывается. Публичная политика
+   * bookings разрешает INSERT кому угодно (иначе форма бы не работала),
+   * так что это единственный барьер на стороне клиента; серверный лимит
+   * частоты нужно ставить отдельно, edge-функцией.
+   */
+  companyWebsite?: string;
   email?: string | null;
   car?: string | null;
   service?: string | null;
@@ -29,7 +37,11 @@ export function isValidLeadPhone(phone: string): boolean {
   return digits.length >= 8 && digits.length <= 15;
 }
 
+/** Минимум времени между открытием формы и отправкой, мс. */
+const MIN_FILL_MS = 1500;
+
 export function normalizeLead(payload: LeadPayload): LeadPayload | { error: string } {
+  if (payload.companyWebsite) return { error: "spam" };
   const name = sanitizeText(payload.name || "", 100);
   const phoneRaw = sanitizeText(payload.phone || "", 30);
   const phone = sanitizePhone(phoneRaw);
@@ -52,6 +64,14 @@ export function normalizeLead(payload: LeadPayload): LeadPayload | { error: stri
     source: payload.source || "website",
     page: payload.page || (typeof window !== "undefined" ? window.location.pathname : undefined),
   };
+}
+
+/**
+ * Форму, отправленную быстрее человека, отбрасываем. Возвращает true, если
+ * отправку следует пропустить (притворившись успешной — боту знать не нужно).
+ */
+export function looksAutomated(openedAt: number): boolean {
+  return Date.now() - openedAt < MIN_FILL_MS;
 }
 
 /** Human-readable message for Telegram / WhatsApp / n8n. */
@@ -117,43 +137,42 @@ export async function submitLead(raw: LeadPayload): Promise<LeadResult> {
     return { ok: false, error: normalized.error };
   }
 
-  let id: string | undefined;
   let dbOk = false;
   let dbError: string | undefined;
 
   try {
     const client = supabase as any;
-    const { data, error } = await client
-      .from("bookings")
-      .insert({
-        name: normalized.name,
-        phone: normalized.phone,
-        email: normalized.email,
-        car: normalized.car,
-        service: normalized.service,
-        message: normalized.message,
-        source: normalized.source,
-        status: "new",
-      })
-      .select("id")
-      .single();
+    /* Без .select(): читать bookings разрешено только админу и редактору
+       (RLS), а INSERT ... RETURNING требует ещё и права на чтение строки.
+       С анонимной заявки такой запрос возвращал ошибку — посетитель видел
+       «не удалось отправить», хотя писал настоящую заявку. Идентификатор
+       нужен был только для строки в вебхуке и легко без него обходится. */
+    const { error } = await client.from("bookings").insert({
+      name: normalized.name,
+      phone: normalized.phone,
+      email: normalized.email,
+      car: normalized.car,
+      service: normalized.service,
+      message: normalized.message,
+      source: normalized.source,
+      status: "new",
+    });
 
     if (error) {
       console.error("Lead insert failed:", error);
       dbError = error.message || "db";
     } else {
       dbOk = true;
-      id = data?.id as string | undefined;
     }
   } catch (err) {
     console.error("Lead submit exception:", err);
     dbError = err instanceof Error ? err.message : "unknown";
   }
 
-  const notified = await notifyWebhook({ ...normalized, id });
+  const notified = await notifyWebhook(normalized);
 
   if (dbOk || notified) {
-    return { ok: true, id, notified };
+    return { ok: true, notified };
   }
 
   return { ok: false, error: dbError || "notify" };

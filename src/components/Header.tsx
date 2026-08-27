@@ -8,7 +8,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 // Menu images - themed for each section
-import menuHome from "@/assets/menu/menu-home.webp";
 import menuBrand from "@/assets/menu/menu-brand.webp";
 import menuProjects from "@/assets/g63-quarter-new.webp";
 import menuModifications from "@/assets/commission-hero-final.webp";
@@ -32,18 +31,35 @@ interface MenuCardProps {
   };
   index: number;
   currentView: string;
+  /** Адрес раздела: нужен, чтобы пункт меню был ссылкой, а не кнопкой. */
+  href: string;
   onNavigate: () => void;
   t: (key: string) => string;
 }
+
+/**
+ * Переход внутри приложения по клику левой кнопкой, обычное поведение
+ * браузера — для «открыть в новой вкладке» и клика колесом.
+ */
+const followInApp = (navigate: () => void) => (e: React.MouseEvent) => {
+  if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  e.preventDefault();
+  navigate();
+};
 const MenuCard = ({
   item,
   index,
   currentView,
+  href,
   onNavigate,
   t
 }: MenuCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
-  return <motion.button type="button" initial={{
+  /* Ссылка, а не кнопка: раньше всё меню сайта было <button onClick>, и ни
+     поисковый робот, ни «открыть в новой вкладке», ни программа чтения с
+     экрана не видели в нём переходов — у сайта не было внутренней перелинковки
+     вовсе. */
+  return <motion.a href={href} initial={{
     opacity: 0,
     scale: 0.7,
     y: 60,
@@ -64,7 +80,7 @@ const MenuCard = ({
     delay: index * 0.07 + 0.15,
     duration: 0.6,
     ease: [0.22, 1, 0.36, 1]
-  }} onClick={onNavigate} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className={`group relative overflow-hidden cursor-pointer touch-target ${item.isWide ? "col-span-2 aspect-video" : "aspect-square md:aspect-[1.5/1] min-h-[40vw] sm:min-h-0"}`}>
+  }} onClick={followInApp(onNavigate)} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className={`group relative block overflow-hidden cursor-pointer touch-target ${item.isWide ? "col-span-2 aspect-video" : "aspect-square md:aspect-[1.5/1] min-h-[40vw] sm:min-h-0"}`}>
     {/* Enhanced hover background effect */}
     <AnimatePresence>
       {isHovered && <motion.span className="absolute inset-0 h-full w-full bg-neutral-200/10 dark:bg-slate-800/30 backdrop-blur-sm block rounded-none z-10" layoutId="menuHoverBackground" initial={{
@@ -159,7 +175,7 @@ const MenuCard = ({
     }} exit={{
       opacity: 0
     }} className="absolute inset-0 shadow-[0_0_40px_rgba(255,255,255,0.1)] z-20 pointer-events-none" />}
-  </motion.button>;
+  </motion.a>;
 };
 const Header = ({
   currentView: propCurrentView,
@@ -194,6 +210,17 @@ const Header = ({
     };
   }, [menuOpen]);
   const navItems = [{
+    /* 3D-студия — единственная страница, на которую со всего сайта вёл один
+       баннер на главной: в меню её не было вовсе, хотя подписи для неё уже
+       переведены на все три языка. Широкая карточка первой строкой заодно
+       держит сетку заполненной: шесть карточек при двух колонках это
+       «широкая + 2 + 2 + широкая». */
+    labelKey: 'nav.configurator',
+    view: 'configurator',
+    image: menuProjects,
+    descKey: 'nav.configuratorDesc',
+    isWide: true
+  }, {
     labelKey: 'nav.brand',
     view: 'brand',
     image: menuBrand,
@@ -266,15 +293,15 @@ const Header = ({
     {!(menuOpen || menuClosing) && <div className="absolute left-4 sm:left-6 md:left-12 z-[90]" style={{
       top: `calc(env(safe-area-inset-top, 0px) + 1rem)`
     }}>
-      <button onClick={() => {
+      <a href="/" onClick={followInApp(() => {
         navigate("/");
         window.scrollTo({
           top: 0,
           behavior: "instant"
         });
-      }} className="cursor-pointer touch-target flex items-center justify-center" type="button">
+      })} className="cursor-pointer touch-target flex items-center justify-center">
         <img src={variant === "light" ? logoBlack : logoWhite} alt="M-Monogram" width={479} height={113} fetchpriority="high" decoding="sync" className="h-10 sm:h-12 md:h-14 w-auto max-w-[11rem] sm:max-w-[13rem] object-contain object-left" />
-      </button>
+      </a>
     </div>}
 
     {/* Fixed menu controls - HIDDEN when menu is open OR closing */}
@@ -323,7 +350,7 @@ const Header = ({
         }}>
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <motion.button type="button" initial={{
+            <motion.a href="/" initial={{
               opacity: 0,
               x: -20
             }} animate={{
@@ -332,12 +359,12 @@ const Header = ({
             }} transition={{
               delay: 0.1,
               duration: 0.4
-            }} onClick={() => {
+            }} onClick={followInApp(() => {
               navigate("/");
               closeMenu();
-            }} className="cursor-pointer touch-target">
+            })} className="block cursor-pointer touch-target">
               <img src={logoWhite} alt="M-Monogram" width={479} height={113} className="h-10 sm:h-12 md:h-14 w-auto max-w-[11rem] sm:max-w-[13rem] object-contain object-left" />
-            </motion.button>
+            </motion.a>
 
             {/* Right controls */}
             <div className="flex items-center gap-2 sm:gap-3">
@@ -453,7 +480,7 @@ const Header = ({
             <nav className="w-full max-w-[95vw] sm:max-w-3xl lg:max-w-4xl">
               {/* Cards Grid - 2x2 layout */}
               <div className="grid grid-cols-2 gap-2 sm:gap-4">
-                {navItems.map((item, index) => <MenuCard key={item.view} item={item} index={index} currentView={currentView} onNavigate={() => handleNavClick(item.view)} t={t} />)}
+                {navItems.map((item, index) => <MenuCard key={item.view} item={item} index={index} currentView={currentView} href={viewToPath[item.view] ?? "/"} onNavigate={() => handleNavClick(item.view)} t={t} />)}
               </div>
             </nav>
           </div>

@@ -5,6 +5,7 @@ import { buildWhatsAppUrl, safeOpenUrl, safeCall } from "@/lib/validation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { submitLead } from "@/lib/leads";
+import { useLeadGuard } from "@/components/LeadGuard";
 
 const ContactSection = () => {
   const { t } = useLanguage();
@@ -16,6 +17,7 @@ const ContactSection = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const { trap, trapValue, isAutomated } = useLeadGuard();
 
   const whatsappNumber = "971545077707";
   const phoneNumber = "+971 54 507 7707";
@@ -26,9 +28,15 @@ const ContactSection = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    /* Боту показываем ровно то же, что человеку, но заявку не отправляем. */
+    if (isAutomated()) {
+      setSubmitted(true);
+      return;
+    }
     setSubmitting(true);
 
     const result = await submitLead({
+      companyWebsite: trapValue,
       name: formData.name,
       phone: formData.phone,
       message: formData.message || null,
@@ -168,7 +176,8 @@ const ContactSection = () => {
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                <form onSubmit={handleSubmit} className="relative space-y-4 sm:space-y-6">
+                  {trap}
                   <div>
                     <label className="block font-body text-caption uppercase tracking-wide text-muted-foreground mb-2">
                       {t('contact.name')}

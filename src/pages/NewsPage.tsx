@@ -10,6 +10,7 @@ import MediaEdgeFade from "@/components/MediaEdgeFade";
 import { getAllNews, NewsCategory } from "@/data/news";
 import { useLanguage } from "@/contexts/LanguageContext";
 import heroBg from "@/assets/hero-main-new.webp";
+import { SITE_URL } from "@/lib/site";
 
 type Filter = "all" | NewsCategory;
 
@@ -44,14 +45,13 @@ const NewsPage = () => {
     : "";
 
   // SEO: ItemList structured data for all visible news
-  const baseUrl = "https://m-monogram.com";
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
     itemListElement: filtered.map((n, i) => ({
       "@type": "ListItem",
       position: i + 1,
-      url: `${baseUrl}/press/${n.slug}`,
+      url: `${SITE_URL}/press/${n.slug}`,
       name: n.title[language],
     })),
   };

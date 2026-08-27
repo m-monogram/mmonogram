@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import AdminLogin from "@/pages/admin/AdminLogin";
@@ -15,6 +16,22 @@ export default function ProtectedRoute({
   loginFallback = false,
 }: ProtectedRouteProps) {
   const { user, loading, canEdit, isAdmin } = useAuth();
+
+  /* Закрываем от поисковиков всю ветку /admin, а не только внутренние
+     страницы: robots.txt запрещает обход, но не индексацию адреса, найденного
+     по внешней ссылке, а форма входа доступна без авторизации. */
+  useEffect(() => {
+    const meta = document.createElement("meta");
+    meta.name = "robots";
+    meta.content = "noindex, nofollow, noarchive";
+    document.head.appendChild(meta);
+    const previousTitle = document.title;
+    document.title = "M-Monogram CMS";
+    return () => {
+      meta.remove();
+      document.title = previousTitle;
+    };
+  }, []);
 
   if (loading) {
     return (

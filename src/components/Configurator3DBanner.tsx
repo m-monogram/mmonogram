@@ -111,11 +111,15 @@ const Configurator3DBanner = () => {
               <p className="mt-4 sm:mt-5 font-body text-sm sm:text-base text-white/60 leading-relaxed max-w-md">
                 {t("nav.configuratorDesc")}
               </p>
-              <motion.button
-                type="button"
+              {/* Единственный вход в 3D-студию со всего сайта — он обязан
+                  быть ссылкой, иначе робот её не найдёт вовсе. */}
+              <motion.a
+                href="/configurator"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => {
+                onClick={(e) => {
+                  if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                  e.preventDefault();
                   navigate("/configurator");
                   window.scrollTo({ top: 0, behavior: "instant" });
                 }}
@@ -123,7 +127,7 @@ const Configurator3DBanner = () => {
               >
                 {t("config.launch")}
                 <ConfiguratorMark className="h-4 w-4 opacity-80" />
-              </motion.button>
+              </motion.a>
             </div>
           </motion.div>
         </ScrollReveal>

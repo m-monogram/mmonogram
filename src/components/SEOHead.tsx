@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/site";
 
 interface SEOHeadProps {
   title: string;
@@ -21,7 +22,7 @@ const SEOHead = ({
   title,
   description,
   path = "",
-  image = "https://m-monogram.com/og-image.jpg",
+  image = DEFAULT_OG_IMAGE,
   updateUrl = true,
   type = "website",
   publishedTime,
@@ -29,8 +30,7 @@ const SEOHead = ({
   author,
   jsonLd,
 }: SEOHeadProps) => {
-  const baseUrl = "https://m-monogram.com";
-  const fullUrl = `${baseUrl}${path}`;
+  const fullUrl = `${SITE_URL}${path}`;
 
   useEffect(() => {
     // Update document title

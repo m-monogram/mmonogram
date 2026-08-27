@@ -34,7 +34,6 @@ interface CameraPreset {
 /* Базовый и «салонный» угол обзора: в кабине нужен широкоугольник */
 const BASE_FOV = 38;
 const BASE_FOV_MOBILE = 54;
-const INTERIOR_FOV = 56;
 const INTERIOR_FOV_MOBILE = 68;
 
 const PRESETS: Record<CameraFocus, { desktop: CameraPreset; mobile: CameraPreset }> = {
@@ -81,10 +80,14 @@ const PRESETS: Record<CameraFocus, { desktop: CameraPreset; mobile: CameraPreset
     mobile: { eye: [-0.78, 1.42, 0.01], target: [0.52, 1.12, 0.05], fov: INTERIOR_FOV_MOBILE },
   },
   /* С места водителя: точка глаза чуть впереди подголовника, взгляд поверх
-     руля на приборку. Из прохода за креслами руль закрывала спинка. */
+     руля на приборку. Из прохода за креслами руль закрывала спинка.
+
+     Место водителя у оцифрованной машины на -Z, а не на +Z: пресет стоял
+     зеркально и показывал торпедо с пассажирского кресла — руль в кадр не
+     попадал вовсе, зато в правой половине было видно наружное зеркало. */
   interiorDriver: {
-    desktop: { eye: [-0.12, 1.34, 0.42], target: [0.72, 1.08, 0.35], fov: 64 },
-    mobile: { eye: [0.02, 1.34, 0.41], target: [0.72, 1.08, 0.35], fov: INTERIOR_FOV_MOBILE },
+    desktop: { eye: [-0.14, 1.40, -0.42], target: [0.70, 1.20, -0.38], fov: 62 },
+    mobile: { eye: [-0.06, 1.40, -0.42], target: [0.70, 1.20, -0.38], fov: INTERIOR_FOV_MOBILE },
   },
   /* Из прохода между передними креслами назад на диван */
   interiorRear: {
@@ -326,7 +329,7 @@ function WarmUpFrames({ reducedMotion }: { reducedMotion: boolean }) {
 }
 
 function useRadialShadowTexture() {
-  return useMemo(() => {
+  const tex = useMemo(() => {
     const c = document.createElement("canvas");
     c.width = 512;
     c.height = 512;
@@ -338,10 +341,13 @@ function useRadialShadowTexture() {
     g.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, 512, 512);
-    const tex = new THREE.CanvasTexture(c);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    return tex;
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
   }, []);
+  // Текстура тени жила в видеопамяти до перезагрузки страницы
+  useEffect(() => () => tex.dispose(), [tex]);
+  return tex;
 }
 
 function SoftGroundShadow({ night, interior }: { night: boolean; interior: boolean }) {
@@ -353,7 +359,7 @@ function SoftGroundShadow({ night, interior }: { night: boolean; interior: boole
       <meshBasicMaterial
         map={shadow}
         transparent
-        opacity={night ? 0.58 : 0.34}
+        opacity={night ? 0.58 : 0.5}
         depthWrite={false}
         toneMapped={false}
       />
@@ -441,7 +447,7 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
         <ambientLight intensity={0.45} />
         <directionalLight
           position={[6, 8, 4]}
-          intensity={config.night ? 0.82 : 1.45}
+          intensity={config.night ? 0.82 : 0.95}
           castShadow={!isMobile}
           shadow-mapSize={[1024, 1024]}
           shadow-camera-left={-6}

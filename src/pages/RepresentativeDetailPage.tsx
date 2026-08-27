@@ -74,6 +74,11 @@ const RepresentativeDetailPage = () => {
   if (!rep) {
     return (
       <div className="min-h-screen bg-premium-black text-foreground">
+        <SEOHead
+          title={`${t("representatives.notFoundTitle")} — M-Monogram`}
+          description={t("representatives.notFoundDescription")}
+          updateUrl={false}
+        />
         <Header />
         <main className="pt-32 px-6 max-w-3xl mx-auto text-center">
           <h1 className="h-display-3 uppercase mb-4">{t("representatives.notFoundTitle")}</h1>

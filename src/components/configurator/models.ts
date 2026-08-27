@@ -42,9 +42,23 @@ export type CarModel = {
   };
   /** Монолитные референс-модели оставляем со встроенными PBR-текстурами. */
   readonly sourceMaterials?: boolean;
+  /**
+   * Есть ли у машины отдельные двери, капот и багажник, которые можно открыть.
+   * У оцифрованных выгрузок кузов идёт одним мешем: дверь из него не вынуть,
+   * и раздел «Openings» для такой машины не показывается. Раньше он показывался
+   * всегда и подменял фотореалистичную сборку процедурной заглушкой — машина
+   * на глазах у посетителя превращалась в другую.
+   */
+  readonly supportsOpenings?: boolean;
+  /**
+   * Референс-модель, которую не показываем в публичном выборе. Открывается
+   * только с ?dev=1: это чужая машина (Rolls-Royce Dawn) с вшитыми
+   * материалами, на ней не работает ни один пункт конфигуратора.
+   */
+  readonly devOnly?: boolean;
 };
 
-export const CARS = {
+export const CARS: Record<CarId, CarModel> = {
   "g63-iconic": {
     name: "G63 Iconic",
     length: 4.82,
@@ -58,14 +72,22 @@ export const CARS = {
     name: "Base Basic PBR",
     length: 4.82,
     sourceMaterials: true,
+    devOnly: true,
     files: {
       body: `${MODEL_BASE}/variants/base-basic-pbr.glb`,
     },
   },
-} as const satisfies Record<CarId, CarModel>;
+};
 
 export const CAR_IDS = Object.keys(CARS) as CarId[];
 export const DEFAULT_CAR: CarId = "g63-iconic";
+
+/** Машины, которые показываем в панели. Референсные — только с ?dev=1. */
+export function selectableCarIds(): CarId[] {
+  const dev =
+    typeof window !== "undefined" && new URLSearchParams(window.location.search).has("dev");
+  return CAR_IDS.filter((id) => dev || !CARS[id].devOnly);
+}
 
 /** Длина G63 по кузову, метры. Значение по умолчанию для computeFit. */
 export const TARGET_LENGTH = CARS[DEFAULT_CAR].length;

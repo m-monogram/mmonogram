@@ -2,15 +2,23 @@ import { Component, Suspense, type ReactNode } from "react";
 import GClassModel from "./GClassModel";
 import GClassGLTF from "./GClassGLTF";
 import { BuildConfig } from "./config";
-import { DEFAULT_CAR } from "./models";
+import { CARS, DEFAULT_CAR } from "./models";
 
 /**
  * Точка подключения машины в сцену.
  *
- * Пока оцифрованные модели не выложены в public/models — или если они не
- * загрузились у посетителя — конфигуратор работает на процедурной заглушке.
- * Она же служит заполнителем на время загрузки: geometry весит десятки
- * мегабайт, и пустая сцена всё это время выглядела бы поломкой.
+ * Оцифрованная сборка — единственное, что видит посетитель. Процедурная
+ * заглушка осталась только на два случая: пока грузятся GLB (десятки
+ * мегабайт, и пустая сцена всё это время выглядела бы поломкой) и если они
+ * не загрузились вовсе.
+ *
+ * Раньше заглушка подменяла сборку ещё и в рабочих режимах — при взгляде из
+ * салона и при открытых дверях. На экране это выглядело как поломка: вместо
+ * фотореалистичного G63 появлялась грубая коробка, а оцифрованный салон
+ * (custom-interior.glb, 2.6 МБ) не показывался никогда, хотя грузился всегда.
+ * Открывание дверей у оцифрованного кузова невозможно — он идёт одним мешем,
+ * — поэтому раздел «Openings» теперь просто не показывается для таких машин
+ * (см. CarModel.supportsOpenings), а не подменяет всю машину.
  */
 
 class ModelBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { failed: boolean }> {
@@ -30,10 +38,8 @@ class ModelBoundary extends Component<{ children: ReactNode; fallback: ReactNode
 }
 
 export default function CarModel({ config, doorsOpen = false }: { config: BuildConfig; doorsOpen?: boolean }) {
-  const placeholder = <GClassModel config={config} doorsOpen={doorsOpen} />;
-  const interactiveOpenings = doorsOpen || config.doors || config.hood || config.trunk;
-
-  if (interactiveOpenings && config.model === DEFAULT_CAR) return placeholder;
+  const car = CARS[config.model] ?? CARS[DEFAULT_CAR];
+  const placeholder = <GClassModel config={config} doorsOpen={doorsOpen && !!car.supportsOpenings} />;
 
   return (
     <ModelBoundary fallback={placeholder}>
