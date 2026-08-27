@@ -204,7 +204,8 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
           </div>
 
           <div className="max-w-5xl mx-auto space-y-6">
-            <h2 
+            {/* Главный заголовок страницы бренда */}
+            <h1 
               className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white uppercase tracking-tight font-bold leading-[1.05]"
               style={{ textShadow: '0 0 60px rgba(255,255,255,0.08)' }}
             >
@@ -213,7 +214,7 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
               <span className="text-white/40 tracking-[0.15em] text-xl sm:text-2xl md:text-3xl mt-4 block">
                 of Singular Automotive Creation
               </span>
-            </h2>
+            </h1>
 
             <div className="w-12 h-px bg-white/20 mx-auto" />
 

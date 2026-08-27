@@ -47,10 +47,12 @@ const MissionStatement = memo((_props: MissionStatementProps) => {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl tracking-widest text-white/90 uppercase mb-4 sm:mb-6 md:mb-8 leading-tight">
+          {/* h1, а не h2: на главной это единственный заголовок, и до правки
+              страница уходила в индекс вообще без h1. */}
+          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl tracking-widest text-white/90 uppercase mb-4 sm:mb-6 md:mb-8 leading-tight">
             {heading}
             <br className="hidden sm:block" /> {headingLine2}
-          </h2>
+          </h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}

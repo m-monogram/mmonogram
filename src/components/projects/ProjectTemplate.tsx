@@ -190,6 +190,10 @@ const ProjectTemplate = memo(function ProjectTemplate({
   return <div className="min-h-screen relative z-10 bg-black">
       {/* ——— A) HERO ——— Premium cinematic hero with car positioned higher ——— */}
       <header className="relative h-[100dvh] min-h-[100dvh] w-full overflow-hidden bg-black">
+        {/* Разворот героя занимает весь экран и заголовка не содержит — страница
+            уходила в индекс без h1 вовсе. Название даём скрытым: макет не трогаем,
+            поисковику и скринридеру страница перестаёт быть безымянной. */}
+        <h1 className="sr-only">{title} — {subtitle}</h1>
         <div className="absolute inset-0 bg-black">
           <img src={heroImage} alt={title} loading="eager" decoding="sync" fetchpriority="high" className="w-full h-full object-cover object-center" />
         </div>
