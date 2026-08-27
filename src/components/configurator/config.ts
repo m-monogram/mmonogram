@@ -73,16 +73,14 @@ export const CALIPER_FINISHES: CaliperFinish[] = [
 export interface KitPackage {
   id: string;
   name: string;
+  price: number;
 }
 
-/* Обвес приходит одним файлом body-kit-wheels.glb, и переключать нечего:
-   он либо стоит на машине, либо нет. Раньше пакетов было четыре — Signature,
-   Blackline, Heritage выглядели в сцене абсолютно одинаково, посетитель
-   нажимал и не понимал, почему ничего не происходит. Появятся отдельные
-   выгрузки под каждый пакет — вернём и остальные. */
 export const KIT_PACKAGES: KitPackage[] = [
-  { id: "stock", name: "Stock Version" },
-  { id: "signature", name: "M Monogram ICONIC" },
+  { id: "stock", name: "Stock Version", price: 0 },
+  { id: "signature", name: "M Monogram Signature", price: 42000 },
+  { id: "blackline", name: "M Monogram Blackline", price: 68000 },
+  { id: "heritage", name: "M Monogram Heritage", price: 92000 },
 ];
 
 export interface InteriorFinish {
@@ -90,13 +88,14 @@ export interface InteriorFinish {
   name: string;
   primary: string;
   accent: string;
+  price: number;
 }
 
 export const INTERIOR_FINISHES: InteriorFinish[] = [
-  { id: "burgundy", name: "Burgundy Atelier", primary: "#241f1e", accent: "#4a231c" },
-  { id: "onyx", name: "Onyx Black", primary: "#0c0c0d", accent: "#19191b" },
-  { id: "sand", name: "Cashmere Sand", primary: "#1a1714", accent: "#a98e68" },
-  { id: "cognac", name: "Cognac Heritage", primary: "#161210", accent: "#8a4d2b" },
+  { id: "burgundy", name: "Burgundy Atelier", primary: "#241f1e", accent: "#4a231c", price: 0 },
+  { id: "onyx", name: "Onyx Black", primary: "#0c0c0d", accent: "#19191b", price: 12000 },
+  { id: "sand", name: "Cashmere Sand", primary: "#1a1714", accent: "#a98e68", price: 18000 },
+  { id: "cognac", name: "Cognac Heritage", primary: "#161210", accent: "#8a4d2b", price: 22000 },
 ];
 
 /** Отделка решётки и декоративного металла: у G63 Iconic он золотой. */
@@ -233,4 +232,16 @@ export function decodeConfig(raw: string | null): BuildConfig {
     trunk: fromV4 ? p[12] === 1 : DEFAULT_CONFIG.trunk,
     saved: fromV4 ? p[13] === 1 : DEFAULT_CONFIG.saved,
   };
+}
+
+export function getBuildPrice(c: BuildConfig): number {
+  const base = 285000;
+  const paint = c.paint > 0 ? 6500 : 0;
+  const wheels = c.rim * 3500 + c.rimFinish * 1200;
+  const calipers = c.caliper > 0 ? 1500 : 0;
+  const carbon = c.carbon ? 18500 : 0;
+  const grille = c.grille > 0 ? 2500 : 0;
+  const interior = INTERIOR_FINISHES[c.interior]?.price ?? 0;
+  const kit = KIT_PACKAGES[c.kitPackage]?.price ?? 0;
+  return base + paint + wheels + calipers + carbon + grille + interior + kit;
 }

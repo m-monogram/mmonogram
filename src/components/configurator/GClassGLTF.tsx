@@ -145,7 +145,7 @@ class OptionalBoundary extends Component<{ children: ReactNode; label: string },
   }
 
   render() {
-    return this.state.failed ? null : this.props.children;
+    return this.state.failed ? null : <Suspense fallback={null}>{this.props.children}</Suspense>;
   }
 }
 
@@ -328,11 +328,7 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
         onGround={reportGround}
       />
 
-      {/* Обвеса и салона у машины может не быть — тогда собирается из того, что есть.
-          Обвес и колёса ждём вместе с кузовом, под общим Suspense в CarModel: без
-          них в кадре стоковый G-Class, и посетитель успевал увидеть сначала его,
-          а потом машину с обвесом. Салон снаружи не виден — он догружается сам,
-          под своим Suspense, и до него уже можно крутить готовую машину. */}
+      {/* Обвеса и салона у машины может не быть — тогда собирается из того, что есть */}
       {car.files.kit && (
         <OptionalBoundary label="обвес и колёса">
           <Parts
@@ -348,9 +344,7 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
 
       {car.files.interior && (
         <OptionalBoundary label="интерьер">
-          <Suspense fallback={null}>
-            <Parts url={car.files.interior} fit={fit} kind="interior" materials={materials} />
-          </Suspense>
+          <Parts url={car.files.interior} fit={fit} kind="interior" materials={materials} />
         </OptionalBoundary>
       )}
     </group>
