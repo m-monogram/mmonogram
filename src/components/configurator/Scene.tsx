@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer, OrbitControls } from "@react-three/drei";
 import { Bloom, BrightnessContrast, EffectComposer, HueSaturation, N8AO } from "@react-three/postprocessing";
@@ -164,16 +164,24 @@ function CameraRig({
   isMobile,
   controlsRef,
   flightRef,
+  ready,
 }: {
   focus: CameraFocus;
   isMobile: boolean;
   controlsRef: React.RefObject<OrbitControlsImpl>;
   flightRef: React.MutableRefObject<FlightState | null>;
+  /** Машина собрана и стоит в кадре. */
+  ready: boolean;
 }) {
   const { camera, invalidate } = useThree();
-  const mounted = useRef(false);
+  const introDone = useRef(false);
 
   useEffect(() => {
+    /* Пока машины нет, камера никуда не летит: раньше интро отрабатывало на
+       монтировании, за пару секунд до того, как догружался кузов, — посетитель
+       заставал уже приехавшую камеру и пустой подиум, а машина потом просто
+       возникала на месте. */
+    if (!ready) return;
     const controls = controlsRef.current;
     const preset = (PRESETS[focus] ?? PRESETS.default)[isMobile ? "mobile" : "desktop"];
     const toPos = presetToPosition(preset);
@@ -181,14 +189,17 @@ function CameraRig({
     const cam = camera as THREE.PerspectiveCamera;
     const toFov = preset.fov ?? (isMobile ? BASE_FOV_MOBILE : BASE_FOV);
 
-    if (!mounted.current) {
-      // Интро-облёт: стартуем издалека и сверху, плавно прилетаем к дефолту
-      mounted.current = true;
+    if (!introDone.current) {
+      /* Интро — аккуратный наезд: камера стоит чуть дальше, выше и левее и
+         спокойно подходит к дефолтному ракурсу. Прежний вариант уходил на
+         55° в сторону и вдвое дальше — получался облёт вокруг машины, а не
+         подача. */
+      introDone.current = true;
       const introPreset: CameraPreset = {
         target: preset.target,
-        azimuth: (preset.azimuth ?? 50) - 55,
-        polar: 55,
-        distance: (preset.distance ?? 8.2) * 1.9,
+        azimuth: (preset.azimuth ?? 50) - 16,
+        polar: Math.max((preset.polar ?? 76) - 9, 40),
+        distance: (preset.distance ?? 8.2) * 1.52,
       };
       camera.position.copy(presetToPosition(introPreset));
       flightRef.current = {
@@ -199,7 +210,7 @@ function CameraRig({
         fromFov: cam.fov,
         toFov,
         start: performance.now(),
-        duration: 2200,
+        duration: 2400,
       };
     } else {
       flightRef.current = {
@@ -215,7 +226,7 @@ function CameraRig({
     }
     invalidate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [focus, isMobile]);
+  }, [focus, isMobile, ready]);
 
   useFrame(() => {
     const flight = flightRef.current;
@@ -365,7 +376,7 @@ function SoftGroundShadow({ night, interior }: { night: boolean; interior: boole
       <meshBasicMaterial
         map={shadow}
         transparent
-        opacity={night ? 0.58 : 0.66}
+        opacity={night ? 0.58 : 0.5}
         depthWrite={false}
         toneMapped={false}
       />
@@ -382,9 +393,9 @@ function SoftGroundShadow({ night, interior }: { night: boolean; interior: boole
 function SceneEnvironment({ night, isMobile }: { night: boolean; isMobile: boolean }) {
   return (
     <Environment resolution={isMobile ? 256 : 512} frames={1}>
-      {/* Фон кубкарты — то, что отражается в лаке. Днём студия светлая, и на
-          тёмно-сером борта чёрной машины оставались без отражений: кузов
-          читался плоским силуэтом. */}
+      {/* Фон кубкарты — то, что отражается в лаке. Он намеренно светлее самого
+          павильона: на тёмно-сером борта чёрной машины оставались без
+          отражений и кузов читался плоским силуэтом. */}
       <color attach="background" args={[night ? "#08090a" : "#5c6165"]} />
       {night ? (
         <>
@@ -418,13 +429,27 @@ function SceneEnvironment({ night, isMobile }: { night: boolean; isMobile: boole
   );
 }
 
-export default function ConfiguratorScene({ config, focus = "default" }: { config: BuildConfig; focus?: CameraFocus }) {
+export default function ConfiguratorScene({
+  config,
+  focus = "default",
+  onReady,
+}: {
+  config: BuildConfig;
+  focus?: CameraFocus;
+  /** Дёргается, когда машина собрана: по нему страница убирает заставку. */
+  onReady?: () => void;
+}) {
   const { isMobile, reducedMotion } = useSceneQuality();
+  const [carReady, setCarReady] = useState(false);
+  const handleReady = useCallback(() => {
+    setCarReady(true);
+    onReady?.();
+  }, [onReady]);
   const safeFocus = PRESETS[focus] ? focus : "default";
   const interior = isInteriorFocus(safeFocus);
   const controls = useRef<OrbitControlsImpl>(null);
   const flightRef = useRef<FlightState | null>(null);
-  const bg = config.night ? "#08090a" : "#d5d8db";
+  const bg = config.night ? "#08090a" : "#111315";
   const enablePostEffects = !isMobile && !reducedMotion && !interior;
 
   return (
@@ -448,7 +473,7 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
 
       <InvalidateOnConfig config={config} />
       <ConfineCamera night={config.night} controlsRef={controls} interior={interior} flightRef={flightRef} />
-      <CameraRig focus={safeFocus} isMobile={isMobile} controlsRef={controls} flightRef={flightRef} />
+      <CameraRig focus={safeFocus} isMobile={isMobile} controlsRef={controls} flightRef={flightRef} ready={carReady} />
 
       <Suspense fallback={null}>
         <SceneEnvironment night={config.night} isMobile={isMobile} />
@@ -464,7 +489,7 @@ export default function ConfiguratorScene({ config, focus = "default" }: { confi
           shadow-camera-top={6}
           shadow-camera-bottom={-6}
         />
-        <CarModel config={config} doorsOpen={interior} />
+        <CarModel config={config} doorsOpen={interior} onReady={handleReady} />
 
         {/* Свет салона. Материалы кабины не берут свет окружения вовсе, так
             что кроме рассеянного её освещают только эти два плафона — зато

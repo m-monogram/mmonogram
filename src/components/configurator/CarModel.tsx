@@ -1,4 +1,4 @@
-import { Component, Suspense, type ReactNode } from "react";
+import { Component, Suspense, useEffect, type ReactNode } from "react";
 import GClassModel from "./GClassModel";
 import GClassGLTF from "./GClassGLTF";
 import SceneLoader from "./SceneLoader";
@@ -41,14 +41,40 @@ class ModelBoundary extends Component<{ children: ReactNode; fallback: ReactNode
   }
 }
 
-export default function CarModel({ config, doorsOpen = false }: { config: BuildConfig; doorsOpen?: boolean }) {
+/* Сигнал «машина в кадре»: монтируется только после того, как Suspense
+   отпустил, то есть кузов и обвес уже собраны. По нему страница убирает
+   заставку, а камера начинает интро-наезд — до этого наезжать не на что. */
+function ReadySignal({ onReady }: { onReady?: () => void }) {
+  useEffect(() => {
+    onReady?.();
+  }, [onReady]);
+  return null;
+}
+
+export default function CarModel({
+  config,
+  doorsOpen = false,
+  onReady,
+}: {
+  config: BuildConfig;
+  doorsOpen?: boolean;
+  onReady?: () => void;
+}) {
   const car = CARS[config.model] ?? CARS[DEFAULT_CAR];
-  const broken = <GClassModel config={config} doorsOpen={doorsOpen && !!car.supportsOpenings} />;
+  /* Заглушка тоже сообщает о готовности: иначе при недоступных GLB заставка
+     висела бы вечно поверх работающей сцены. */
+  const broken = (
+    <>
+      <GClassModel config={config} doorsOpen={doorsOpen && !!car.supportsOpenings} />
+      <ReadySignal onReady={onReady} />
+    </>
+  );
 
   return (
     <ModelBoundary fallback={broken}>
       <Suspense fallback={<SceneLoader night={config.night} />}>
         <GClassGLTF config={config} />
+        <ReadySignal onReady={onReady} />
       </Suspense>
     </ModelBoundary>
   );

@@ -38,6 +38,7 @@ import {
   type CameraFocus,
 } from "@/components/configurator/config";
 import SceneErrorBoundary from "@/components/configurator/SceneErrorBoundary";
+import StudioIntro from "@/components/configurator/StudioIntro";
 import { CARS, DEFAULT_CAR, selectableCarIds } from "@/components/configurator/models";
 
 const ConfiguratorScene = lazy(() => import("@/components/configurator/Scene"));
@@ -176,6 +177,7 @@ const ConfiguratorPage = () => {
   const [config, setConfig] = useState<BuildConfig>(() => decodeConfig(searchParams.get("c")));
   const [activeSection, setActiveSection] = useState<StudioSection>("exterior");
   const [tuningOpen, setTuningOpen] = useState(false);
+  const [sceneReady, setSceneReady] = useState(false);
   const panelRef = useRef<HTMLElement>(null);
   const [copied, setCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
@@ -256,6 +258,8 @@ const ConfiguratorPage = () => {
     if (tuningOpen) el.removeAttribute("inert");
     else el.setAttribute("inert", "");
   }, [tuningOpen]);
+
+  const handleSceneReady = useCallback(() => setSceneReady(true), []);
 
   const handleShare = useCallback(async () => {
     const params = new URLSearchParams({ c: encodeConfig(config) });
@@ -564,10 +568,12 @@ const ConfiguratorPage = () => {
               </div>
             }
           >
-            <ConfiguratorScene config={config} focus={focus} />
+            <ConfiguratorScene config={config} focus={focus} onReady={handleSceneReady} />
           </Suspense>
         </SceneErrorBoundary>
       </div>
+
+      <StudioIntro done={sceneReady} />
 
       <div className="pointer-events-none absolute inset-x-0 top-[5.25rem] z-20 flex justify-center px-4 sm:top-[5.75rem]">
         <div className="pointer-events-auto flex items-center gap-2">
