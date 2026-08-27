@@ -25,6 +25,10 @@ const EditionCard = memo(function EditionCard({
 }) {
   const [loaded, setLoaded] = useState(false);
   const isDark = variant === "dark";
+  /* Тёмные карточки — комплектации внутри семейства, у них надстрочником идёт
+     имя семейства. Светлые — сами семейства на главной, там имени семейства
+     сверху взяться неоткуда, поэтому подписываем категорией. */
+  const eyebrow = isDark ? project.subtitle : project.category;
 
   return (
     <motion.button
@@ -75,9 +79,14 @@ const EditionCard = memo(function EditionCard({
         )}
       </div>
       <div className={cn(isDark ? "mt-5 sm:mt-6" : "mt-4 sm:mt-5")}>
-        {isDark && project.subtitle ? (
-          <p className="font-body text-[10px] sm:text-xs uppercase tracking-[0.2em] text-white/40 mb-2">
-            {project.subtitle}
+        {eyebrow ? (
+          <p
+            className={cn(
+              "font-body text-[10px] sm:text-xs uppercase tracking-[0.2em] mb-2",
+              isDark ? "text-white/40" : "text-black/45"
+            )}
+          >
+            {eyebrow}
           </p>
         ) : null}
         <p
