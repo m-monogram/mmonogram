@@ -44,7 +44,7 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
         </div>
 
         {/* Hero Section - Enhanced - starts from top with light gradient overlay */}
-        <section className="relative pb-16 sm:pb-20 md:pb-24 px-4 sm:px-6 md:px-8 min-h-[60vh] sm:min-h-[70vh] flex items-center justify-center" style={{ paddingTop: `calc(env(safe-area-inset-top, 0px) + 8rem)` }}>
+        <section className="relative pb-10 sm:pb-12 md:pb-14 px-4 sm:px-6 md:px-8 min-h-[46vh] sm:min-h-[54vh] flex items-center justify-center" style={{ paddingTop: `calc(env(safe-area-inset-top, 0px) + 6.5rem)` }}>
           {/* Light gradient overlay - photo visible, text readable */}
           <div
             className="absolute inset-0 pointer-events-none z-0"
@@ -139,7 +139,7 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8 }}
-          className="relative pt-20 sm:pt-24 md:pt-32 pb-16 sm:pb-20 md:pb-24 px-4 sm:px-6 md:px-8"
+          className="relative pt-14 sm:pt-16 md:pt-20 pb-12 sm:pb-14 md:pb-16 px-4 sm:px-6 md:px-8"
         >
           {/* Subtle background gradient */}
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent pointer-events-none" aria-hidden />

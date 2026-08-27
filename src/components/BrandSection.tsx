@@ -127,7 +127,7 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 1 }}
-        className="relative max-w-7xl mx-auto px-6 sm:px-10 md:px-16 pt-20 sm:pt-24 md:pt-32 pb-0"
+        className="relative max-w-7xl mx-auto px-6 sm:px-10 md:px-16 pt-14 sm:pt-16 md:pt-20 pb-0"
       >
         <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-10 md:gap-16 items-start">
           {/* Left: label + description */}
@@ -171,11 +171,11 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
         whileInView={{ scaleX: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent origin-left mt-16 sm:mt-20"
+        className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent origin-left mt-10 sm:mt-12"
       />
 
       {/* ── CINEMATIC MISSION ── Giant centered headline */}
-      <div className="relative max-w-7xl mx-auto px-6 sm:px-10 md:px-16 py-20 sm:py-24 md:py-32">
+      <div className="relative max-w-7xl mx-auto px-6 sm:px-10 md:px-16 py-12 sm:py-16 md:py-20">
         {/* Background ghost text */}
         <div
           aria-hidden
@@ -197,13 +197,13 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
           className="relative z-10 text-center"
         >
           {/* Decorative thin line above */}
-          <div className="flex items-center justify-center gap-6 mb-12">
+          <div className="flex items-center justify-center gap-6 mb-8">
             <div className="w-24 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
             <div className="w-1 h-1 rounded-full bg-white/40 shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
             <div className="w-24 h-px bg-gradient-to-l from-transparent via-white/20 to-transparent" />
           </div>
 
-          <div className="max-w-5xl mx-auto space-y-8">
+          <div className="max-w-5xl mx-auto space-y-6">
             <h2 
               className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white uppercase tracking-tight font-bold leading-[1.05]"
               style={{ textShadow: '0 0 60px rgba(255,255,255,0.08)' }}
@@ -225,7 +225,7 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
           </div>
 
           {/* Decorative thin line below */}
-          <div className="flex items-center justify-center gap-6 mt-16">
+          <div className="flex items-center justify-center gap-6 mt-10">
             <div className="w-24 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
             <div className="w-1 h-1 rounded-full bg-white/40 shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
             <div className="w-24 h-px bg-gradient-to-l from-transparent via-white/20 to-transparent" />
@@ -248,7 +248,7 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.9, delay: 0.1 }}
-        className="max-w-7xl mx-auto px-6 sm:px-10 md:px-16 py-16 sm:py-20 md:py-24 text-center"
+        className="max-w-7xl mx-auto px-6 sm:px-10 md:px-16 py-10 sm:py-12 md:py-14 text-center"
       >
         <p className="font-display text-base sm:text-lg md:text-xl lg:text-2xl tracking-widest uppercase text-white/50 font-bold">
           {t('brand.transformDescription').split('\n\n')[2]}
@@ -276,7 +276,7 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.1 + i * 0.12 }}
-                className="py-8 sm:py-10 flex flex-col items-center gap-2 group"
+                className="py-6 sm:py-8 flex flex-col items-center gap-2 group"
               >
                 <span className="font-body text-[8px] tracking-widest text-white/15 uppercase">{num}</span>
                 <span className="font-body text-[9px] sm:text-[10px] md:text-xs tracking-widest uppercase text-white/40 group-hover:text-white/60 transition-colors duration-500">
@@ -292,7 +292,7 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
 
 
     {/* Pillars - Compact */}
-    <section className="py-10 sm:py-12 px-4 sm:px-6 md:px-8 lg:px-16 bg-premium-black">
+    <section className="py-8 sm:py-10 px-4 sm:px-6 md:px-8 lg:px-16 bg-premium-black">
       <div className="max-w-7xl mx-auto">
         <PillarsCarousel items={pillars} className="gap-6" />
       </div>

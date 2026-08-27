@@ -9,7 +9,6 @@ import LanguageSwitcher from "./LanguageSwitcher";
 
 // Menu images - themed for each section
 import menuBrand from "@/assets/menu/menu-brand.webp";
-import menuProjects from "@/assets/g63-quarter-new.webp";
 import menuModifications from "@/assets/commission-hero-final.webp";
 import menuVerify from "@/assets/menu/menu-verify.webp";
 import menuContact from "@/assets/menu/menu-contact-new.jpg.webp";
@@ -209,18 +208,11 @@ const Header = ({
       document.body.style.overflow = prev;
     };
   }, [menuOpen]);
+  /* 3D-студия из меню убрана: пока в неё ведёт только баннер с главной.
+     Подписи и переводы для неё остаются на месте — вернуть карточку это
+     одна строка. Пять карточек при двух колонках дают ровную сетку:
+     2 + 2 + широкая. */
   const navItems = [{
-    /* 3D-студия — единственная страница, на которую со всего сайта вёл один
-       баннер на главной: в меню её не было вовсе, хотя подписи для неё уже
-       переведены на все три языка. Широкая карточка первой строкой заодно
-       держит сетку заполненной: шесть карточек при двух колонках это
-       «широкая + 2 + 2 + широкая». */
-    labelKey: 'nav.configurator',
-    view: 'configurator',
-    image: menuProjects,
-    descKey: 'nav.configuratorDesc',
-    isWide: true
-  }, {
     labelKey: 'nav.brand',
     view: 'brand',
     image: menuBrand,
