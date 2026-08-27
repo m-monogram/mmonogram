@@ -1,5 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import { motion } from "framer-motion";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   Armchair,
   Camera,
@@ -17,10 +16,13 @@ import {
   RotateCcw,
   Save,
   Share2,
+  SlidersHorizontal,
   Sparkles,
   SunMoon,
+  X,
 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { cn } from "@/lib/utils";
 import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -75,6 +77,16 @@ type StudioSection =
   | "interior"
   | "overview";
 
+/** Одна опция активного раздела: панель рисует их одинаково, что бы ни выбирали. */
+type OptionItem = {
+  key: string;
+  title: string;
+  subtitle?: string;
+  preview: ReactNode;
+  selected: boolean;
+  onClick: () => void;
+};
+
 const SECTION_FOCUS: Partial<Record<StudioSection, CameraFocus>> = {
   exterior: "exterior",
   wheels: "wheels",
@@ -101,34 +113,30 @@ function OptionCard({
   title,
   subtitle,
   preview,
-}: {
-  selected: boolean;
-  onClick: () => void;
-  title: string;
-  subtitle?: string;
-  preview: ReactNode;
-}) {
+}: Omit<OptionItem, "key">) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`group relative flex h-[116px] min-w-[168px] max-w-[184px] flex-col justify-between overflow-hidden rounded-md border p-3 text-left transition-all duration-200 ${
+      aria-pressed={selected}
+      className={cn(
+        "group relative flex w-full shrink-0 items-center gap-3 rounded-md border p-2.5 text-left transition-colors duration-150",
         selected
-          ? "border-white/70 bg-white/[0.12] shadow-[0_12px_34px_rgba(255,255,255,0.08)]"
-          : "border-white/12 bg-black/35 hover:border-white/35 hover:bg-white/[0.07]"
-      }`}
+          ? "border-white/70 bg-white/[0.12]"
+          : "border-white/10 bg-white/[0.035] hover:border-white/35 hover:bg-white/[0.08]"
+      )}
     >
-      <span className="flex min-h-10 items-center gap-3 text-white/75">{preview}</span>
-      <span className="min-w-0">
+      <span className="flex h-12 w-[68px] shrink-0 items-center justify-center text-white/75">{preview}</span>
+      <span className="min-w-0 flex-1">
         <span className="block truncate font-body text-[13px] text-white">{title}</span>
         {subtitle && (
-          <span className="mt-1 block truncate font-body text-[10px] uppercase tracking-[0.14em] text-white/38">
+          <span className="mt-0.5 block truncate font-body text-[10px] uppercase tracking-[0.14em] text-white/38">
             {subtitle}
           </span>
         )}
       </span>
       {selected && (
-        <span className="absolute right-2.5 top-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-white text-black">
+        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white text-black">
           <Check className="h-3.5 w-3.5" strokeWidth={2.4} />
         </span>
       )}
@@ -176,6 +184,8 @@ const ConfiguratorPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [config, setConfig] = useState<BuildConfig>(() => decodeConfig(searchParams.get("c")));
   const [activeSection, setActiveSection] = useState<StudioSection>("exterior");
+  const [tuningOpen, setTuningOpen] = useState(false);
+  const panelRef = useRef<HTMLElement>(null);
   const [copied, setCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [savedFlash, setSavedFlash] = useState(false);
@@ -236,6 +246,25 @@ const ConfiguratorPage = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, []);
+
+  useEffect(() => {
+    if (!tuningOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setTuningOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [tuningOpen]);
+
+  /* Панель не размонтируем — она уезжает трансформом, чтобы открываться без
+     пересборки списка. Закрытую надо убрать из фокуса и из дерева доступности,
+     иначе табом можно уехать в невидимое меню. */
+  useEffect(() => {
+    const el = panelRef.current;
+    if (!el) return;
+    if (tuningOpen) el.removeAttribute("inert");
+    else el.setAttribute("inert", "");
+  }, [tuningOpen]);
 
   const handleShare = useCallback(async () => {
     const params = new URLSearchParams({ c: encodeConfig(config) });
@@ -348,6 +377,201 @@ const ConfiguratorPage = () => {
     ["interiorRear", t("config.interiorRear")],
   ];
 
+  /* Опции активного раздела одним списком. Раньше на каждый раздел был свой
+     кусок JSX с одинаковыми карточками — десять почти одинаковых веток. */
+  const options = useMemo<OptionItem[]>(() => {
+    const plus = (value: number) =>
+      `+${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value)}`;
+
+    switch (activeSection) {
+      case "model":
+        return carIds.map((id) => ({
+          key: id,
+          selected: config.model === id,
+          onClick: () => set({ model: id }),
+          preview: <Car className="h-8 w-8" strokeWidth={1.4} />,
+          title: CARS[id].name,
+          subtitle: id === "base-basic-pbr" ? t("config.modelSourcePbr") : t("config.modelMain"),
+        }));
+
+      case "exterior":
+        return [
+          ...PAINTS.map((paint, index) => ({
+            key: `paint-${paint.id}`,
+            selected: config.paint === index,
+            onClick: () => set({ paint: index }),
+            preview: <PreviewImage src={PAINT_PREVIEWS[index]} alt={paint.name} fallback={paint.color} />,
+            title: paint.name,
+          })),
+          ...GRILLE_FINISHES.map((finish, index) => ({
+            key: `grille-${finish.id}`,
+            selected: config.grille === index,
+            onClick: () => set({ grille: index }),
+            preview: <Swatch color={finish.color} />,
+            title: finish.name,
+            subtitle: t("config.grille"),
+          })),
+        ];
+
+      case "wheels":
+        return [
+          ...RIM_DESIGNS.map((rim, index) => ({
+            key: `rim-${rim.id}`,
+            selected: config.rim === index,
+            onClick: () => set({ rim: index }),
+            preview: <PreviewImage src={RIM_PREVIEWS[index]} alt={rim.name} fallback="#26282b" />,
+            title: rim.name,
+            subtitle: '24"',
+          })),
+          ...RIM_FINISHES.map((finish, index) => ({
+            key: `rim-finish-${finish.id}`,
+            selected: config.rimFinish === index,
+            onClick: () => set({ rimFinish: index }),
+            preview: <PreviewImage src={FINISH_PREVIEWS[index]} alt={finish.name} fallback={finish.color} />,
+            title: finish.name,
+            subtitle: t("config.rimColor"),
+          })),
+        ];
+
+      case "calipers":
+        return CALIPER_FINISHES.map((caliper, index) => ({
+          key: caliper.id,
+          selected: config.caliper === index,
+          onClick: () => set({ caliper: index }),
+          preview: <Swatch color={caliper.color} />,
+          title: caliper.name,
+        }));
+
+      case "kit":
+        return KIT_PACKAGES.map((pack, index) => ({
+          key: pack.id,
+          selected: config.kitPackage === index,
+          onClick: () => set({ kitPackage: index, kit: index > 0 }),
+          preview:
+            index === 0 ? <Car className="h-8 w-8" strokeWidth={1.4} /> : <Sparkles className="h-8 w-8" strokeWidth={1.4} />,
+          title: pack.name,
+          subtitle: index === 0 ? "Stock version" : plus(pack.price),
+        }));
+
+      case "carbon":
+        return [
+          {
+            key: "carbon-off",
+            selected: !config.carbon,
+            onClick: () => set({ carbon: false }),
+            preview: <Swatch color={PAINTS[config.paint].color} />,
+            title: t("config.carbonOff"),
+          },
+          {
+            key: "carbon-on",
+            selected: config.carbon,
+            onClick: () => set({ carbon: true }),
+            preview: <Swatch color="#15161a" />,
+            title: t("config.carbonOn"),
+          },
+        ];
+
+      case "openings":
+        return canOpen
+          ? [
+              {
+                key: "doors",
+                selected: config.doors,
+                onClick: () => set({ doors: !config.doors }),
+                preview: <DoorOpen className="h-8 w-8" strokeWidth={1.35} />,
+                title: "Open 4 Doors",
+                subtitle: config.doors ? "Open" : "Closed",
+              },
+              {
+                key: "hood",
+                selected: config.hood,
+                onClick: () => set({ hood: !config.hood }),
+                preview: <Car className="h-8 w-8" strokeWidth={1.35} />,
+                title: "Open Hood",
+                subtitle: config.hood ? "Open" : "Closed",
+              },
+              {
+                key: "trunk",
+                selected: config.trunk,
+                onClick: () => set({ trunk: !config.trunk }),
+                preview: <Package className="h-8 w-8" strokeWidth={1.35} />,
+                title: "Open Trunk",
+                subtitle: config.trunk ? "Open" : "Closed",
+              },
+            ]
+          : [];
+
+      case "lights":
+        return [
+          {
+            key: "lights-on",
+            selected: config.lights,
+            onClick: () => set({ lights: true }),
+            preview: <Lightbulb className="h-8 w-8 text-white" strokeWidth={1.4} />,
+            title: t("config.lightsOn"),
+          },
+          {
+            key: "lights-off",
+            selected: !config.lights,
+            onClick: () => set({ lights: false }),
+            preview: <Lightbulb className="h-8 w-8 text-white/42" strokeWidth={1.4} />,
+            title: t("config.lightsOff"),
+          },
+        ];
+
+      case "env":
+        return [
+          {
+            key: "env-studio",
+            selected: !config.night,
+            onClick: () => set({ night: false }),
+            preview: <Swatch color="#c7cbce" />,
+            title: t("config.envStudio"),
+          },
+          {
+            key: "env-night",
+            selected: config.night,
+            onClick: () => set({ night: true }),
+            preview: <Swatch color="#0a0a0c" />,
+            title: t("config.envNight"),
+          },
+        ];
+
+      case "interior":
+        return [
+          ...INTERIOR_FINISHES.map((finish, index) => ({
+            key: `interior-${finish.id}`,
+            selected: config.interior === index,
+            onClick: () => set({ interior: index }),
+            preview: (
+              <span className="flex">
+                <Swatch color={finish.primary} className="relative z-10" />
+                <Swatch color={finish.accent} className="-ml-4" />
+              </span>
+            ),
+            title: finish.name,
+            subtitle: index === 0 ? undefined : plus(finish.price),
+          })),
+          ...interiorViews.map(([view, label]) => ({
+            key: view,
+            selected: focus === view,
+            onClick: () => changeFocus(view),
+            preview: <Armchair className="h-8 w-8" strokeWidth={1.35} />,
+            title: label,
+            subtitle: "Camera",
+          })),
+        ];
+
+      default:
+        return [];
+    }
+    /* interiorViews пересобирается каждый рендер вместе с переводами — в
+       зависимостях достаточно самого t. */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSection, canOpen, carIds, changeFocus, config, focus, set, t]);
+
+  const activeMeta = sections.find((item) => item.id === activeSection);
+
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden bg-premium-black">
       <SEOHead
@@ -357,7 +581,16 @@ const ConfiguratorPage = () => {
       />
       <Header variant={config.night ? "dark" : "light"} />
 
-      <div id="configurator-canvas" className="absolute inset-0">
+      {/* Открытая панель забирает часть экрана, поэтому сцену уводим из-под неё:
+          на десктопе влево на половину ширины панели, на телефоне вверх. Это
+          трансформ, а не изменение размера канваса, — WebGL ничего не пересобирает. */}
+      <div
+        id="configurator-canvas"
+        className={cn(
+          "absolute inset-0 transition-transform duration-300 ease-out will-change-transform",
+          tuningOpen ? "-translate-y-[7.5rem] md:translate-y-0 md:-translate-x-[12.5rem]" : "translate-y-0 md:translate-x-0"
+        )}
+      >
         <SceneErrorBoundary>
           <Suspense
             fallback={
@@ -393,23 +626,8 @@ const ConfiguratorPage = () => {
         </div>
       </div>
 
-      <div
-        className={`pointer-events-none absolute bottom-[15.5rem] left-4 z-20 hidden md:block ${
-          config.night ? "text-white/40" : "text-black/45"
-        }`}
-      >
-        <p className="font-body text-[10px] uppercase tracking-[0.14em]">
-          {t("config.demoNote")} · {car.name}
-        </p>
-      </div>
-
-      <div className="pointer-events-none absolute bottom-[15.25rem] right-4 z-20 hidden md:flex items-center gap-2 rounded-md border border-white/10 bg-black/45 px-3 py-2 text-white/85 backdrop-blur-xl">
-        <DollarSign className="h-4 w-4 text-white/48" />
-        <span className="font-body text-[12px] uppercase tracking-[0.12em]">{formattedPrice}</span>
-      </div>
-
       {shareUrl && (
-        <div className="absolute inset-x-0 top-[8.5rem] z-30 flex justify-center px-4">
+        <div className="absolute inset-x-0 top-[8.5rem] z-40 flex justify-center px-4">
           <div className="flex w-full max-w-lg items-center gap-2 rounded-md border border-white/15 bg-black/85 px-3 py-2 backdrop-blur-xl">
             <input
               readOnly
@@ -429,14 +647,76 @@ const ConfiguratorPage = () => {
         </div>
       )}
 
-      <motion.div
-        initial={{ y: 38, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.38, ease: "easeOut" }}
-        className="absolute inset-x-0 bottom-0 z-30 border-t border-white/10 bg-[rgba(8,8,9,0.88)] shadow-[0_-22px_70px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
+      {/* Нижний HUD. Пока тюнинг закрыт, машину не перекрывает ничего, кроме
+          одной строки подписи, цены и кнопки вызова меню. */}
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-x-0 bottom-0 z-30 flex items-end gap-3 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] transition-[padding,opacity] duration-300 ease-out sm:px-5",
+          tuningOpen && "opacity-0 md:pr-[26.25rem] md:opacity-100"
+        )}
       >
-        <div className="mx-auto w-full max-w-[1560px] px-3 pb-[max(0.8rem,env(safe-area-inset-bottom))] pt-3 sm:px-5">
-          <div className="no-scrollbar flex gap-2 overflow-x-auto pb-2">
+        <p
+          className={cn(
+            "hidden font-body text-[10px] uppercase tracking-[0.14em] md:block",
+            config.night ? "text-white/40" : "text-black/45"
+          )}
+        >
+          {t("config.demoNote")} · {car.name}
+        </p>
+
+        <div className="pointer-events-auto flex w-full items-center gap-2 md:ml-auto md:w-auto">
+          <span className="flex h-11 flex-1 items-center gap-2 rounded-md border border-white/10 bg-black/55 px-3 text-white/85 backdrop-blur-xl md:flex-none">
+            <DollarSign className="h-4 w-4 text-white/48" />
+            <span className="font-body text-[12px] uppercase tracking-[0.12em]">{formattedPrice}</span>
+          </span>
+          <button
+            type="button"
+            onClick={() => setTuningOpen(true)}
+            aria-expanded={tuningOpen}
+            aria-controls="tuning-panel"
+            className="flex h-11 shrink-0 items-center gap-2 rounded-md bg-white px-5 font-body text-[12px] uppercase tracking-[0.18em] text-black shadow-[0_18px_44px_rgba(0,0,0,0.45)] transition-transform duration-150 hover:bg-white/90 active:scale-[0.98]"
+          >
+            <SlidersHorizontal className="h-4 w-4" strokeWidth={2} />
+            Tuning
+          </button>
+        </div>
+      </div>
+
+      {/* Меню тюнинга: на десктопе выезжает панелью справа, на телефоне —
+          шторкой снизу. Не размонтируется, поэтому открывается мгновенно. */}
+      <aside
+        id="tuning-panel"
+        ref={panelRef}
+        aria-label="Tuning"
+        className={cn(
+          "absolute z-40 flex flex-col border-white/10 bg-[rgba(8,8,9,0.93)] shadow-[0_-22px_70px_rgba(0,0,0,0.55)] backdrop-blur-2xl transition-transform duration-300 ease-out will-change-transform",
+          "inset-x-0 bottom-0 max-h-[74dvh] rounded-t-2xl border-t",
+          /* На десктопе панель во всю высоту: сдвинутая сцена иначе оголяет
+             полосу справа под шапкой. Шапка сайта лежит выше по z-index,
+             поэтому её кнопки остаются кликабельными поверх панели. */
+          "md:inset-x-auto md:bottom-0 md:right-0 md:top-0 md:max-h-none md:w-[25rem] md:rounded-none md:border-l md:border-t-0 md:pt-[4.5rem]",
+          tuningOpen ? "translate-y-0 md:translate-x-0" : "translate-y-full md:translate-y-0 md:translate-x-full"
+        )}
+      >
+        <div className="flex shrink-0 items-center gap-3 border-b border-white/10 px-4 py-3">
+          <SlidersHorizontal className="h-4 w-4 shrink-0 text-white/50" strokeWidth={1.8} />
+          <span className="font-display text-[12px] uppercase tracking-[0.22em] text-white">Tuning</span>
+          <span className="ml-auto truncate font-body text-[12px] text-white/45">{formattedPrice}</span>
+          <button
+            type="button"
+            onClick={() => setTuningOpen(false)}
+            aria-label="Close tuning"
+            className="-mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+          <nav
+            aria-label="Tuning sections"
+            className="no-scrollbar flex shrink-0 gap-1.5 overflow-x-auto border-b border-white/10 p-2 md:w-[6.75rem] md:flex-col md:overflow-x-visible md:overflow-y-auto md:border-b-0 md:border-r"
+          >
             {sections.map((item) => {
               const Icon = item.icon;
               const active = activeSection === item.id;
@@ -445,275 +725,82 @@ const ConfiguratorPage = () => {
                   key={item.id}
                   type="button"
                   onClick={() => chooseSection(item.id)}
-                  className={`flex h-[58px] min-w-[196px] items-center gap-2 rounded-md border px-3 text-left transition-all ${
+                  aria-current={active}
+                  className={cn(
+                    "flex shrink-0 items-center gap-2 rounded-md border px-3 py-2 transition-colors duration-150 md:w-full md:min-h-[4rem] md:flex-col md:justify-center md:gap-1 md:px-1.5 md:py-2 md:text-center",
                     active
                       ? "border-white/70 bg-white text-black"
-                      : "border-white/12 bg-white/[0.045] text-white hover:border-white/32 hover:bg-white/[0.08]"
-                  }`}
+                      : "border-white/10 bg-white/[0.04] text-white/80 hover:border-white/30 hover:bg-white/[0.09]"
+                  )}
                 >
                   <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.8} />
-                  <span className="min-w-0">
-                    <span className="block truncate font-body text-[12px] uppercase tracking-[0.12em]">{item.label}</span>
-                    {item.value && (
-                      <span className={`mt-0.5 block truncate font-body text-[10px] ${active ? "text-black/55" : "text-white/38"}`}>
-                        {item.value}
-                      </span>
-                    )}
+                  <span className="font-body text-[10px] uppercase tracking-[0.14em] md:text-[9px] md:leading-tight">
+                    {item.label}
                   </span>
                 </button>
               );
             })}
-          </div>
+          </nav>
 
-          <div className="no-scrollbar flex h-[132px] gap-2 overflow-x-auto pt-1">
-            {activeSection === "model" && (
-              <>
-                {carIds.map((id) => (
-                  <OptionCard
-                    key={id}
-                    selected={config.model === id}
-                    onClick={() => set({ model: id })}
-                    preview={<Car className="h-9 w-9" strokeWidth={1.4} />}
-                    title={CARS[id].name}
-                    subtitle={id === "base-basic-pbr" ? t("config.modelSourcePbr") : t("config.modelMain")}
-                  />
-                ))}
-              </>
+          <div className="flex min-h-0 flex-1 flex-col">
+            {activeMeta && (
+              <div className="flex shrink-0 items-baseline gap-2 px-3 pt-3">
+                <span className="shrink-0 font-body text-[11px] uppercase tracking-[0.18em] text-white/45">
+                  {activeMeta.label}
+                </span>
+                {activeMeta.value && (
+                  <span className="min-w-0 truncate font-body text-[11px] text-white/70">{activeMeta.value}</span>
+                )}
+              </div>
             )}
 
-            {activeSection === "exterior" && (
-              <>
-                {PAINTS.map((paint, index) => (
-                  <OptionCard
-                    key={paint.id}
-                    selected={config.paint === index}
-                    onClick={() => set({ paint: index })}
-                    preview={<PreviewImage src={PAINT_PREVIEWS[index]} alt={paint.name} fallback={paint.color} />}
-                    title={paint.name}
-                    subtitle={t("config.exterior")}
-                  />
-                ))}
-                {GRILLE_FINISHES.map((finish, index) => (
-                  <OptionCard
-                    key={finish.id}
-                    selected={config.grille === index}
-                    onClick={() => set({ grille: index })}
-                    preview={<Swatch color={finish.color} />}
-                    title={finish.name}
-                    subtitle={t("config.grille")}
-                  />
-                ))}
-              </>
-            )}
-
-            {activeSection === "wheels" && (
-              <>
-                {RIM_DESIGNS.map((rim, index) => (
-                  <OptionCard
-                    key={rim.id}
-                    selected={config.rim === index}
-                    onClick={() => set({ rim: index })}
-                    preview={<PreviewImage src={RIM_PREVIEWS[index]} alt={rim.name} fallback="#26282b" />}
-                    title={rim.name}
-                    subtitle={'24"'}
-                  />
-                ))}
-                {RIM_FINISHES.map((finish, index) => (
-                  <OptionCard
-                    key={finish.id}
-                    selected={config.rimFinish === index}
-                    onClick={() => set({ rimFinish: index })}
-                    preview={<PreviewImage src={FINISH_PREVIEWS[index]} alt={finish.name} fallback={finish.color} />}
-                    title={finish.name}
-                    subtitle={t("config.rimColor")}
-                  />
-                ))}
-              </>
-            )}
-
-            {activeSection === "calipers" && (
-              <>
-                {CALIPER_FINISHES.map((caliper, index) => (
-                  <OptionCard
-                    key={caliper.id}
-                    selected={config.caliper === index}
-                    onClick={() => set({ caliper: index })}
-                    preview={<Swatch color={caliper.color} />}
-                    title={caliper.name}
-                    subtitle="Brake calipers"
-                  />
-                ))}
-              </>
-            )}
-
-            {activeSection === "kit" && (
-              <>
-                {KIT_PACKAGES.map((pack, index) => (
-                  <OptionCard
-                    key={pack.id}
-                    selected={config.kitPackage === index}
-                    onClick={() => set({ kitPackage: index, kit: index > 0 })}
-                    preview={index === 0 ? <Car className="h-9 w-9" strokeWidth={1.4} /> : <Sparkles className="h-9 w-9" strokeWidth={1.4} />}
-                    title={pack.name}
-                    subtitle={
-                      index === 0
-                        ? "Stock version"
-                        : `+${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(pack.price)}`
-                    }
-                  />
-                ))}
-              </>
-            )}
-
-            {activeSection === "carbon" && (
-              <>
-                <OptionCard
-                  selected={!config.carbon}
-                  onClick={() => set({ carbon: false })}
-                  preview={<Swatch color={PAINTS[config.paint].color} />}
-                  title={t("config.carbonOff")}
-                  subtitle={t("config.carbon")}
-                />
-                <OptionCard
-                  selected={config.carbon}
-                  onClick={() => set({ carbon: true })}
-                  preview={<Swatch color="#15161a" />}
-                  title={t("config.carbonOn")}
-                  subtitle={t("config.carbon")}
-                />
-              </>
-            )}
-
-            {activeSection === "openings" && canOpen && (
-              <>
-                <OptionCard
-                  selected={config.doors}
-                  onClick={() => set({ doors: !config.doors })}
-                  preview={<DoorOpen className="h-9 w-9" strokeWidth={1.35} />}
-                  title="Open 4 Doors"
-                  subtitle={config.doors ? "Open" : "Closed"}
-                />
-                <OptionCard
-                  selected={config.hood}
-                  onClick={() => set({ hood: !config.hood })}
-                  preview={<Car className="h-9 w-9" strokeWidth={1.35} />}
-                  title="Open Hood"
-                  subtitle={config.hood ? "Open" : "Closed"}
-                />
-                <OptionCard
-                  selected={config.trunk}
-                  onClick={() => set({ trunk: !config.trunk })}
-                  preview={<Package className="h-9 w-9" strokeWidth={1.35} />}
-                  title="Open Trunk"
-                  subtitle={config.trunk ? "Open" : "Closed"}
-                />
-              </>
-            )}
-
-            {activeSection === "lights" && (
-              <>
-                <OptionCard
-                  selected={config.lights}
-                  onClick={() => set({ lights: true })}
-                  preview={<Lightbulb className="h-9 w-9 text-white" strokeWidth={1.4} />}
-                  title={t("config.lightsOn")}
-                  subtitle={t("config.lights")}
-                />
-                <OptionCard
-                  selected={!config.lights}
-                  onClick={() => set({ lights: false })}
-                  preview={<Lightbulb className="h-9 w-9 text-white/42" strokeWidth={1.4} />}
-                  title={t("config.lightsOff")}
-                  subtitle={t("config.lights")}
-                />
-              </>
-            )}
-
-            {activeSection === "env" && (
-              <>
-                <OptionCard
-                  selected={!config.night}
-                  onClick={() => set({ night: false })}
-                  preview={<Swatch color="#c7cbce" />}
-                  title={t("config.envStudio")}
-                  subtitle={t("config.environment")}
-                />
-                <OptionCard
-                  selected={config.night}
-                  onClick={() => set({ night: true })}
-                  preview={<Swatch color="#0a0a0c" />}
-                  title={t("config.envNight")}
-                  subtitle={t("config.environment")}
-                />
-              </>
-            )}
-
-            {activeSection === "interior" && (
-              <>
-                {INTERIOR_FINISHES.map((finish, index) => (
-                  <OptionCard
-                    key={finish.id}
-                    selected={config.interior === index}
-                    onClick={() => set({ interior: index })}
-                    preview={
-                      <span className="flex">
-                        <Swatch color={finish.primary} className="relative z-10" />
-                        <Swatch color={finish.accent} className="-ml-4" />
+            <div className="no-scrollbar flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3">
+              {activeSection === "overview"
+                ? overviewRows.map((row) => (
+                    <div
+                      key={row.label}
+                      className="flex items-baseline justify-between gap-3 border-b border-white/10 pb-2 last:border-b-0"
+                    >
+                      <span className="shrink-0 font-body text-[10px] uppercase tracking-[0.16em] text-white/38">
+                        {row.label}
                       </span>
-                    }
-                    title={finish.name}
-                    subtitle={
-                      index === 0
-                        ? t("config.interior")
-                        : `+${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(finish.price)}`
-                    }
-                  />
-                ))}
-                {interiorViews.map(([view, label]) => (
-                  <OptionCard
-                    key={view}
-                    selected={focus === view}
-                    onClick={() => changeFocus(view)}
-                    preview={<Armchair className="h-9 w-9" strokeWidth={1.35} />}
-                    title={label}
-                    subtitle={t("config.interior")}
-                  />
-                ))}
-              </>
-            )}
-
-            {activeSection === "overview" && (
-              <>
-                <button
-                  type="button"
-                  onClick={() => navigate(`/booking?build=${encodeConfig(config)}`)}
-                  className="flex h-[116px] min-w-[210px] flex-col justify-center rounded-md bg-white px-5 text-left text-black transition-colors hover:bg-white/90"
-                >
-                  <span className="font-body text-[12px] uppercase tracking-[0.18em]">Request this build</span>
-                  <span className="mt-2 font-body text-[11px] text-black/48">{formattedPrice}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSave}
-                  className="flex h-[116px] min-w-[188px] flex-col justify-center rounded-md border border-white/12 bg-black/35 px-5 text-left text-white transition-colors hover:border-white/35 hover:bg-white/[0.07]"
-                >
-                  <span className="font-body text-[12px] uppercase tracking-[0.18em]">{config.saved ? "Saved car" : "Save car"}</span>
-                  <span className="mt-2 font-body text-[11px] text-white/42">Local garage</span>
-                </button>
-                {overviewRows.map((row) => (
-                  <div
-                    key={row.label}
-                    className="flex h-[116px] min-w-[188px] max-w-[220px] flex-col justify-between rounded-md border border-white/12 bg-black/35 p-3"
-                  >
-                    <span className="truncate font-body text-[10px] uppercase tracking-[0.16em] text-white/38">{row.label}</span>
-                    <span className="line-clamp-3 font-body text-[13px] leading-snug text-white">{row.value}</span>
-                  </div>
-                ))}
-              </>
-            )}
+                      <span className="text-right font-body text-[12px] text-white">{row.value}</span>
+                    </div>
+                  ))
+                : options.map((option) => (
+                    <OptionCard
+                      key={option.key}
+                      selected={option.selected}
+                      onClick={option.onClick}
+                      title={option.title}
+                      subtitle={option.subtitle}
+                      preview={option.preview}
+                    />
+                  ))}
+            </div>
           </div>
         </div>
-      </motion.div>
+
+        <div className="flex shrink-0 items-center gap-2 border-t border-white/10 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <button
+            type="button"
+            onClick={() => navigate(`/booking?build=${encodeConfig(config)}`)}
+            className="flex h-11 flex-1 items-center justify-center rounded-md bg-white font-body text-[11px] uppercase tracking-[0.18em] text-black transition-colors hover:bg-white/90"
+          >
+            Request this build
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            aria-label={config.saved ? "Saved car" : "Save car"}
+            title={config.saved ? "Saved car" : "Save car"}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-white/12 bg-white/[0.04] text-white/80 transition-colors hover:border-white/35 hover:bg-white/[0.09] hover:text-white"
+          >
+            {savedFlash || config.saved ? <Check className="h-4 w-4" /> : <Save className="h-4 w-4" />}
+          </button>
+        </div>
+      </aside>
+
     </div>
   );
 };

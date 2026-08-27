@@ -432,6 +432,18 @@
     background: hsl(var(--premium-black));
   }
 
+  /* Полосы прокрутки в панелях конфигуратора: класс использовался и раньше,
+     но нигде не был объявлен, поэтому системный скроллбар резал карточки. */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
   /* Premium black background */
   .bg-premium-black {
     background: hsl(var(--premium-black));

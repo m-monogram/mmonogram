@@ -283,7 +283,7 @@ export const projects: Project[] = [
       "24'' forged chrome wheels",
     ],
     specs: {
-      exterior: "Graphite Grey / chrome",
+      exterior: "Graphite Silver / chrome",
       interior: "Black Nappa, silver accents",
       carbon: "Dark carbon detailing",
       spoilers: "Integrated roof spoiler",

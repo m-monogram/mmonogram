@@ -30,7 +30,7 @@ export interface RimFinish {
 export const PAINTS: PaintOption[] = [
   { id: "obsidian", name: "Obsidian Black", color: "#0b0b0d", metalness: 0.9, roughness: 0.32 },
   { id: "polar", name: "Polar White", color: "#e8e8e6", metalness: 0.55, roughness: 0.3 },
-  { id: "nardo", name: "Nardo Grey", color: "#7d8287", metalness: 0.6, roughness: 0.34 },
+  { id: "nardo", name: "Nardo Silver", color: "#7d8287", metalness: 0.6, roughness: 0.34 },
   { id: "emerald", name: "Emerald", color: "#0e3d2c", metalness: 0.85, roughness: 0.3 },
   { id: "oxblood", name: "Oxblood", color: "#4a0f14", metalness: 0.85, roughness: 0.3 },
   { id: "aurum", name: "Desert Aurum", color: "#8a6d3b", metalness: 0.95, roughness: 0.28 },
