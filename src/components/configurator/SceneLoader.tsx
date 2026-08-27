@@ -1,4 +1,4 @@
-import { Html, useProgress } from "@react-three/drei";
+import { Html } from "@react-three/drei";
 
 /**
  * Индикатор загрузки на месте машины.
@@ -10,11 +10,6 @@ import { Html, useProgress } from "@react-three/drei";
  * скачано из моделей и окружения.
  */
 export default function SceneLoader({ night }: { night: boolean }) {
-  const { progress } = useProgress();
-  /* До 100 доводит появление самой машины, а не счётчик: последние проценты
-     уходят на разбор Draco, и замерший на 100% индикатор читается как зависший. */
-  const percent = Math.min(99, Math.round(progress));
-
   return (
     <Html fullscreen style={{ pointerEvents: "none" }}>
       <div className="flex h-full w-full items-center justify-center">
@@ -28,14 +23,13 @@ export default function SceneLoader({ night }: { night: boolean }) {
           </p>
           <div className={`h-px w-full overflow-hidden ${night ? "bg-white/15" : "bg-black/15"}`}>
             <div
-              className={`h-full transition-[width] duration-200 ease-out ${night ? "bg-white/70" : "bg-black/55"}`}
-              style={{ width: `${percent}%` }}
+              className={`h-full w-2/3 animate-pulse ${night ? "bg-white/70" : "bg-black/55"}`}
             />
           </div>
           <p
             className={`font-body text-[10px] tabular-nums ${night ? "text-white/40" : "text-black/40"}`}
           >
-            {percent}%
+            Preparing studio
           </p>
         </div>
       </div>

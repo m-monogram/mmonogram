@@ -51,6 +51,42 @@ const FOCUS_VALUES: CameraFocus[] = [
   "interiorFront", "interiorDriver", "interiorRear",
 ];
 
+type SavedBuild = { code: string; savedAt: string; price?: number };
+
+function readSavedBuilds(): SavedBuild[] {
+  try {
+    const raw = localStorage.getItem("mmonogram-builds");
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((item): item is SavedBuild => {
+        return (
+          item &&
+          typeof item.code === "string" &&
+          typeof item.savedAt === "string" &&
+          (typeof item.price === "number" || typeof item.price === "undefined")
+        );
+      })
+      .slice(0, 12);
+  } catch {
+    return [];
+  }
+}
+
+function estimateBuildPrice(c: BuildConfig): number {
+  const interiorPrices = [0, 12000, 18000, 22000];
+  return (
+    349000 +
+    (c.kitPackage === 0 ? -42000 : 0) +
+    (c.paint > 0 ? 6500 : 0) +
+    c.rimFinish * 1200 +
+    (c.carbon ? 18500 : 0) +
+    (c.grille > 0 ? 2500 : 0) +
+    (interiorPrices[c.interior] ?? 0)
+  );
+}
+
 const PAINT_PREVIEWS = Object.values(
   import.meta.glob("@/assets/previews/paint-*.jpg", { eager: true, import: "default" })
 ) as string[];
@@ -182,6 +218,7 @@ const ConfiguratorPage = () => {
   const [copied, setCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [savedBuilds, setSavedBuilds] = useState<SavedBuild[]>(() => readSavedBuilds());
   const [focus, setFocus] = useState<CameraFocus>(() => {
     const v = searchParams.get("v");
     return v && (FOCUS_VALUES as string[]).includes(v) ? (v as CameraFocus) : "default";
@@ -278,6 +315,13 @@ const ConfiguratorPage = () => {
     window.setTimeout(() => setCopied(false), 1800);
   }, [config, focus]);
 
+  const price = estimateBuildPrice(config);
+  const formatPrice = useCallback(
+    (value: number) =>
+      new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value),
+    []
+  );
+
   const handleSave = useCallback(() => {
     /* Чужая запись под тем же ключом или приватный режим не должны ронять
        страницу: раньше JSON.parse на мусоре выбрасывал прямо из обработчика
@@ -290,16 +334,17 @@ const ConfiguratorPage = () => {
       saved = [];
     }
     const code = encodeConfig(config);
-    const next = [{ code, savedAt: new Date().toISOString() }, ...saved.filter((item) => item.code !== code)].slice(0, 12);
+    const next = [{ code, savedAt: new Date().toISOString(), price }, ...saved.filter((item) => item.code !== code)].slice(0, 12);
     try {
       localStorage.setItem("mmonogram-builds", JSON.stringify(next));
+      setSavedBuilds(next);
     } catch {
       /* Квота или запрет хранилища — сборка всё равно живёт в ссылке. */
     }
     handleChange({ ...config, saved: true });
     setSavedFlash(true);
     window.setTimeout(() => setSavedFlash(false), 1800);
-  }, [config, handleChange]);
+  }, [config, handleChange, price]);
 
   const handleScreenshot = useCallback(() => {
     const canvas = document.querySelector<HTMLCanvasElement>("#configurator-canvas canvas");
@@ -314,6 +359,25 @@ const ConfiguratorPage = () => {
     setActiveSection("exterior");
     apply(DEFAULT_CONFIG, focusForSection("exterior"));
   }, [apply]);
+
+  const loadSavedBuild = useCallback(
+    (code: string) => {
+      const next = decodeConfig(code);
+      setActiveSection("overview");
+      apply(next, "default");
+    },
+    [apply]
+  );
+
+  const clearSavedBuilds = useCallback(() => {
+    try {
+      localStorage.removeItem("mmonogram-builds");
+    } catch {
+      /* Хранилище может быть запрещено, но интерфейс всё равно должен жить. */
+    }
+    setSavedBuilds([]);
+    handleChange({ ...config, saved: false });
+  }, [config, handleChange]);
 
   const handleFullscreen = useCallback(() => {
     const root = document.documentElement;
@@ -355,6 +419,7 @@ const ConfiguratorPage = () => {
     ...(canOpen
       ? [{ label: "Openings", value: [config.doors && "4 doors", config.hood && "hood", config.trunk && "trunk"].filter(Boolean).join(" · ") || "closed" }]
       : []),
+    { label: "Price", value: formatPrice(price) },
   ];
 
   const interiorViews: [InteriorView, string][] = [
@@ -442,6 +507,22 @@ const ConfiguratorPage = () => {
       case "openings":
         return canOpen
           ? [
+              {
+                key: "showcase-open",
+                selected: config.doors && config.hood && config.trunk,
+                onClick: () => set({ doors: true, hood: true, trunk: true }),
+                preview: <Sparkles className="h-8 w-8" strokeWidth={1.35} />,
+                title: "Showcase Open",
+                subtitle: "All panels",
+              },
+              {
+                key: "close-all",
+                selected: !config.doors && !config.hood && !config.trunk,
+                onClick: () => set({ doors: false, hood: false, trunk: false }),
+                preview: <Car className="h-8 w-8" strokeWidth={1.35} />,
+                title: "Close All",
+                subtitle: "Clean silhouette",
+              },
               {
                 key: "doors",
                 selected: config.doors,
@@ -719,8 +800,63 @@ const ConfiguratorPage = () => {
             )}
 
             <div className="no-scrollbar flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3">
-              {activeSection === "overview"
-                ? overviewRows.map((row) => (
+              {activeSection === "overview" ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/booking?build=${encodeConfig(config)}`)}
+                    className="flex min-h-14 items-center justify-between gap-3 rounded-md bg-white px-3.5 py-3 text-left text-black transition-colors hover:bg-white/90"
+                  >
+                    <span className="font-body text-[11px] uppercase tracking-[0.18em]">Request this build</span>
+                    <span className="shrink-0 font-body text-[11px] text-black/48">{formatPrice(price)}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    className="flex min-h-14 items-center justify-between gap-3 rounded-md border border-white/12 bg-white/[0.04] px-3.5 py-3 text-left text-white transition-colors hover:border-white/35 hover:bg-white/[0.09]"
+                  >
+                    <span className="font-body text-[11px] uppercase tracking-[0.18em]">
+                      {config.saved ? "Saved car" : "Save car"}
+                    </span>
+                    <span className="font-body text-[10px] uppercase tracking-[0.12em] text-white/42">Local garage</span>
+                  </button>
+                  {savedBuilds.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={clearSavedBuilds}
+                      className="flex min-h-14 items-center justify-between gap-3 rounded-md border border-white/12 bg-white/[0.04] px-3.5 py-3 text-left text-white transition-colors hover:border-white/35 hover:bg-white/[0.09]"
+                    >
+                      <span className="font-body text-[11px] uppercase tracking-[0.18em]">Clear saved</span>
+                      <span className="font-body text-[10px] uppercase tracking-[0.12em] text-white/42">
+                        {savedBuilds.length} builds
+                      </span>
+                    </button>
+                  )}
+                  {savedBuilds.map((item, index) => {
+                    const savedConfig = decodeConfig(item.code);
+                    const savedCar = CARS[savedConfig.model] ?? CARS[DEFAULT_CAR];
+                    const savedPrice = formatPrice(item.price ?? estimateBuildPrice(savedConfig));
+
+                    return (
+                      <button
+                        key={`${item.code}-${index}`}
+                        type="button"
+                        onClick={() => loadSavedBuild(item.code)}
+                        className="flex min-h-16 flex-col gap-1 rounded-md border border-white/12 bg-white/[0.04] px-3.5 py-3 text-left text-white transition-colors hover:border-white/35 hover:bg-white/[0.09]"
+                      >
+                        <span className="font-body text-[10px] uppercase tracking-[0.16em] text-white/38">
+                          Saved build {index + 1}
+                        </span>
+                        <span className="font-body text-[12px] leading-snug text-white">
+                          {savedCar.name} · {PAINTS[savedConfig.paint].name}
+                        </span>
+                        <span className="font-body text-[10px] uppercase tracking-[0.12em] text-white/42">
+                          {savedPrice}
+                        </span>
+                      </button>
+                    );
+                  })}
+                  {overviewRows.map((row) => (
                     <div
                       key={row.label}
                       className="flex items-baseline justify-between gap-3 border-b border-white/10 pb-2 last:border-b-0"
@@ -730,17 +866,20 @@ const ConfiguratorPage = () => {
                       </span>
                       <span className="text-right font-body text-[12px] text-white">{row.value}</span>
                     </div>
-                  ))
-                : options.map((option) => (
-                    <OptionCard
-                      key={option.key}
-                      selected={option.selected}
-                      onClick={option.onClick}
-                      title={option.title}
-                      subtitle={option.subtitle}
-                      preview={option.preview}
-                    />
                   ))}
+                </>
+              ) : (
+                options.map((option) => (
+                  <OptionCard
+                    key={option.key}
+                    selected={option.selected}
+                    onClick={option.onClick}
+                    title={option.title}
+                    subtitle={option.subtitle}
+                    preview={option.preview}
+                  />
+                ))
+              )}
             </div>
           </div>
         </div>

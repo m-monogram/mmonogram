@@ -299,7 +299,9 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
    */
   const [grounds, setGrounds] = useState<Record<string, number>>({});
   const reportGround = useCallback((url: string, minY: number) => {
-    setGrounds((prev) => (prev[url] === minY ? prev : { ...prev, [url]: minY }));
+    window.setTimeout(() => {
+      setGrounds((prev) => (prev[url] === minY ? prev : { ...prev, [url]: minY }));
+    }, 0);
   }, []);
 
   const groundOffset = useMemo(() => {
