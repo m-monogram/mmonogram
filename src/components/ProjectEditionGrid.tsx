@@ -35,8 +35,8 @@ const EditionCard = memo(function EditionCard({
       transition={{ duration: 0.5, delay: index * 0.08 }}
       onClick={onClick}
       className={cn(
-        "group w-full text-left cursor-pointer border-0 p-0",
-        isDark ? "bg-transparent" : "bg-white text-center"
+        "group w-full cursor-pointer border-0 p-0 bg-transparent",
+        isDark ? "text-left" : "text-center"
       )}
     >
       <div

@@ -437,70 +437,40 @@
     background: hsl(var(--premium-black));
   }
 
-  /* Smooth black-to-light section flow */
+  /*
+   * Переход из чёрных секций в светлую и обратно.
+   *
+   * Растушёвка отмеряется в пикселях от краёв, а не в процентах высоты:
+   * секция на телефоне и на десктопе сильно разной высоты, и от процентов
+   * переход то растягивался на треть экрана, то схлопывался. Ширина самой
+   * растушёвки — clamp() по ширине вьюпорта, так что на узком экране она
+   * короче и заголовок всегда попадает уже на белое.
+   *
+   * Раньше поверх лежал непрозрачный radial-gradient: он полностью
+   * перекрывал линейный (тот вообще не рисовался) и на вытянутом мобильном
+   * экране давал не световое пятно, а серую кляксу с грязными углами.
+   * Отдельные ::before/::after с чёрной шторкой были нужны, чтобы эти углы
+   * прятать, — с честной вертикальной растушёвкой они не нужны.
+   */
   .section-flow-light {
+    --flow-fade: clamp(110px, 16vw, 210px);
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    background:
-      radial-gradient(
-        ellipse at center,
-        hsl(0 0% 100%) 0%,
-        hsl(0 0% 96%) 46%,
-        hsl(0 0% 86%) 68%,
-        hsl(0 0% 18%) 91%,
-        hsl(0 0% 0%) 100%
-      ),
-      linear-gradient(
-        to bottom,
-        hsl(0 0% 0%) 0%,
-        hsl(0 0% 8%) 10%,
-        hsl(0 0% 46%) 24%,
-        hsl(0 0% 90%) 38%,
-        hsl(0 0% 100%) 48%,
-        hsl(0 0% 100%) 52%,
-        hsl(0 0% 90%) 62%,
-        hsl(0 0% 46%) 76%,
-        hsl(0 0% 8%) 90%,
-        hsl(0 0% 0%) 100%
-      );
-    color: hsl(0 0% 0%);
-  }
-
-  .section-flow-light::before,
-  .section-flow-light::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    z-index: -1;
-    pointer-events: none;
-  }
-
-  .section-flow-light::before {
-    top: 0;
-    height: clamp(220px, 28vw, 420px);
     background: linear-gradient(
       to bottom,
-      hsl(0 0% 0%) 0%,
-      hsl(0 0% 0% / 0.96) 10%,
-      hsl(0 0% 0% / 0.72) 34%,
-      hsl(0 0% 0% / 0.32) 68%,
-      hsl(0 0% 0% / 0) 100%
+      hsl(0 0% 0%) 0px,
+      hsl(0 0% 12%) calc(var(--flow-fade) * 0.18),
+      hsl(0 0% 55%) calc(var(--flow-fade) * 0.5),
+      hsl(0 0% 94%) calc(var(--flow-fade) * 0.82),
+      hsl(0 0% 100%) var(--flow-fade),
+      hsl(0 0% 100%) calc(100% - var(--flow-fade)),
+      hsl(0 0% 94%) calc(100% - var(--flow-fade) * 0.82),
+      hsl(0 0% 55%) calc(100% - var(--flow-fade) * 0.5),
+      hsl(0 0% 12%) calc(100% - var(--flow-fade) * 0.18),
+      hsl(0 0% 0%) 100%
     );
-  }
-
-  .section-flow-light::after {
-    bottom: 0;
-    height: clamp(220px, 28vw, 420px);
-    background: linear-gradient(
-      to top,
-      hsl(0 0% 0%) 0%,
-      hsl(0 0% 0% / 0.96) 10%,
-      hsl(0 0% 0% / 0.72) 34%,
-      hsl(0 0% 0% / 0.32) 68%,
-      hsl(0 0% 0% / 0) 100%
-    );
+    color: hsl(0 0% 0%);
   }
 
   .section-flow-light > * {
