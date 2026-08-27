@@ -6,13 +6,44 @@ import { brokeredPreviewStorage } from './previewAuthStorage';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
+/**
+ * Отсутствие переменных окружения не должно гасить весь сайт.
+ *
+ * createClient с пустым адресом выбрасывает «supabaseUrl is required» прямо
+ * при загрузке модуля — до первого рендера. Проверено: собранная без .env
+ * страница отдавала пустой белый экран, без единой строчки вёрстки. При этом
+ * весь публичный сайт умеет жить без базы: тексты секций падают обратно на
+ * defaultContent, проекты и новости лежат в src/data. Не работает без базы
+ * только админка и приём заявок в bookings.
+ *
+ * Поэтому при нехватке переменных поднимаем клиента на заведомо недоступном
+ * адресе: запросы честно провалятся и уйдут в те же ветки обработки ошибок,
+ * что и потеря сети, а сайт останется на экране.
+ */
+const FALLBACK_URL = "https://missing-supabase-config.invalid";
+const configured = Boolean(SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY);
+
+if (!configured && typeof console !== "undefined") {
+  console.error(
+    "Supabase не настроен: нет VITE_SUPABASE_URL и/или VITE_SUPABASE_PUBLISHABLE_KEY. " +
+      "Сайт работает на встроенном содержимом, админка и приём заявок недоступны.",
+  );
+}
+
+/** Есть ли у сборки доступ к базе. */
+export const isSupabaseConfigured = configured;
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: {
-    storage: brokeredPreviewStorage(),
-    persistSession: true,
-    autoRefreshToken: true,
-  }
-});
+export const supabase = createClient<Database>(
+  configured ? SUPABASE_URL : FALLBACK_URL,
+  configured ? SUPABASE_PUBLISHABLE_KEY : "missing-anon-key",
+  {
+    auth: {
+      storage: brokeredPreviewStorage(),
+      persistSession: true,
+      autoRefreshToken: true,
+    },
+  },
+);

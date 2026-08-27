@@ -24,10 +24,16 @@ dist-ssr
 *.sw?
 .vercel
 
-# Local secrets / env files
-.env
-.env.*
-!.env.example
+# Секреты — только в *.local: Vite читает их последними и они не в репозитории.
+#
+# Сам .env остаётся в репозитории намеренно. В нём лежат VITE_-переменные, а
+# всё с префиксом VITE_ Vite подставляет в бандл при сборке — эти значения
+# и так открыты каждому, кто откроет исходники страницы. Ключ Supabase здесь
+# publishable (anon), доступ к данным ограничивает RLS, а не секретность ключа.
+# Убирать .env из репозитория смысла нет, а вред есть: без него сборка уходит
+# в прод без адреса Supabase.
+.env.local
+.env.*.local
 
 # Lovable/L5e runtime asset cache — not source of truth
 public/__l5e
