@@ -244,9 +244,10 @@ const ContactBookingSection = memo(({ setCurrentView, prefilledModel }: ContactB
                 {!isSubmitted ? (
                   <>
                     <div className="mb-6">
-                      <h2 className="font-display text-xl tracking-widest text-white mb-2 sm:text-base">
+                      {/* Единственный заголовок страницы контактов — h1 */}
+                      <h1 className="font-display text-xl tracking-widest text-white mb-2 sm:text-base">
                         Fill form below to send us a message
-                      </h2>
+                      </h1>
                       <p className="font-body text-xs text-white/40">Request a consultation</p>
                     </div>
 
