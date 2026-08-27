@@ -453,7 +453,7 @@
    * прятать, — с честной вертикальной растушёвкой они не нужны.
    */
   .section-flow-light {
-    --flow-fade: clamp(110px, 16vw, 210px);
+    --flow-fade: clamp(72px, 9vw, 130px);
     position: relative;
     isolation: isolate;
     overflow: hidden;
