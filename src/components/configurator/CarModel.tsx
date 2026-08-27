@@ -1,6 +1,7 @@
 import { Component, Suspense, type ReactNode } from "react";
 import GClassModel from "./GClassModel";
 import GClassGLTF from "./GClassGLTF";
+import SceneLoader from "./SceneLoader";
 import { BuildConfig } from "./config";
 import { CARS, DEFAULT_CAR } from "./models";
 
@@ -8,9 +9,12 @@ import { CARS, DEFAULT_CAR } from "./models";
  * Точка подключения машины в сцену.
  *
  * Оцифрованная сборка — единственное, что видит посетитель. Процедурная
- * заглушка осталась только на два случая: пока грузятся GLB (десятки
- * мегабайт, и пустая сцена всё это время выглядела бы поломкой) и если они
- * не загрузились вовсе.
+ * заглушка осталась ровно на один случай: GLB не загрузились вовсе.
+ *
+ * Во время загрузки её больше не показываем. Посетитель видел сначала грубую
+ * процедурную машину, а секунды через три она подменялась настоящей — со
+ * стороны это читалось как «сначала показали старую модель». Теперь на её
+ * месте индикатор с процентом, и машина появляется сразу в правильном виде.
  *
  * Раньше заглушка подменяла сборку ещё и в рабочих режимах — при взгляде из
  * салона и при открытых дверях. На экране это выглядело как поломка: вместо
@@ -39,11 +43,11 @@ class ModelBoundary extends Component<{ children: ReactNode; fallback: ReactNode
 
 export default function CarModel({ config, doorsOpen = false }: { config: BuildConfig; doorsOpen?: boolean }) {
   const car = CARS[config.model] ?? CARS[DEFAULT_CAR];
-  const placeholder = <GClassModel config={config} doorsOpen={doorsOpen && !!car.supportsOpenings} />;
+  const broken = <GClassModel config={config} doorsOpen={doorsOpen && !!car.supportsOpenings} />;
 
   return (
-    <ModelBoundary fallback={placeholder}>
-      <Suspense fallback={placeholder}>
+    <ModelBoundary fallback={broken}>
+      <Suspense fallback={<SceneLoader night={config.night} />}>
         <GClassGLTF config={config} />
       </Suspense>
     </ModelBoundary>

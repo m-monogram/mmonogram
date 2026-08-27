@@ -5,7 +5,6 @@ import {
   Car,
   Check,
   ClipboardList,
-  DollarSign,
   DoorOpen,
   Disc3,
   Gem,
@@ -28,17 +27,14 @@ import SEOHead from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   BuildConfig,
-  CALIPER_FINISHES,
   DEFAULT_CONFIG,
   GRILLE_FINISHES,
   INTERIOR_FINISHES,
   KIT_PACKAGES,
   PAINTS,
-  RIM_DESIGNS,
   RIM_FINISHES,
   decodeConfig,
   encodeConfig,
-  getBuildPrice,
   type CameraFocus,
 } from "@/components/configurator/config";
 import SceneErrorBoundary from "@/components/configurator/SceneErrorBoundary";
@@ -57,9 +53,6 @@ const FOCUS_VALUES: CameraFocus[] = [
 const PAINT_PREVIEWS = Object.values(
   import.meta.glob("@/assets/previews/paint-*.jpg", { eager: true, import: "default" })
 ) as string[];
-const RIM_PREVIEWS = Object.values(
-  import.meta.glob("@/assets/previews/rim-*.jpg", { eager: true, import: "default" })
-) as string[];
 const FINISH_PREVIEWS = Object.values(
   import.meta.glob("@/assets/previews/finish-*.jpg", { eager: true, import: "default" })
 ) as string[];
@@ -68,7 +61,6 @@ type StudioSection =
   | "model"
   | "exterior"
   | "wheels"
-  | "calipers"
   | "kit"
   | "carbon"
   | "openings"
@@ -90,7 +82,6 @@ type OptionItem = {
 const SECTION_FOCUS: Partial<Record<StudioSection, CameraFocus>> = {
   exterior: "exterior",
   wheels: "wheels",
-  calipers: "wheels",
   kit: "kit",
   carbon: "carbon",
   openings: "kit",
@@ -283,17 +274,11 @@ const ConfiguratorPage = () => {
     window.setTimeout(() => setCopied(false), 1800);
   }, [config, focus]);
 
-  const price = getBuildPrice(config);
-  const formattedPrice = useMemo(
-    () => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(price),
-    [price]
-  );
-
   const handleSave = useCallback(() => {
     /* Чужая запись под тем же ключом или приватный режим не должны ронять
        страницу: раньше JSON.parse на мусоре выбрасывал прямо из обработчика
        и «Сохранить» переставало работать до очистки хранилища. */
-    let saved: Array<{ code: string; savedAt: string; price: number }> = [];
+    let saved: Array<{ code: string; savedAt: string }> = [];
     try {
       const parsed = JSON.parse(localStorage.getItem("mmonogram-builds") ?? "[]");
       if (Array.isArray(parsed)) saved = parsed.filter((item) => item && typeof item.code === "string");
@@ -301,7 +286,7 @@ const ConfiguratorPage = () => {
       saved = [];
     }
     const code = encodeConfig(config);
-    const next = [{ code, savedAt: new Date().toISOString(), price }, ...saved.filter((item) => item.code !== code)].slice(0, 12);
+    const next = [{ code, savedAt: new Date().toISOString() }, ...saved.filter((item) => item.code !== code)].slice(0, 12);
     try {
       localStorage.setItem("mmonogram-builds", JSON.stringify(next));
     } catch {
@@ -310,7 +295,7 @@ const ConfiguratorPage = () => {
     handleChange({ ...config, saved: true });
     setSavedFlash(true);
     window.setTimeout(() => setSavedFlash(false), 1800);
-  }, [config, handleChange, price]);
+  }, [config, handleChange]);
 
   const handleScreenshot = useCallback(() => {
     const canvas = document.querySelector<HTMLCanvasElement>("#configurator-canvas canvas");
@@ -340,8 +325,7 @@ const ConfiguratorPage = () => {
         ? [{ id: "model" as const, label: t("config.model"), value: car.name, icon: Car }]
         : []),
       { id: "exterior" as const, label: t("config.exterior"), value: PAINTS[config.paint].name, icon: Palette },
-      { id: "wheels" as const, label: t("config.rims"), value: RIM_DESIGNS[config.rim].name, icon: Disc3 },
-      { id: "calipers" as const, label: "Calipers", value: CALIPER_FINISHES[config.caliper].name, icon: Disc3 },
+      { id: "wheels" as const, label: t("config.rims"), value: RIM_FINISHES[config.rimFinish].name, icon: Disc3 },
       { id: "kit" as const, label: t("config.kit"), value: KIT_PACKAGES[config.kitPackage].name, icon: Package },
       { id: "carbon" as const, label: t("config.carbon"), value: config.carbon ? t("config.carbonOn") : t("config.carbonOff"), icon: Gem },
       ...(canOpen
@@ -358,8 +342,7 @@ const ConfiguratorPage = () => {
   const overviewRows = [
     { label: t("config.model"), value: car.name },
     { label: t("config.exterior"), value: `${PAINTS[config.paint].name} · ${GRILLE_FINISHES[config.grille].name}` },
-    { label: t("config.rims"), value: `${RIM_DESIGNS[config.rim].name} · ${RIM_FINISHES[config.rimFinish].name}` },
-    { label: "Calipers", value: CALIPER_FINISHES[config.caliper].name },
+    { label: t("config.rims"), value: RIM_FINISHES[config.rimFinish].name },
     { label: t("config.kit"), value: KIT_PACKAGES[config.kitPackage].name },
     { label: t("config.carbon"), value: config.carbon ? t("config.carbonOn") : t("config.carbonOff") },
     { label: t("config.lights"), value: config.lights ? t("config.lightsOn") : t("config.lightsOff") },
@@ -368,7 +351,6 @@ const ConfiguratorPage = () => {
     ...(canOpen
       ? [{ label: "Openings", value: [config.doors && "4 doors", config.hood && "hood", config.trunk && "trunk"].filter(Boolean).join(" · ") || "closed" }]
       : []),
-    { label: "Price", value: formattedPrice },
   ];
 
   const interiorViews: [InteriorView, string][] = [
@@ -380,9 +362,6 @@ const ConfiguratorPage = () => {
   /* Опции активного раздела одним списком. Раньше на каждый раздел был свой
      кусок JSX с одинаковыми карточками — десять почти одинаковых веток. */
   const options = useMemo<OptionItem[]>(() => {
-    const plus = (value: number) =>
-      `+${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value)}`;
-
     switch (activeSection) {
       case "model":
         return carIds.map((id) => ({
@@ -413,33 +392,18 @@ const ConfiguratorPage = () => {
           })),
         ];
 
+      /* Дизайны дисков (MG.1 Monoblock и прочие) отсюда убраны: колёса
+         приходят одним мешем внутри body-kit-wheels.glb, поменять рисунок
+         нечем — нажатие не меняло в сцене ничего. Осталась отделка, она
+         красит материал колеса по-настоящему. */
       case "wheels":
-        return [
-          ...RIM_DESIGNS.map((rim, index) => ({
-            key: `rim-${rim.id}`,
-            selected: config.rim === index,
-            onClick: () => set({ rim: index }),
-            preview: <PreviewImage src={RIM_PREVIEWS[index]} alt={rim.name} fallback="#26282b" />,
-            title: rim.name,
-            subtitle: '24"',
-          })),
-          ...RIM_FINISHES.map((finish, index) => ({
-            key: `rim-finish-${finish.id}`,
-            selected: config.rimFinish === index,
-            onClick: () => set({ rimFinish: index }),
-            preview: <PreviewImage src={FINISH_PREVIEWS[index]} alt={finish.name} fallback={finish.color} />,
-            title: finish.name,
-            subtitle: t("config.rimColor"),
-          })),
-        ];
-
-      case "calipers":
-        return CALIPER_FINISHES.map((caliper, index) => ({
-          key: caliper.id,
-          selected: config.caliper === index,
-          onClick: () => set({ caliper: index }),
-          preview: <Swatch color={caliper.color} />,
-          title: caliper.name,
+        return RIM_FINISHES.map((finish, index) => ({
+          key: `rim-finish-${finish.id}`,
+          selected: config.rimFinish === index,
+          onClick: () => set({ rimFinish: index }),
+          preview: <PreviewImage src={FINISH_PREVIEWS[index]} alt={finish.name} fallback={finish.color} />,
+          title: finish.name,
+          subtitle: t("config.rimColor"),
         }));
 
       case "kit":
@@ -450,7 +414,7 @@ const ConfiguratorPage = () => {
           preview:
             index === 0 ? <Car className="h-8 w-8" strokeWidth={1.4} /> : <Sparkles className="h-8 w-8" strokeWidth={1.4} />,
           title: pack.name,
-          subtitle: index === 0 ? "Stock version" : plus(pack.price),
+          subtitle: index === 0 ? "Without body kit" : "M Monogram body kit",
         }));
 
       case "carbon":
@@ -550,7 +514,6 @@ const ConfiguratorPage = () => {
               </span>
             ),
             title: finish.name,
-            subtitle: index === 0 ? undefined : plus(finish.price),
           })),
           ...interiorViews.map(([view, label]) => ({
             key: view,
@@ -665,16 +628,12 @@ const ConfiguratorPage = () => {
         </p>
 
         <div className="pointer-events-auto flex w-full items-center gap-2 md:ml-auto md:w-auto">
-          <span className="flex h-11 flex-1 items-center gap-2 rounded-md border border-white/10 bg-black/55 px-3 text-white/85 backdrop-blur-xl md:flex-none">
-            <DollarSign className="h-4 w-4 text-white/48" />
-            <span className="font-body text-[12px] uppercase tracking-[0.12em]">{formattedPrice}</span>
-          </span>
           <button
             type="button"
             onClick={() => setTuningOpen(true)}
             aria-expanded={tuningOpen}
             aria-controls="tuning-panel"
-            className="flex h-11 shrink-0 items-center gap-2 rounded-md bg-white px-5 font-body text-[12px] uppercase tracking-[0.18em] text-black shadow-[0_18px_44px_rgba(0,0,0,0.45)] transition-transform duration-150 hover:bg-white/90 active:scale-[0.98]"
+            className="flex h-11 w-full shrink-0 items-center justify-center gap-2 rounded-md bg-white px-5 font-body text-[12px] uppercase tracking-[0.18em] text-black shadow-[0_18px_44px_rgba(0,0,0,0.45)] transition-transform duration-150 hover:bg-white/90 active:scale-[0.98] md:w-auto"
           >
             <SlidersHorizontal className="h-4 w-4" strokeWidth={2} />
             Tuning
@@ -701,12 +660,11 @@ const ConfiguratorPage = () => {
         <div className="flex shrink-0 items-center gap-3 border-b border-white/10 px-4 py-3">
           <SlidersHorizontal className="h-4 w-4 shrink-0 text-white/50" strokeWidth={1.8} />
           <span className="font-display text-[12px] uppercase tracking-[0.22em] text-white">Tuning</span>
-          <span className="ml-auto truncate font-body text-[12px] text-white/45">{formattedPrice}</span>
           <button
             type="button"
             onClick={() => setTuningOpen(false)}
             aria-label="Close tuning"
-            className="-mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+            className="-mr-1 ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-white/60 transition-colors hover:bg-white/10 hover:text-white"
           >
             <X className="h-4 w-4" />
           </button>
