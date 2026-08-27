@@ -161,7 +161,7 @@ export function getListingProjects<T extends { id: string; slug?: string; editio
 export const projects: Project[] = [
   {
     id: "g3-iconic",
-    title: "G-Wagen",
+    title: "ICONIC",
     subtitle: "Black Edition",
     year: "2024",
     duration: "12 weeks",
