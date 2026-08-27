@@ -155,7 +155,10 @@ export async function submitLead(raw: LeadPayload): Promise<LeadResult> {
       service: normalized.service,
       message: normalized.message,
       source: normalized.source,
-      status: "new",
+      /* status не передаём: у анонима нет привилегии на эту колонку
+         (см. миграцию 20260827120000_harden_public_bookings), а значение
+         по умолчанию в базе и так 'new'. Иначе заявку можно было завести
+         сразу закрытой, минуя форму. */
     });
 
     if (error) {
