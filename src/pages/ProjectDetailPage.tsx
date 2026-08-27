@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
 import { useProjects, DBProject } from "@/hooks/useProjects";
 import { isHubProject } from "@/data/projects";
+import { SITE_URL } from "@/lib/site";
 
 const ProjectDetailView = lazy(() => import("@/components/ProjectDetailView"));
 const ParticleBackground = lazy(() => import("@/components/ParticleBackground"));
@@ -67,15 +68,15 @@ const ProjectDetailPage = () => {
             image: selectedProject.cover_image,
             category: selectedProject.category,
             brand: { "@type": "Brand", name: "M-Monogram" },
-            url: `https://mmonogram.lovable.app/projects/${selectedProject.slug}`,
+            url: `${SITE_URL}/projects/${selectedProject.slug}`,
           },
           {
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Home", item: "https://mmonogram.lovable.app/" },
-              { "@type": "ListItem", position: 2, name: "Projects", item: "https://mmonogram.lovable.app/projects" },
-              { "@type": "ListItem", position: 3, name: `${selectedProject.title} ${selectedProject.subtitle}`, item: `https://mmonogram.lovable.app/projects/${selectedProject.slug}` },
+              { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
+              { "@type": "ListItem", position: 2, name: "Projects", item: `${SITE_URL}/projects` },
+              { "@type": "ListItem", position: 3, name: `${selectedProject.title} ${selectedProject.subtitle}`, item: `${SITE_URL}/projects/${selectedProject.slug}` },
             ],
           },
         ]}

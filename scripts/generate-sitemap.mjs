@@ -13,7 +13,27 @@ import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const SITE_URL = (process.env.VITE_SITE_URL || "https://mmonogram.lovable.app").replace(/\/+$/, "");
+
+/**
+ * Домен берём оттуда же, откуда его берёт сборка. Голый Node не читает .env,
+ * и без этого правка VITE_SITE_URL в .env меняла бы адреса в бандле, но не в
+ * sitemap.xml — то самое расхождение доменов, из-за которого страницы
+ * объявляли каноническим чужой адрес.
+ */
+function siteUrlFromEnvFile() {
+  try {
+    const raw = readFileSync(resolve(ROOT, ".env"), "utf8");
+    const match = raw.match(/^\s*VITE_SITE_URL\s*=\s*"?([^"\n\r]+)"?/m);
+    return match?.[1]?.trim();
+  } catch {
+    return undefined;
+  }
+}
+
+const SITE_URL = (process.env.VITE_SITE_URL || siteUrlFromEnvFile() || "https://mmonogram.com").replace(
+  /\/+$/,
+  "",
+);
 
 /** Достаёт значения строкового поля верхнего уровня из data-файла. */
 function extractField(file, field) {
