@@ -681,7 +681,7 @@ const ConfiguratorPage = () => {
         id="configurator-canvas"
         className={cn(
           "absolute inset-0 transition-transform duration-300 ease-out will-change-transform",
-          tuningOpen ? "-translate-y-[7.5rem] md:translate-y-0 md:-translate-x-[12.5rem]" : "translate-y-0 md:translate-x-0"
+          tuningOpen ? "-translate-y-[11rem] drawer:translate-y-0 drawer:-translate-x-[11rem] md:-translate-x-[12.5rem]" : "translate-y-0 drawer:translate-x-0"
         )}
       >
         <SceneErrorBoundary>
@@ -747,13 +747,13 @@ const ConfiguratorPage = () => {
       <div
         className={cn(
           "pointer-events-none absolute inset-x-0 bottom-0 z-30 flex items-end gap-3 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] transition-[padding,opacity] duration-300 ease-out sm:px-5",
-          tuningOpen && "opacity-0 md:pr-[26.25rem] md:opacity-100"
+          tuningOpen && "opacity-0 drawer:pr-[23.25rem] drawer:opacity-100 md:pr-[26.25rem]"
         )}
       >
         {/* Левый нижний угол — единственное место, где названа машина. Одной
             серой строкой она терялась, поэтому приписка отдельно и мелко,
             а имя модели — крупно и светлым. */}
-        <div className="hidden md:block">
+        <div className="hidden drawer:block">
           <p className="font-body text-[9px] uppercase tracking-[0.26em] text-white/35">
             {t("config.demoNote")}
           </p>
@@ -764,8 +764,8 @@ const ConfiguratorPage = () => {
 
         <div
           className={cn(
-            "pointer-events-auto flex w-full items-center gap-2 transition-opacity duration-200 md:ml-auto md:w-auto",
-            tuningOpen && "md:pointer-events-none md:opacity-0"
+            "pointer-events-auto flex w-full items-center gap-2 transition-opacity duration-200 drawer:ml-auto drawer:w-auto",
+            tuningOpen && "drawer:pointer-events-none drawer:opacity-0"
           )}
         >
           <button
@@ -774,7 +774,7 @@ const ConfiguratorPage = () => {
             aria-expanded={tuningOpen}
             aria-controls="tuning-panel"
             tabIndex={tuningOpen ? -1 : undefined}
-            className="flex h-11 w-full shrink-0 items-center justify-center gap-2 rounded-md bg-white px-5 font-body text-[12px] uppercase tracking-[0.18em] text-black shadow-[0_18px_44px_rgba(0,0,0,0.45)] transition-transform duration-150 hover:bg-white/90 active:scale-[0.98] md:w-auto"
+            className="flex h-11 w-full shrink-0 items-center justify-center gap-2 rounded-md bg-white px-5 font-body text-[12px] uppercase tracking-[0.18em] text-black shadow-[0_18px_44px_rgba(0,0,0,0.45)] transition-transform duration-150 hover:bg-white/90 active:scale-[0.98] drawer:w-auto"
           >
             <SlidersHorizontal className="h-4 w-4" strokeWidth={2} />
             Tuning
@@ -790,15 +790,15 @@ const ConfiguratorPage = () => {
         aria-label="Tuning"
         className={cn(
           "absolute z-40 flex flex-col border-white/10 bg-[rgba(8,8,9,0.93)] shadow-[0_-22px_70px_rgba(0,0,0,0.55)] backdrop-blur-2xl transition-transform duration-300 ease-out will-change-transform",
-          "inset-x-0 bottom-0 max-h-[74dvh] rounded-t-2xl border-t",
+          "inset-x-0 bottom-0 max-h-[54dvh] rounded-t-2xl border-t",
           /* На десктопе панель во всю высоту: сдвинутая сцена иначе оголяет
              полосу справа под шапкой. Шапка сайта лежит выше по z-index,
              поэтому её кнопки остаются кликабельными поверх панели. */
-          "md:inset-x-auto md:bottom-0 md:right-0 md:top-0 md:max-h-none md:w-[25rem] md:rounded-none md:border-l md:border-t-0 md:pt-[4.5rem]",
-          tuningOpen ? "translate-y-0 md:translate-x-0" : "translate-y-full md:translate-y-0 md:translate-x-full"
+          "drawer:inset-x-auto drawer:bottom-0 drawer:right-0 drawer:top-0 drawer:max-h-none drawer:w-[22rem] drawer:rounded-none md:w-[25rem] drawer:border-l drawer:border-t-0 drawer:pt-[4.5rem]",
+          tuningOpen ? "translate-y-0 drawer:translate-x-0" : "translate-y-full drawer:translate-y-0 drawer:translate-x-full"
         )}
       >
-        <div className="flex shrink-0 items-center gap-3 border-b border-white/10 px-4 py-3">
+        <div className="flex shrink-0 items-center gap-3 border-b border-white/10 px-4 py-2 drawer:py-3">
           <SlidersHorizontal className="h-4 w-4 shrink-0 text-white/50" strokeWidth={1.8} />
           <span className="font-display text-[12px] uppercase tracking-[0.22em] text-white">Tuning</span>
           {/* Музыка и сброс жили на плашке поверх машины — единственном месте
@@ -811,7 +811,7 @@ const ConfiguratorPage = () => {
               onClick={handleReset}
               aria-label="Reset build"
               title="Reset build"
-              className="flex h-8 w-8 items-center justify-center rounded-md text-white/55 transition-colors hover:bg-white/10 hover:text-white"
+              className="flex h-10 w-10 items-center justify-center rounded-md text-white/55 transition-colors hover:bg-white/10 hover:text-white md:h-8 md:w-8"
             >
               <RotateCcw className="h-4 w-4" />
             </button>
@@ -819,17 +819,17 @@ const ConfiguratorPage = () => {
               type="button"
               onClick={() => setTuningOpen(false)}
               aria-label="Close tuning"
-              className="-mr-1 flex h-8 w-8 items-center justify-center rounded-md text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+              className="-mr-1 flex h-10 w-10 items-center justify-center rounded-md text-white/60 transition-colors hover:bg-white/10 hover:text-white md:h-8 md:w-8"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+        <div className="flex min-h-0 flex-1 flex-col drawer:flex-row">
           <nav
             aria-label="Tuning sections"
-            className="no-scrollbar flex shrink-0 gap-1.5 overflow-x-auto border-b border-white/10 p-2 md:w-[6.75rem] md:flex-col md:overflow-x-visible md:overflow-y-auto md:border-b-0 md:border-r"
+            className="no-scrollbar flex shrink-0 gap-1.5 overflow-x-auto border-b border-white/10 p-2 drawer:w-[6.75rem] drawer:flex-col drawer:overflow-x-visible drawer:overflow-y-auto drawer:border-b-0 drawer:border-r"
           >
             {sections.map((item) => {
               const Icon = item.icon;
@@ -841,14 +841,14 @@ const ConfiguratorPage = () => {
                   onClick={() => chooseSection(item.id)}
                   aria-current={active}
                   className={cn(
-                    "flex shrink-0 items-center gap-2 rounded-md border px-3 py-2 transition-colors duration-150 md:w-full md:min-h-[4rem] md:flex-col md:justify-center md:gap-1 md:px-1.5 md:py-2 md:text-center",
+                    "flex min-h-11 shrink-0 items-center gap-2 rounded-md border px-3 py-2 transition-colors duration-150 drawer:min-h-[4rem] drawer:w-full drawer:flex-col drawer:justify-center drawer:gap-1 drawer:px-1.5 drawer:py-2 drawer:text-center",
                     active
                       ? "border-white/70 bg-white text-black"
                       : "border-white/10 bg-white/[0.04] text-white/80 hover:border-white/30 hover:bg-white/[0.09]"
                   )}
                 >
                   <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.8} />
-                  <span className="font-body text-[10px] uppercase tracking-[0.14em] md:text-[9px] md:leading-tight">
+                  <span className="font-body text-[10px] uppercase tracking-[0.14em] drawer:text-[9px] drawer:leading-tight">
                     {item.label}
                   </span>
                 </button>
@@ -858,7 +858,7 @@ const ConfiguratorPage = () => {
 
           <div className="flex min-h-0 flex-1 flex-col">
             {activeMeta && (
-              <div className="flex shrink-0 items-baseline gap-2 px-3 pt-3">
+              <div className="flex shrink-0 items-baseline gap-2 px-3 pt-2 drawer:pt-3">
                 <span className="shrink-0 font-body text-[11px] uppercase tracking-[0.18em] text-white/45">
                   {activeMeta.label}
                 </span>
@@ -868,7 +868,7 @@ const ConfiguratorPage = () => {
               </div>
             )}
 
-            <div className="no-scrollbar flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3">
+            <div className="no-scrollbar flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-3 py-2 drawer:p-3">
               {activeSection === "overview" ? (
                 <>
                   <button
@@ -974,7 +974,7 @@ const ConfiguratorPage = () => {
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2 border-t border-white/10 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div className="flex shrink-0 items-center gap-2 border-t border-white/10 px-3 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] drawer:p-3 drawer:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <button
             type="button"
             onClick={() => navigate(`/booking?build=${encodeConfig(config)}`)}

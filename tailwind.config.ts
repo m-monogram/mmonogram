@@ -13,6 +13,13 @@ export default {
       },
     },
     extend: {
+      screens: {
+        /* Раскладка панели тюнинга: боковой ящик вместо шторки снизу.
+           Включается не только на планшете и десктопе, но и на телефоне,
+           повёрнутом набок, — там высота экрана мизерная, и шторка снизу
+           закрывала машину целиком. */
+        drawer: { raw: "(min-width: 768px), (max-height: 520px)" },
+      },
       fontFamily: {
         sans: ["var(--font-family-body)", "sans-serif"],
         display: ["var(--font-family-primary)", "sans-serif"],
