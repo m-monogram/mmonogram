@@ -50,35 +50,13 @@ const ForgedWheelsGrid = memo(({
   return <section className="relative bg-premium-black py-12 sm:py-16 md:py-24 -mx-4 sm:-mx-8 md:-mx-16">
     <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16">
       {/* Section Title */}
-      <motion.h2 initial={{
-        opacity: 0,
-        y: 20
-      }} whileInView={{
-        opacity: 1,
-        y: 0
-      }} viewport={{
-        once: true
-      }} transition={{
-        duration: 0.6
-      }} className="font-display text-xl sm:text-3xl md:text-4xl lg:text-5xl tracking-widest text-white uppercase mb-8 sm:mb-12">
+      <motion.h2 className="font-display text-xl sm:text-3xl md:text-4xl lg:text-5xl tracking-widest text-white uppercase mb-8 sm:mb-12">
         FORGED WHEELS
       </motion.h2>
 
       {/* Grid: 2 col mobile, 2 tablet, 3 desktop */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
-        {images.map((image, index) => <motion.div key={index} initial={{
-          opacity: 0,
-          y: 20
-        }} whileInView={{
-          opacity: 1,
-          y: 0
-        }} viewport={{
-          once: true,
-          margin: "-50px"
-        }} transition={{
-          duration: 0.5,
-          delay: index * 0.05
-        }} className="group cursor-pointer" onClick={() => onImageClick?.(index)}>
+        {images.map((image, index) => <motion.div key={index} className="group cursor-pointer" onClick={() => onImageClick?.(index)}>
           {/* Card - Premium design with enhanced styling */}
           <div className="relative bg-gradient-to-br from-[#E8E8E8] to-[#D8D8D8] rounded-none overflow-hidden transition-all duration-300 ease-out group-hover:-translate-y-[6px] group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] border border-white/20 group-hover:border-white/40">
             {/* Subtle inner glow on hover */}

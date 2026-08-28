@@ -164,6 +164,11 @@ const HomePage = () => {
           />
           <Configurator3DBanner />
           <VinBanner />
+          {/* Пресса больше не в меню: вход к ней — этот блок в самом низу
+              главной, перед подвалом. */}
+          <Suspense fallback={null}>
+            <NewsHighlightSection />
+          </Suspense>
           <Suspense fallback={null}>
             <Footer />
           </Suspense>

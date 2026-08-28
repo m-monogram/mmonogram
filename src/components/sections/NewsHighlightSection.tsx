@@ -13,40 +13,24 @@ const NewsHighlightSection = () => {
     >
       <div className="max-w-4xl mx-auto px-4 sm:px-8 text-center">
         <motion.span
-          initial={{ opacity: 0, y: 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
           className="inline-block font-display text-[11px] uppercase tracking-[0.35em] text-white/45 mb-5"
         >
           {t("homeNews.eyebrow")}
         </motion.span>
 
         <motion.h2
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.05 }}
           className="font-display text-3xl sm:text-5xl md:text-6xl text-white tracking-tight leading-[1.05]"
         >
           {t("homeNews.title")}
         </motion.h2>
 
         <motion.p
-          initial={{ opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.12 }}
           className="mt-5 sm:mt-6 max-w-xl mx-auto font-body text-sm sm:text-base text-white/60 leading-relaxed"
         >
           {t("news.subtitle")}
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
           className="mt-10 sm:mt-12"
         >
           <Link

@@ -20,7 +20,7 @@ const LoadingScreen = memo(({ onComplete }: LoadingScreenProps) => {
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      className="fixed inset-0 z-50 bg-premium-black flex items-center justify-center"
+      className="fixed inset-0 z-50 bg-premium-black flex flex-col items-center justify-center"
     >
       <img
         src={logoMmonogram}
@@ -32,6 +32,12 @@ const LoadingScreen = memo(({ onComplete }: LoadingScreenProps) => {
         fetchpriority="high"
         className="w-64 sm:w-80 md:w-96 lg:w-[28rem] max-w-[78vw] h-auto object-contain opacity-95 animate-logo-pulse will-change-[opacity,transform]"
       />
+      {/* Девиз под монограммой. Разрядка крупная, кегль мелкий — подпись
+          должна читаться как гравировка под клеймом, а не как второй
+          заголовок рядом с логотипом. */}
+      <p className="mt-6 font-display text-[9px] uppercase tracking-[0.42em] text-white/35 sm:mt-7 sm:text-[10px]">
+        Beyond the Ordinary
+      </p>
     </motion.div>
   );
 });

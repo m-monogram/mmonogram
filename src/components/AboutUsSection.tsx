@@ -30,18 +30,10 @@ const AboutUsSection = () => {
 
       <div className="relative z-10 max-w-4xl mx-auto px-6">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           className="flex flex-col items-center text-center"
         >
           {/* Eyebrow index mark */}
           <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.1 }}
             className="flex items-center gap-3 mb-10"
           >
             <span className="h-px w-8 bg-foreground/30" />
@@ -70,10 +62,6 @@ const AboutUsSection = () => {
 
           {/* Signature mark */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.5 }}
             className="mt-14 flex flex-col items-center gap-3"
           >
             <div className="h-10 w-px bg-gradient-to-b from-transparent via-foreground/30 to-transparent" />

@@ -154,10 +154,6 @@ const LocationCard = memo(function LocationCard({
   return (
     <motion.button
       type="button"
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.08 }}
       onMouseEnter={() => onHover(id)}
       onMouseLeave={() => onHover(null)}
       onFocus={() => onHover(id)}
@@ -245,10 +241,6 @@ const RepresentativesMapSection = () => {
         {/* Header */}
         <div className="mb-8 sm:mb-10">
           <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.45 }}
             className="font-body text-[10px] sm:text-[11px] uppercase tracking-[0.35em] text-white/40 mb-4"
           >
             {t("representatives.eyebrow")}
@@ -257,10 +249,6 @@ const RepresentativesMapSection = () => {
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between lg:gap-10">
             <div className="min-w-0 flex-1">
               <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.05 }}
                 className="flex items-end gap-4 sm:gap-6"
               >
                 <h2 className="font-display font-bold uppercase tracking-[0.12em] sm:tracking-[0.14em] text-[22px] sm:text-3xl md:text-[34px] text-white leading-tight">
@@ -269,10 +257,6 @@ const RepresentativesMapSection = () => {
                 <div className="mb-2 hidden min-w-[3rem] flex-1 sm:block h-px bg-gradient-to-r from-white/25 to-transparent" aria-hidden />
               </motion.div>
               <motion.p
-                initial={{ opacity: 0, y: 8 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.12 }}
                 className="mt-4 max-w-2xl font-body text-sm sm:text-base text-white/55 leading-relaxed tracking-wide"
               >
                 {t("representatives.subtitle")}
@@ -285,10 +269,6 @@ const RepresentativesMapSection = () => {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-8 xl:gap-10">
           {/* Map */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className="relative lg:col-span-7 xl:col-span-8 lg:h-full"
           >
             <div className="relative flex h-full flex-col overflow-hidden border border-white/10 bg-neutral-950">
@@ -359,10 +339,6 @@ const RepresentativesMapSection = () => {
           {/* Locations */}
           <div className="lg:col-span-5 xl:col-span-4 flex flex-col">
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.45 }}
               className="mb-5 sm:mb-6 flex items-center gap-4 sm:gap-5"
             >
               <h3 className="shrink-0 font-display font-bold uppercase tracking-[0.16em] text-sm sm:text-base text-white">

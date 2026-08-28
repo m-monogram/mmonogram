@@ -42,10 +42,6 @@ const MissionStatement = memo((_props: MissionStatementProps) => {
 
       <div className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 text-center">
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8 }}
         >
           {/* h1, а не h2: на главной это единственный заголовок, и до правки
               страница уходила в индекс вообще без h1. */}
@@ -55,10 +51,6 @@ const MissionStatement = memo((_props: MissionStatementProps) => {
           </h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, delay: 0.2 }}
             className="font-body text-sm sm:text-base md:text-lg text-white/70 mb-6 sm:mb-8 md:mb-10 leading-relaxed max-w-2xl mx-auto px-4 break-words"
             style={{ wordBreak: "normal", overflowWrap: "break-word" }}
           >

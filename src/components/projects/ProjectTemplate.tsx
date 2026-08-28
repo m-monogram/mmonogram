@@ -73,10 +73,6 @@ function ProjectGallery({
             {images.map((img, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.6, delay: Math.min(index, 4) * 0.08 }}
                 className="relative overflow-hidden group cursor-pointer"
                 onClick={() => setSelectedIdx(index)}
               >
@@ -221,18 +217,7 @@ const ProjectTemplate = memo(function ProjectTemplate({
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         
         <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 text-center relative">
-          <motion.p initial={{
-          opacity: 0,
-          y: 20
-        }} whileInView={{
-          opacity: 1,
-          y: 0
-        }} viewport={{
-          once: true,
-          margin: "-80px"
-        }} transition={{
-          duration: 0.7
-        }} className="font-body text-lg sm:text-xl md:text-2xl lg:text-3xl text-white/85 leading-relaxed tracking-wide">
+          <motion.p className="font-body text-lg sm:text-xl md:text-2xl lg:text-3xl text-white/85 leading-relaxed tracking-wide">
             {statement}
           </motion.p>
         </div>
@@ -247,18 +232,7 @@ const ProjectTemplate = memo(function ProjectTemplate({
       {/* ——— Video (optional) ——— */}
       {videoUrl && <section className="relative bg-black py-12 sm:py-16 md:py-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8">
-            <motion.div initial={{
-          opacity: 0,
-          y: 20
-        }} whileInView={{
-          opacity: 1,
-          y: 0
-        }} viewport={{
-          once: true,
-          margin: "-60px"
-        }} transition={{
-          duration: 0.5
-        }} className="aspect-video overflow-hidden rounded-none bg-black">
+            <motion.div className="aspect-video overflow-hidden rounded-none bg-black">
               {videoUrl.startsWith("http") ?
           // YouTube video
           <iframe src={`https://www.youtube.com/embed/${videoUrl.split("v=")[1]?.split("&")[0]}`} title={`${title} — Video`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen loading="lazy" className="w-full h-full" /> :
@@ -276,18 +250,7 @@ const ProjectTemplate = memo(function ProjectTemplate({
       {/* CTA */}
       {onOrderClick && <section className="relative bg-black py-16 sm:py-20">
           <div className="max-w-2xl mx-auto px-4 sm:px-6 md:px-8 text-center">
-            <motion.div initial={{
-          opacity: 0,
-          y: 16
-        }} whileInView={{
-          opacity: 1,
-          y: 0
-        }} viewport={{
-          once: true,
-          margin: "-60px"
-        }} transition={{
-          duration: 0.5
-        }}>
+            <motion.div >
               <button type="button" onClick={onOrderClick} className="font-body text-sm uppercase tracking-widest text-white/80 hover:text-white border-b border-white/30 hover:border-white/60 transition-colors cursor-pointer touch-target pb-1">
                 Order this project
               </button>

@@ -31,10 +31,6 @@ const ProjectHeroBanner = memo(({
 
   return (
     <motion.article
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true, margin: "-10%" }}
-      transition={{ duration: 0.8 }}
       className={`relative w-full ${isFullscreen ? "h-[90vh] snap-start" : "h-[70vh] sm:h-[80vh] min-h-[500px] max-h-[900px]"}`}
     >
       {/* Banner container */}
@@ -77,10 +73,6 @@ const ProjectHeroBanner = memo(({
           <div className="w-full max-w-7xl mx-auto px-6 sm:px-10 md:px-16 pb-8 sm:pb-12 md:pb-16">
             {/* Project number */}
             <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
               className="font-body text-[11px] tracking-widest text-white/40 uppercase mb-3"
             >
               {String(index + 1).padStart(2, "0")}
@@ -88,10 +80,6 @@ const ProjectHeroBanner = memo(({
 
             {/* Title */}
             <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
               className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl tracking-widest text-white uppercase leading-none mb-2"
             >
               {project.title}
@@ -99,10 +87,6 @@ const ProjectHeroBanner = memo(({
 
             {/* Subtitle */}
             <motion.p
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
               className="font-body text-base sm:text-lg md:text-xl text-white/60 mb-8"
             >
               {project.subtitle}
@@ -110,10 +94,6 @@ const ProjectHeroBanner = memo(({
 
             {/* CTA - Premium styling */}
             <motion.button
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.4 }}
               onClick={(e) => {
                 e.stopPropagation();
                 onViewProject(project.id);

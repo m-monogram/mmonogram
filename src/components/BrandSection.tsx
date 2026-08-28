@@ -123,19 +123,11 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
 
       {/* ── ORIGIN BLOCK ── Two-column grid: text left / stamp right */}
       <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1 }}
         className="relative max-w-7xl mx-auto px-6 sm:px-10 md:px-16 pt-14 sm:pt-16 md:pt-20 pb-0"
       >
         <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-10 md:gap-16 items-start">
           {/* Left: label + description */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.9, delay: 0.1 }}
           >
             <p className="font-body text-[9px] sm:text-[10px] tracking-widest text-white/25 uppercase mb-6 flex items-center gap-3">
               <span className="inline-block w-8 h-px bg-white/20" />
@@ -148,10 +140,6 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
 
           {/* Right: large decorative year stamp */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 0.06, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1.2, delay: 0.2 }}
             className="hidden md:block select-none"
             aria-hidden
           >
@@ -167,10 +155,6 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
 
       {/* ── FULL-WIDTH DIVIDER ── */}
       <motion.div
-        initial={{ scaleX: 0 }}
-        whileInView={{ scaleX: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
         className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent origin-left mt-10 sm:mt-12"
       />
 
@@ -190,10 +174,6 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1, delay: 0.1 }}
           className="relative z-10 text-center"
         >
           {/* Decorative thin line above */}
@@ -236,19 +216,11 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
 
       {/* ── FULL-WIDTH DIVIDER ── */}
       <motion.div
-        initial={{ scaleX: 0 }}
-        whileInView={{ scaleX: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
         className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent origin-right"
       />
 
       {/* ── SIGNATURE STATEMENT ── */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.9, delay: 0.1 }}
         className="max-w-7xl mx-auto px-6 sm:px-10 md:px-16 py-10 sm:py-12 md:py-14 text-center"
       >
         <p className="font-display text-base sm:text-lg md:text-xl lg:text-2xl tracking-widest uppercase text-white/50 font-bold">
@@ -258,10 +230,6 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
 
       {/* ── VALUES BAR ── */}
       <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, delay: 0.2 }}
         className="border-t border-white/[0.06]"
       >
         <div className="max-w-7xl mx-auto">
@@ -273,10 +241,6 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
             ].map(({ label, num }, i) => (
               <motion.div
                 key={label}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.1 + i * 0.12 }}
                 className="py-6 sm:py-8 flex flex-col items-center gap-2 group"
               >
                 <span className="font-body text-[8px] tracking-widest text-white/15 uppercase">{num}</span>

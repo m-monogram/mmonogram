@@ -12,7 +12,6 @@ import menuBrand from "@/assets/menu/menu-brand.webp";
 import menuModifications from "@/assets/commission-hero-final.webp";
 import menuVerify from "@/assets/menu/menu-verify.webp";
 import menuContact from "@/assets/menu/menu-contact-new.jpg.webp";
-import menuNews from "@/assets/news/m-monogram-g-iconic/01-cover.jpeg";
 interface HeaderProps {
   currentView?: string;
   setCurrentView?: (view: string) => void;
@@ -210,8 +209,8 @@ const Header = ({
   }, [menuOpen]);
   /* 3D-студия из меню убрана: пока в неё ведёт только баннер с главной.
      Подписи и переводы для неё остаются на месте — вернуть карточку это
-     одна строка. Пять карточек при двух колонках дают ровную сетку:
-     2 + 2 + широкая. */
+     одна строка. Пресса тоже ушла из меню — на неё ведёт блок внизу главной,
+     там она к месту. Четыре карточки при двух колонках дают ровную сетку. */
   const navItems = [{
     labelKey: 'nav.brand',
     view: 'brand',
@@ -232,12 +231,6 @@ const Header = ({
     view: 'contact',
     image: menuContact,
     descKey: 'nav.contactDesc'
-  }, {
-    labelKey: 'nav.press',
-    view: 'press',
-    image: menuNews,
-    descKey: 'nav.pressDesc',
-    isWide: true
   }];
   const viewToPath: Record<string, string> = {
     "home": "/",

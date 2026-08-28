@@ -161,10 +161,6 @@ const NewsPage = () => {
               {/* Featured editorial card */}
               {featured && (
                 <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                   className="mb-12 sm:mb-16"
                 >
                   <Link

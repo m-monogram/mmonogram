@@ -27,10 +27,6 @@ const NextSectionCTA = memo(({
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4 }}
       className={`relative py-24 sm:py-32 px-4 sm:px-6 overflow-hidden ${!backgroundImage ? (isDark ? "bg-premium-black" : "luxury-bg") : ""}`}
     >
       {backgroundImage && (

@@ -248,19 +248,7 @@ const ModificationDetail = ({
 
               {/* Premium Gallery Grid - 2x2 edge-to-edge layout */}
               <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 px-4 sm:px-8 md:px-16">
-                {category.images.map((image, index) => <motion.div key={index} initial={{
-              opacity: 0,
-              y: 30
-            }} whileInView={{
-              opacity: 1,
-              y: 0
-            }} viewport={{
-              once: true,
-              margin:"-50px"
-            }} transition={{
-              duration: 0.5,
-              delay: index * 0.08
-            }} onClick={() => openLightbox(index)} className="group relative overflow-hidden cursor-pointer">
+                {category.images.map((image, index) => <motion.div key={index} onClick={() => openLightbox(index)} className="group relative overflow-hidden cursor-pointer">
                     <div className="relative aspect-square overflow-hidden bg-premium-black">
                       <img src={image.src} alt={image.title} loading={index < 4 ?"eager" :"lazy"} decoding={index < 4 ?"sync" :"async"} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                     </div>

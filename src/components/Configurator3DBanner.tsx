@@ -100,18 +100,10 @@ const Configurator3DBanner = () => {
       <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 py-20 sm:py-28">
         <ScrollReveal>
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
             className="max-w-2xl flex flex-col sm:flex-row sm:items-start gap-6 sm:gap-8"
           >
             {/* 3D constructor mark */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.92, rotate: -6 }}
-              whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.75, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
               className="shrink-0 self-start"
             >
               <div className="flex h-16 w-16 sm:h-[4.75rem] sm:w-[4.75rem] items-center justify-center border border-white/25 bg-black/40">

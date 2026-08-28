@@ -82,16 +82,7 @@ const ModificationsSection = ({
       {/* Categories Grid with Hover Effect */}
       <section className="px-4 sm:px-6 md:px-8 lg:px-16 pb-16 sm:pb-20 md:pb-24">
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-          {modificationCategories.map((category, index) => <motion.div key={category.id} initial={{
-            opacity: 0,
-            y: 30
-          }} whileInView={{
-            opacity: 1,
-            y: 0
-          }} transition={{
-            duration: 0.5,
-            delay: index * 0.08
-          }} onClick={() => setSelectedCategoryId(category.id)} viewport={{
+          {modificationCategories.map((category, index) => <motion.div key={category.id} onClick={() => setSelectedCategoryId(category.id)} viewport={{
             once: true
           }} className="relative group cursor-pointer" onMouseEnter={() => setHoveredIndex(index)} onMouseLeave={() => setHoveredIndex(null)}>
             {/* Enhanced Hover Background */}

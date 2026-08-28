@@ -135,10 +135,6 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
 
         {/* CTA Section - Enhanced */}
         <motion.section
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8 }}
           className="relative pt-14 sm:pt-16 md:pt-20 pb-12 sm:pb-14 md:pb-16 px-4 sm:px-6 md:px-8"
         >
           {/* Subtle background gradient */}
@@ -150,10 +146,6 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
 
             {/* CTA Title - enhanced */}
             <motion.h3
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
               className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-widest text-white uppercase mb-6 sm:mb-8"
             >
               Commission Your Project
@@ -161,10 +153,6 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
 
             {/* CTA Description - enhanced */}
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 }}
               className="font-body text-base sm:text-lg md:text-xl text-white/70 leading-relaxed max-w-2xl mx-auto mb-10 sm:mb-12"
             >
               Transform your vehicle into a bespoke masterpiece. Let's discuss your vision.
@@ -176,10 +164,6 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
               onClick={handleCommissionClick}
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
               className="group inline-flex items-center gap-3 bg-white text-black px-10 py-4 sm:px-12 sm:py-5 font-body text-sm sm:text-base md:text-lg uppercase tracking-widest hover:bg-white/95 transition-all duration-300 cursor-pointer shadow-[0_10px_40px_rgba(0,0,0,0.3)] hover:shadow-[0_15px_50px_rgba(0,0,0,0.4)]"
             >
               <span>Get Started</span>

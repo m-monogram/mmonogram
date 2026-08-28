@@ -58,9 +58,6 @@ export const BlurTextInView = ({
       {words.map((word, index) => (
         <motion.span
           key={index}
-          initial={{ opacity: 0, filter: "blur(6px)", y: 12 }}
-          whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-          viewport={{ once, margin: "-50px" }}
           transition={{
             duration: 0.35,
             delay: delay + index * staggerDelay,
