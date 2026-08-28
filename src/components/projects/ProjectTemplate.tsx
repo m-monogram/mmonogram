@@ -176,6 +176,9 @@ const ProjectTemplate = memo(function ProjectTemplate({
   videoUrl,
   modifications
 }: ProjectTemplateProps) {
+  /* Незаполненные пункты приходят как «—»: показывать прочерк вместо
+     значения — хуже, чем не показывать строку вовсе. */
+  const filledSpecs = specs.filter((spec) => spec.value && spec.value !== "—");
   const navigate = useNavigate();
   useEffect(() => {
     window.scrollTo({
@@ -245,7 +248,72 @@ const ProjectTemplate = memo(function ProjectTemplate({
         </section>}
 
 
-      {modifications && modifications.length > 0}
+      {/* ——— D) BUILD SHEET ——— что сделано и из чего собрано ———
+          Данные лежали в проекте с самого начала — specs и modifications
+          приходили в шаблон и не выводились ни разу: строка ниже была
+          заготовкой, которая всегда рисовала пустоту. Страница машины
+          состояла из разворота, одного предложения и галереи.
+
+          Свёрстано разворотом, а не карточками: слева работы, справа
+          спецификация тонкими линейками. Пустые пункты («—») отбрасываем,
+          чтобы у машины без части данных не зияли прочерки. */}
+      {(modifications?.length || filledSpecs.length > 0) && (
+        <section className="relative bg-black pb-16 pt-4 sm:pb-20 md:pb-24" aria-labelledby="build-sheet">
+          <div className="mx-auto max-w-5xl px-4 sm:px-6 md:px-8">
+            <div className="flex items-baseline gap-5 border-t border-white/12 pt-8 sm:pt-10">
+              <h2
+                id="build-sheet"
+                className="shrink-0 font-display text-[11px] uppercase tracking-[0.32em] text-white/45"
+              >
+                Build sheet
+              </h2>
+              <span className="h-px flex-1 bg-white/10" aria-hidden />
+            </div>
+
+            <div className="mt-8 grid grid-cols-1 gap-10 sm:mt-10 md:grid-cols-2 md:gap-14">
+              {modifications && modifications.length > 0 && (
+                <div>
+                  <p className="font-body text-[10px] uppercase tracking-[0.28em] text-white/35">
+                    Work carried out
+                  </p>
+                  <ul className="mt-5 space-y-3.5">
+                    {modifications.map((item) => (
+                      <li key={item} className="flex gap-3 font-body text-[13px] leading-relaxed text-white/75 sm:text-sm">
+                        <span className="mt-[0.6em] h-px w-4 shrink-0 bg-white/25" aria-hidden />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {filledSpecs.length > 0 && (
+                <div>
+                  <p className="font-body text-[10px] uppercase tracking-[0.28em] text-white/35">
+                    Specification
+                  </p>
+                  <dl className="mt-5">
+                    {filledSpecs.map((spec) => (
+                      <div
+                        key={spec.label}
+                        className="flex items-baseline justify-between gap-6 border-b border-white/10 py-3 last:border-b-0"
+                      >
+                        <dt className="shrink-0 font-body text-[10px] uppercase tracking-[0.2em] text-white/40">
+                          {spec.label}
+                        </dt>
+                        <dd className="text-right font-body text-[13px] tabular-nums text-white sm:text-sm">
+                          {spec.value}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
 
       {/* CTA */}
       {onOrderClick && <section className="relative bg-black py-16 sm:py-20">

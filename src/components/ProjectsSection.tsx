@@ -44,7 +44,7 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
         </div>
 
         {/* Hero Section - Enhanced - starts from top with light gradient overlay */}
-        <section className="relative pb-10 sm:pb-12 md:pb-14 px-4 sm:px-6 md:px-8 min-h-[46vh] sm:min-h-[54vh] flex items-center justify-center" style={{ paddingTop: `calc(env(safe-area-inset-top, 0px) + 6.5rem)` }}>
+        <section className="relative pb-6 sm:pb-8 px-4 sm:px-6 md:px-8" style={{ paddingTop: `calc(env(safe-area-inset-top, 0px) + 5.5rem)` }}>
           {/* Light gradient overlay - photo visible, text readable */}
           <div
             className="absolute inset-0 pointer-events-none z-0"
@@ -76,7 +76,7 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
               initial={{ opacity: 0, scaleX: 0 }}
               animate={{ opacity: 1, scaleX: 1 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="w-24 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent mx-auto mb-8 sm:mb-10"
+              className="w-24 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent mx-auto mb-5 sm:mb-6"
             />
 
             {/* Main Title */}
@@ -87,7 +87,7 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
             >
               <BlurText
                 text="OUR PROJECTS"
-                className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl tracking-widest text-white uppercase mb-6 sm:mb-8"
+                className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl tracking-widest text-white uppercase mb-4 sm:mb-5"
                 delay={0.5}
                 staggerDelay={0.1}
               />
@@ -98,7 +98,7 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="font-body text-base sm:text-lg md:text-xl text-white/75 leading-relaxed max-w-3xl mx-auto tracking-wide mb-6"
+              className="font-body text-base sm:text-lg md:text-xl text-white/75 leading-relaxed max-w-3xl mx-auto tracking-wide mb-4"
             >
               A curated collection of bespoke automotive transformations
             </motion.p>
@@ -108,7 +108,7 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.8 }}
-              className="flex items-center justify-center mt-8 sm:mt-10"
+              className="flex items-center justify-center mt-6"
             >
               <div className="flex items-center gap-3 px-6 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-none">
                 <Sparkles className="w-5 h-5 text-white/70" />
@@ -123,7 +123,7 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
               initial={{ opacity: 0, scaleX: 0 }}
               animate={{ opacity: 1, scaleX: 1 }}
               transition={{ duration: 0.8, delay: 1 }}
-              className="w-24 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent mx-auto mt-10 sm:mt-12"
+              className="w-24 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent mx-auto mt-6 sm:mt-8"
             />
           </div>
         </section>

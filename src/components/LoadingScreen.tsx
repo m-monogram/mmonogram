@@ -11,7 +11,10 @@ interface LoadingScreenProps {
  */
 const LoadingScreen = memo(({ onComplete }: LoadingScreenProps) => {
   useEffect(() => {
-    const timer = setTimeout(onComplete, 700);
+    /* Было 700 мс — за это время монограмма успевала только мигнуть, а
+       девиз под ней прочитать было невозможно. 1600 мс — это по-прежнему
+       меньше, чем открывается любая тяжёлая страница, но кадр читается. */
+    const timer = setTimeout(onComplete, 1600);
     return () => clearTimeout(timer);
   }, [onComplete]);
 

@@ -19,7 +19,7 @@ import logoMmonogram from "@/assets/logo-mmonogram.webp";
 const StudioIntro = memo(({ done }: { done: boolean }) => (
   <div
     aria-hidden={done}
-    className={`pointer-events-none absolute inset-0 z-[110] flex items-center justify-center bg-premium-black transition-opacity duration-700 ease-out ${
+    className={`pointer-events-none absolute inset-0 z-[110] flex flex-col items-center justify-center bg-premium-black transition-opacity duration-700 ease-out ${
       done ? "opacity-0" : "opacity-100"
     }`}
   >
@@ -33,6 +33,11 @@ const StudioIntro = memo(({ done }: { done: boolean }) => (
       fetchpriority="high"
       className="h-auto w-64 max-w-[78vw] object-contain opacity-95 animate-logo-pulse will-change-[opacity,transform] sm:w-80 md:w-96"
     />
+    {/* Тот же девиз, что и на входе в сайт: заставка студии — второй экран,
+        где посетитель задерживается, и марка должна звучать одинаково. */}
+    <p className="mt-6 font-display text-[9px] uppercase tracking-[0.42em] text-white/35 sm:mt-7 sm:text-[10px]">
+      Beyond the Ordinary
+    </p>
   </div>
 ));
 
