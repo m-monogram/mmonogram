@@ -38,6 +38,7 @@ import {
   type CameraFocus,
 } from "@/components/configurator/config";
 import SceneErrorBoundary from "@/components/configurator/SceneErrorBoundary";
+import StudioAudio from "@/components/configurator/StudioAudio";
 import StudioIntro from "@/components/configurator/StudioIntro";
 import { CARS, DEFAULT_CAR, selectableCarIds } from "@/components/configurator/models";
 
@@ -673,6 +674,7 @@ const ConfiguratorPage = () => {
           <ToolbarButton label="Reset" onClick={handleReset}>
             <RotateCcw className="h-[18px] w-[18px]" />
           </ToolbarButton>
+          <StudioAudio />
         </div>
       </div>
 
