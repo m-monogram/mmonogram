@@ -148,6 +148,7 @@ const ContactBookingSection = memo(({ setCurrentView, prefilledModel }: ContactB
       if (result.error === "phone") setSubmitError("Please enter a valid phone number");
       else if (result.error === "name") setSubmitError("Please enter your name");
       else if (result.error === "email") setSubmitError("Please enter a valid email");
+      else if (result.error === "throttled") setSubmitError("Your request has already been sent. Please wait a couple of minutes.");
       else setSubmitError("Could not send. Please try again.");
       return;
     }
