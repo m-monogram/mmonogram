@@ -10,6 +10,7 @@ import {
   Gem,
   Lightbulb,
   Maximize2,
+  Minimize2,
   Package,
   Palette,
   RotateCcw,
@@ -218,6 +219,9 @@ const ConfiguratorPage = () => {
   const panelRef = useRef<HTMLElement>(null);
   const [copied, setCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [screenshotFlash, setScreenshotFlash] = useState(false);
+  const [screenshotError, setScreenshotError] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
   const [savedBuilds, setSavedBuilds] = useState<SavedBuild[]>(() => readSavedBuilds());
   const [focus, setFocus] = useState<CameraFocus>(() => {
@@ -279,6 +283,12 @@ const ConfiguratorPage = () => {
   }, []);
 
   useEffect(() => {
+    const onFullscreen = () => setIsFullscreen(Boolean(document.fullscreenElement));
+    document.addEventListener("fullscreenchange", onFullscreen);
+    return () => document.removeEventListener("fullscreenchange", onFullscreen);
+  }, []);
+
+  useEffect(() => {
     if (!tuningOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setTuningOpen(false);
@@ -299,10 +309,13 @@ const ConfiguratorPage = () => {
 
   const handleSceneReady = useCallback(() => setSceneReady(true), []);
 
-  const handleShare = useCallback(async () => {
+  const currentBuildUrl = useCallback(() => {
     const params = new URLSearchParams({ c: encodeConfig(config) });
     if (focus !== "default") params.set("v", focus);
-    const url = `${location.origin}/configurator?${params}`;
+    return `${location.origin}/configurator?${params}`;
+  }, [config, focus]);
+
+  const copyBuildUrl = useCallback(async (url: string) => {
     try {
       await navigator.clipboard.writeText(url);
     } catch {
@@ -314,7 +327,25 @@ const ConfiguratorPage = () => {
     }
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
-  }, [config, focus]);
+  }, []);
+
+  const handleShare = useCallback(async () => {
+    const url = currentBuildUrl();
+    const shareData = {
+      title: "M-Monogram G-Class build",
+      text: "M-Monogram 3D configurator build",
+      url,
+    };
+    if (navigator.share && navigator.canShare?.(shareData)) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+      }
+    }
+    await copyBuildUrl(url);
+  }, [copyBuildUrl, currentBuildUrl]);
 
   const price = estimateBuildPrice(config);
   const formatPrice = useCallback(
@@ -347,13 +378,25 @@ const ConfiguratorPage = () => {
     window.setTimeout(() => setSavedFlash(false), 1800);
   }, [config, handleChange, price]);
 
-  const handleScreenshot = useCallback(() => {
+  const handleScreenshot = useCallback(async () => {
     const canvas = document.querySelector<HTMLCanvasElement>("#configurator-canvas canvas");
     if (!canvas) return;
-    const a = document.createElement("a");
-    a.href = canvas.toDataURL("image/png");
-    a.download = `m-monogram-build-${encodeConfig(config)}.png`;
-    a.click();
+    setScreenshotError(false);
+    try {
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png", 0.96));
+      if (!blob) throw new Error("Empty screenshot");
+      const a = document.createElement("a");
+      const objectUrl = URL.createObjectURL(blob);
+      a.href = objectUrl;
+      a.download = `m-monogram-build-${encodeConfig(config)}.png`;
+      a.click();
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+      setScreenshotFlash(true);
+      window.setTimeout(() => setScreenshotFlash(false), 1800);
+    } catch {
+      setScreenshotError(true);
+      window.setTimeout(() => setScreenshotError(false), 2400);
+    }
   }, [config]);
 
   const handleReset = useCallback(() => {
@@ -382,8 +425,8 @@ const ConfiguratorPage = () => {
 
   const handleFullscreen = useCallback(() => {
     const root = document.documentElement;
-    if (!document.fullscreenElement) root.requestFullscreen?.();
-    else document.exitFullscreen?.();
+    if (!document.fullscreenElement) void root.requestFullscreen?.();
+    else void document.exitFullscreen?.();
   }, []);
 
   const sections = useMemo(
@@ -662,14 +705,17 @@ const ConfiguratorPage = () => {
           <ToolbarButton label={copied ? t("config.shareCopied") : t("config.share")} onClick={handleShare}>
             {copied ? <Check className="h-[18px] w-[18px]" /> : <Share2 className="h-[18px] w-[18px]" />}
           </ToolbarButton>
-          <ToolbarButton label={t("config.screenshot")} onClick={handleScreenshot}>
-            <Camera className="h-[18px] w-[18px]" />
+          <ToolbarButton
+            label={screenshotError ? "Screenshot unavailable" : screenshotFlash ? "Screenshot saved" : t("config.screenshot")}
+            onClick={handleScreenshot}
+          >
+            {screenshotFlash ? <Check className="h-[18px] w-[18px]" /> : <Camera className="h-[18px] w-[18px]" />}
           </ToolbarButton>
           <ToolbarButton label={savedFlash || config.saved ? "Saved" : "Save car"} onClick={handleSave}>
             {savedFlash || config.saved ? <Check className="h-[18px] w-[18px]" /> : <Save className="h-[18px] w-[18px]" />}
           </ToolbarButton>
-          <ToolbarButton label="Fullscreen" onClick={handleFullscreen}>
-            <Maximize2 className="h-[18px] w-[18px]" />
+          <ToolbarButton label={isFullscreen ? "Exit fullscreen" : "Fullscreen"} onClick={handleFullscreen}>
+            {isFullscreen ? <Minimize2 className="h-[18px] w-[18px]" /> : <Maximize2 className="h-[18px] w-[18px]" />}
           </ToolbarButton>
           <ToolbarButton label="Reset" onClick={handleReset}>
             <RotateCcw className="h-[18px] w-[18px]" />
@@ -688,6 +734,13 @@ const ConfiguratorPage = () => {
               aria-label={t("config.share")}
               className="min-w-0 flex-1 bg-transparent font-body text-[11px] text-white/80 outline-none"
             />
+            <button
+              type="button"
+              onClick={() => void copyBuildUrl(shareUrl)}
+              className="shrink-0 font-body text-[10px] uppercase tracking-[0.16em] text-white/65 transition-colors hover:text-white"
+            >
+              {copied ? "Copied" : "Copy"}
+            </button>
             <button
               type="button"
               onClick={() => setShareUrl(null)}
