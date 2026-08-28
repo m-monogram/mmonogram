@@ -5,7 +5,7 @@
 -- только последнего запроса, и разбитая на блоки проверка выдавала лишь
 -- четвёртую таблицу.
 --
--- Ожидаемый итог: три строки «ОК» и одна справочная.
+-- Ожидаемый итог: четыре строки «ОК» и одна справочная.
 
 SELECT 'Ограничение длин полей' AS проверка,
        COALESCE(string_agg(conname, ', ' ORDER BY conname), '— нет') AS значение,
@@ -41,6 +41,16 @@ SELECT 'Права анонима на таблицу целиком',
               OR has_table_privilege('anon', 'public.bookings', 'UPDATE')
               OR has_table_privilege('anon', 'public.bookings', 'DELETE')
             THEN 'ПРОБЛЕМА: REVOKE не отработал' ELSE 'ОК' END
+
+UNION ALL
+
+SELECT 'Ограничитель частоты',
+       COALESCE(string_agg(tgname, ', '), '— нет'),
+       CASE WHEN count(*) = 1 THEN 'ОК' ELSE 'НЕ ПРИМЕНЕНО' END
+FROM pg_trigger
+WHERE tgrelid = 'public.bookings'::regclass
+  AND NOT tgisinternal
+  AND tgname = 'bookings_throttle'
 
 UNION ALL
 

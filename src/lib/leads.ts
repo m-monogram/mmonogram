@@ -163,7 +163,11 @@ export async function submitLead(raw: LeadPayload): Promise<LeadResult> {
 
     if (error) {
       console.error("Lead insert failed:", error);
-      dbError = error.message || "db";
+      /* MM001/MM002 — свои коды ограничителя частоты в базе (миграция
+         20260827180000). Их нужно отличать от настоящего сбоя: посетителю
+         показывается «уже отправлено», а не «ошибка, попробуйте ещё раз»,
+         иначе он будет жать кнопку по кругу и получать то же самое. */
+      dbError = error.code === "MM001" || error.code === "MM002" ? "throttled" : error.message || "db";
     } else {
       dbOk = true;
     }

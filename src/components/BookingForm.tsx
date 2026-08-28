@@ -63,6 +63,7 @@ const BookingForm = () => {
     if (!result.ok) {
       if (result.error === "phone") setError(t("booking.errorPhone"));
       else if (result.error === "name") setError(t("booking.errorName"));
+      else if (result.error === "throttled") setError(t("booking.errorThrottled"));
       else setError(t("booking.errorGeneric"));
       return;
     }
