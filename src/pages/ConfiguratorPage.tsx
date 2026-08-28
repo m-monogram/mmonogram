@@ -201,7 +201,7 @@ function ToolbarButton({
       onClick={onClick}
       title={label}
       aria-label={label}
-      className="flex h-10 w-10 items-center justify-center rounded-md border border-white/12 bg-black/55 text-white/80 shadow-[0_12px_34px_rgba(0,0,0,0.32)] backdrop-blur-xl transition-colors hover:border-white/36 hover:bg-white/12 hover:text-white"
+      className="flex h-10 w-10 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/12 hover:text-white"
     >
       {children}
     </button>
@@ -671,7 +671,10 @@ const ConfiguratorPage = () => {
         description="Configure your bespoke M-Monogram G-Class in real-time 3D: body colors, forged wheels, carbon packages and the M-Monogram body kit."
         path="/configurator"
       />
-      <Header variant={config.night ? "dark" : "light"} />
+      {/* Шапка всегда светлая, даже при дневном свете студии: чёрный логотип
+          на сером фоне циклорамы читался как выцветший, а под ним теперь
+          лежит затемнение сверху — белый держится на любом свете. */}
+      <Header variant="dark" />
 
       {/* Открытая панель забирает часть экрана, поэтому сцену уводим из-под неё:
           на десктопе влево на половину ширины панели, на телефоне вверх. Это
@@ -699,9 +702,22 @@ const ConfiguratorPage = () => {
       </div>
 
       <StudioIntro done={sceneReady} />
+      {/* Затемнение кадра. Верхняя и нижняя полосы дают шапке, подписи и кнопке
+          тюнинга опору на любом фоне; радиальная — уводит углы в тень, и центр
+          с машиной читается как подсвеченное пятно, а не как ровная заливка.
+          Только CSS поверх канваса: WebGL ничего лишнего не считает. */}
+      <div className="pointer-events-none absolute inset-0 z-10" aria-hidden>
+        <div className="absolute inset-x-0 top-0 h-52 bg-gradient-to-b from-black/75 via-black/28 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/70 via-black/24 to-transparent" />
+        <div
+          className="absolute inset-0"
+          style={{ background: "radial-gradient(118% 84% at 50% 46%, transparent 44%, rgba(0,0,0,0.44) 100%)" }}
+        />
+      </div>
+
 
       <div className="pointer-events-none absolute inset-x-0 top-[5.25rem] z-20 flex justify-center px-4 sm:top-[5.75rem]">
-        <div className="pointer-events-auto flex items-center gap-2">
+        <div className="pointer-events-auto flex items-center gap-1 rounded-xl border border-white/10 bg-black/45 p-1 shadow-[0_18px_48px_rgba(0,0,0,0.45)] backdrop-blur-xl">
           <ToolbarButton label={copied ? t("config.shareCopied") : t("config.share")} onClick={handleShare}>
             {copied ? <Check className="h-[18px] w-[18px]" /> : <Share2 className="h-[18px] w-[18px]" />}
           </ToolbarButton>
@@ -760,21 +776,30 @@ const ConfiguratorPage = () => {
           tuningOpen && "opacity-0 md:pr-[26.25rem] md:opacity-100"
         )}
       >
-        <p
+        {/* Левый нижний угол — единственное место, где названа машина. Одной
+            серой строкой она терялась, поэтому приписка отдельно и мелко,
+            а имя модели — крупно и светлым. */}
+        <div className="hidden md:block">
+          <p className="font-body text-[9px] uppercase tracking-[0.26em] text-white/35">
+            {t("config.demoNote")}
+          </p>
+          <p className="mt-1 font-display text-[15px] uppercase tracking-[0.2em] text-white/85">
+            {car.name}
+          </p>
+        </div>
+
+        <div
           className={cn(
-            "hidden font-body text-[10px] uppercase tracking-[0.14em] md:block",
-            config.night ? "text-white/40" : "text-black/45"
+            "pointer-events-auto flex w-full items-center gap-2 transition-opacity duration-200 md:ml-auto md:w-auto",
+            tuningOpen && "md:pointer-events-none md:opacity-0"
           )}
         >
-          {t("config.demoNote")} · {car.name}
-        </p>
-
-        <div className="pointer-events-auto flex w-full items-center gap-2 md:ml-auto md:w-auto">
           <button
             type="button"
             onClick={() => setTuningOpen(true)}
             aria-expanded={tuningOpen}
             aria-controls="tuning-panel"
+            tabIndex={tuningOpen ? -1 : undefined}
             className="flex h-11 w-full shrink-0 items-center justify-center gap-2 rounded-md bg-white px-5 font-body text-[12px] uppercase tracking-[0.18em] text-black shadow-[0_18px_44px_rgba(0,0,0,0.45)] transition-transform duration-150 hover:bg-white/90 active:scale-[0.98] md:w-auto"
           >
             <SlidersHorizontal className="h-4 w-4" strokeWidth={2} />

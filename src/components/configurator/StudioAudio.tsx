@@ -77,7 +77,7 @@ export default function StudioAudio() {
         title={playing ? "Выключить музыку" : "Включить музыку"}
         aria-label={playing ? "Выключить музыку" : "Включить музыку"}
         aria-pressed={playing}
-        className="flex h-10 w-10 items-center justify-center rounded-md border border-white/12 bg-black/55 text-white/80 shadow-[0_12px_34px_rgba(0,0,0,0.32)] backdrop-blur-xl transition-colors hover:border-white/36 hover:bg-white/12 hover:text-white"
+        className="flex h-10 w-10 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/12 hover:text-white"
       >
         {playing ? <Volume2 className="h-[18px] w-[18px]" /> : <VolumeX className="h-[18px] w-[18px]" />}
       </button>
