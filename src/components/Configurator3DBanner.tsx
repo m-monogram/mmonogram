@@ -1,3 +1,4 @@
+import { useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import ScrollReveal from "./ScrollReveal";
@@ -62,6 +63,23 @@ const ConfiguratorMark = ({ className = "" }: { className?: string }) => (
 /* Переход в 3D-конфигуратор внизу главной страницы */
 const Configurator3DBanner = () => {
   const navigate = useNavigate();
+
+  /* Студия тянет за собой three.js: полтора мегабайта скриптов, и качаться они
+     начинают только после нажатия — первые секунды посетитель смотрит в пустоту.
+     Начинаем заранее, но не всем подряд: заходить в студию собирается тот, кто
+     подвёл к кнопке курсор или коснулся её. Так мы выигрываем секунду-другую и
+     при этом не грузим полтора мегабайта в мобильный трафик тем, кто просто
+     пролистал главную мимо. */
+  const prefetched = useRef(false);
+  const prefetchStudio = useCallback(() => {
+    if (prefetched.current) return;
+    prefetched.current = true;
+    void import("@/pages/ConfiguratorPage");
+    /* Отдельно тянем сцену: страница студии грузит её лениво, и без этого
+       предзагрузка вытаскивала сорок килобайт разметки, а полтора мегабайта
+       three.js всё равно начинали качаться только после нажатия. */
+    void import("@/components/configurator/Scene");
+  }, []);
   const { t } = useLanguage();
 
   return (
@@ -117,6 +135,9 @@ const Configurator3DBanner = () => {
                 href="/configurator"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
+                onPointerEnter={prefetchStudio}
+                onTouchStart={prefetchStudio}
+                onFocus={prefetchStudio}
                 onClick={(e) => {
                   if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
                   e.preventDefault();
