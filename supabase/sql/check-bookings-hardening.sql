@@ -1,43 +1,51 @@
 -- Проверка, что миграция 20260827120000_harden_public_bookings применилась.
 -- Ничего не меняет, только читает системные каталоги.
--- Запускать в Supabase → SQL Editor.
+--
+-- Один запрос, а не несколько: SQL Editor в Supabase показывает результат
+-- только последнего запроса, и разбитая на блоки проверка выдавала лишь
+-- четвёртую таблицу.
+--
+-- Ожидаемый итог: три строки «ОК» и одна справочная.
 
--- 1. Ограничение на длины полей.
---    Ожидается строка bookings_field_lengths.
---    validated = false — это норма: ограничение добавлено как NOT VALID,
---    старые строки не перепроверяются, всё новое проверяется.
-SELECT conname AS constraint_name,
-       convalidated AS validated
+SELECT 'Ограничение длин полей' AS проверка,
+       COALESCE(string_agg(conname, ', ' ORDER BY conname), '— нет') AS значение,
+       CASE WHEN count(*) FILTER (WHERE conname = 'bookings_field_lengths') = 1
+            THEN 'ОК' ELSE 'НЕ ПРИМЕНЕНО' END AS итог
 FROM pg_constraint
-WHERE conrelid = 'public.bookings'::regclass
-  AND contype = 'c'
-ORDER BY conname;
+WHERE conrelid = 'public.bookings'::regclass AND contype = 'c'
 
--- 2. Что аноним может писать по колонкам.
---    Ожидается ровно восемь строк с INSERT:
---    budget, car, email, message, name, phone, service, source.
---    Если в списке есть status или notes — миграция не отработала.
-SELECT privilege_type, column_name
-FROM information_schema.column_privileges
-WHERE grantee = 'anon'
-  AND table_schema = 'public'
-  AND table_name = 'bookings'
-  AND privilege_type IN ('INSERT', 'UPDATE')
-ORDER BY privilege_type, column_name;
+UNION ALL
 
--- 3. Права анонима на таблицу целиком.
---    Ожидается только SELECT (его гасит RLS: политики на чтение заявок
---    выданы лишь роли authenticated с ролью admin/editor).
---    INSERT, UPDATE, DELETE тут быть не должно.
-SELECT privilege_type
-FROM information_schema.table_privileges
-WHERE grantee = 'anon'
-  AND table_schema = 'public'
-  AND table_name = 'bookings'
-ORDER BY privilege_type;
+SELECT 'Колонки, куда аноним может писать',
+       COALESCE(string_agg(c.column_name, ', ' ORDER BY c.column_name), '— нет'),
+       CASE
+         WHEN count(*) = 0 THEN 'ПРОБЛЕМА: форма не сможет отправить заявку'
+         WHEN bool_or(c.column_name IN ('status', 'notes')) THEN 'ПРОБЛЕМА: доступны служебные колонки'
+         WHEN count(*) = 8 THEN 'ОК'
+         ELSE 'проверить вручную'
+       END
+FROM information_schema.columns c
+WHERE c.table_schema = 'public' AND c.table_name = 'bookings'
+  AND has_column_privilege('anon', 'public.bookings', c.column_name, 'INSERT')
 
--- 4. Политики RLS на таблице — на случай, если их правили руками.
-SELECT policyname, cmd, roles::text
+UNION ALL
+
+SELECT 'Права анонима на таблицу целиком',
+       COALESCE(NULLIF(concat_ws(', ',
+         CASE WHEN has_table_privilege('anon', 'public.bookings', 'SELECT') THEN 'SELECT' END,
+         CASE WHEN has_table_privilege('anon', 'public.bookings', 'INSERT') THEN 'INSERT' END,
+         CASE WHEN has_table_privilege('anon', 'public.bookings', 'UPDATE') THEN 'UPDATE' END,
+         CASE WHEN has_table_privilege('anon', 'public.bookings', 'DELETE') THEN 'DELETE' END
+       ), ''), '— нет'),
+       CASE WHEN has_table_privilege('anon', 'public.bookings', 'INSERT')
+              OR has_table_privilege('anon', 'public.bookings', 'UPDATE')
+              OR has_table_privilege('anon', 'public.bookings', 'DELETE')
+            THEN 'ПРОБЛЕМА: REVOKE не отработал' ELSE 'ОК' END
+
+UNION ALL
+
+SELECT 'Политики RLS',
+       string_agg(policyname || ' → ' || cmd, '; ' ORDER BY policyname),
+       'справочно'
 FROM pg_policies
-WHERE schemaname = 'public' AND tablename = 'bookings'
-ORDER BY policyname;
+WHERE schemaname = 'public' AND tablename = 'bookings';
