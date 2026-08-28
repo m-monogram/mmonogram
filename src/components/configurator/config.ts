@@ -164,6 +164,87 @@ export const DEFAULT_CONFIG: BuildConfig = {
   saved: false,
 };
 
+/**
+ * Три фирменных пакета из линейки ателье, собранные заранее.
+ *
+ * Раньше конфигуратор открывался на заводской машине, и посетитель должен был
+ * сам догадаться, что собирать. Между тем на сайте уже продаются ровно три
+ * готовых пакета — с них и логично начинать: одно касание показывает товар,
+ * дальше его можно править как угодно.
+ *
+ * Значения взяты из спецификаций в src/data/projects.ts, чтобы 3D и страницы
+ * проектов не разъезжались.
+ */
+export interface SignatureBuild {
+  id: string;
+  name: string;
+  tagline: string;
+  /** Страница проекта на сайте — та же машина в фотографиях. */
+  slug: string;
+  config: BuildConfig;
+}
+
+export const SIGNATURE_BUILDS: SignatureBuild[] = [
+  {
+    id: "black",
+    name: "Black Package",
+    tagline: "Stealth black-out",
+    slug: "g3-iconic-black",
+    config: {
+      ...DEFAULT_CONFIG,
+      paint: 0,      /* Obsidian Black */
+      rimFinish: 3,  /* Gloss Black */
+      grille: 2,     /* Gloss Black */
+      interior: 1,   /* Onyx Black */
+    },
+  },
+  {
+    id: "gold",
+    name: "Gold Package",
+    tagline: "Black and 24K gold",
+    slug: "g3-iconic-gold",
+    config: {
+      ...DEFAULT_CONFIG,
+      paint: 0,      /* Obsidian Black */
+      rimFinish: 2,  /* Champagne Gold */
+      grille: 0,     /* Brushed Gold */
+      interior: 3,   /* Cognac Heritage */
+    },
+  },
+  {
+    id: "silver",
+    name: "Silver Package",
+    tagline: "Graphite and chrome",
+    slug: "g3-iconic-grey",
+    config: {
+      ...DEFAULT_CONFIG,
+      paint: 2,      /* Nardo Silver */
+      rimFinish: 1,  /* Brushed Silver */
+      grille: 1,     /* Polished Silver */
+      interior: 1,   /* Onyx Black */
+    },
+  },
+];
+
+/**
+ * Какому пакету отвечает текущая сборка. Сравниваются только те поля, которые
+ * пакет и задаёт: свет, окружение и открытые двери человек крутит сам, и
+ * из-за них подпись «Black Package» не должна слетать на «Custom».
+ */
+export function matchSignatureBuild(c: BuildConfig): SignatureBuild | null {
+  return (
+    SIGNATURE_BUILDS.find(
+      (b) =>
+        b.config.paint === c.paint &&
+        b.config.rimFinish === c.rimFinish &&
+        b.config.grille === c.grille &&
+        b.config.interior === c.interior &&
+        b.config.kitPackage === c.kitPackage &&
+        b.config.carbon === c.carbon
+    ) ?? null
+  );
+}
+
 /* Первый сегмент — версия схемы: старые ссылки не ломаются при добавлении опций */
 const SCHEMA_VERSION = 4;
 

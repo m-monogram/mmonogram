@@ -9,8 +9,6 @@ import {
   Disc3,
   Gem,
   Lightbulb,
-  Maximize2,
-  Minimize2,
   Package,
   Palette,
   RotateCcw,
@@ -34,14 +32,19 @@ import {
   KIT_PACKAGES,
   PAINTS,
   RIM_FINISHES,
+  SIGNATURE_BUILDS,
   decodeConfig,
   encodeConfig,
+  matchSignatureBuild,
   type CameraFocus,
 } from "@/components/configurator/config";
 import SceneErrorBoundary from "@/components/configurator/SceneErrorBoundary";
 import StudioAudio from "@/components/configurator/StudioAudio";
 import StudioIntro from "@/components/configurator/StudioIntro";
 import { CARS, DEFAULT_CAR, selectableCarIds } from "@/components/configurator/models";
+import signatureBlack from "@/assets/g-2.jpg";
+import signatureGold from "@/assets/g3-iconic-gold-front.jpg";
+import signatureSilver from "@/assets/g3-grey-cover.jpg";
 
 const ConfiguratorScene = lazy(() => import("@/components/configurator/Scene"));
 
@@ -92,11 +95,20 @@ function estimateBuildPrice(c: BuildConfig): number {
 const PAINT_PREVIEWS = Object.values(
   import.meta.glob("@/assets/previews/paint-*.jpg", { eager: true, import: "default" })
 ) as string[];
+/* Обложки фирменных пакетов — те же снимки, что на страницах проектов:
+   человек узнаёт машину, которую видел в разделе Projects. */
+const SIGNATURE_COVERS: Record<string, string> = {
+  black: signatureBlack,
+  gold: signatureGold,
+  silver: signatureSilver,
+};
+
 const FINISH_PREVIEWS = Object.values(
   import.meta.glob("@/assets/previews/finish-*.jpg", { eager: true, import: "default" })
 ) as string[];
 
 type StudioSection =
+  | "signature"
   | "model"
   | "exterior"
   | "wheels"
@@ -119,6 +131,9 @@ type OptionItem = {
 };
 
 const SECTION_FOCUS: Partial<Record<StudioSection, CameraFocus>> = {
+  /* Готовый пакет показываем с общего ракурса: меняется вся машина сразу,
+     а не одна деталь, и подъезжать к колесу тут незачем. */
+  signature: "default",
   exterior: "exterior",
   wheels: "wheels",
   kit: "kit",
@@ -186,34 +201,15 @@ function PreviewImage({ src, alt, fallback }: { src?: string; alt: string; fallb
   );
 }
 
-function ToolbarButton({
-  label,
-  onClick,
-  children,
-}: {
-  label: string;
-  onClick: () => void;
-  children: ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      title={label}
-      aria-label={label}
-      className="flex h-10 w-10 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/12 hover:text-white"
-    >
-      {children}
-    </button>
-  );
-}
-
 const ConfiguratorPage = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [config, setConfig] = useState<BuildConfig>(() => decodeConfig(searchParams.get("c")));
-  const [activeSection, setActiveSection] = useState<StudioSection>("exterior");
+  /* Панель открывается на готовых пакетах, а не на палитре красок: первым
+     делом человек должен увидеть то, что ателье продаёт, и уже потом
+     править под себя. */
+  const [activeSection, setActiveSection] = useState<StudioSection>("signature");
   const [tuningOpen, setTuningOpen] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
   const panelRef = useRef<HTMLElement>(null);
@@ -221,7 +217,6 @@ const ConfiguratorPage = () => {
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [screenshotFlash, setScreenshotFlash] = useState(false);
   const [screenshotError, setScreenshotError] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
   const [savedBuilds, setSavedBuilds] = useState<SavedBuild[]>(() => readSavedBuilds());
   const [focus, setFocus] = useState<CameraFocus>(() => {
@@ -267,6 +262,10 @@ const ConfiguratorPage = () => {
 
   const set = useCallback((patch: Partial<BuildConfig>) => handleChange({ ...config, ...patch }), [config, handleChange]);
 
+  /* Какому фирменному пакету отвечает текущая сборка (или null, если человек
+     ушёл в свою). Нужен и разделу Signature, и подписи в списке разделов. */
+  const signature = matchSignatureBuild(config);
+
   const focusForSection = (section: StudioSection): CameraFocus =>
     section === "interior" ? "interiorDriver" : SECTION_FOCUS[section] ?? "default";
 
@@ -280,12 +279,6 @@ const ConfiguratorPage = () => {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
-  }, []);
-
-  useEffect(() => {
-    const onFullscreen = () => setIsFullscreen(Boolean(document.fullscreenElement));
-    document.addEventListener("fullscreenchange", onFullscreen);
-    return () => document.removeEventListener("fullscreenchange", onFullscreen);
   }, []);
 
   useEffect(() => {
@@ -400,8 +393,8 @@ const ConfiguratorPage = () => {
   }, [config]);
 
   const handleReset = useCallback(() => {
-    setActiveSection("exterior");
-    apply(DEFAULT_CONFIG, focusForSection("exterior"));
+    setActiveSection("signature");
+    apply(DEFAULT_CONFIG, focusForSection("signature"));
   }, [apply]);
 
   const loadSavedBuild = useCallback(
@@ -423,12 +416,6 @@ const ConfiguratorPage = () => {
     handleChange({ ...config, saved: false });
   }, [config, handleChange]);
 
-  const handleFullscreen = useCallback(() => {
-    const root = document.documentElement;
-    if (!document.fullscreenElement) void root.requestFullscreen?.();
-    else void document.exitFullscreen?.();
-  }, []);
-
   const sections = useMemo(
     () => ([
       /* Раздел выбора машины прячем, когда выбирать не из чего: одна карточка
@@ -436,6 +423,7 @@ const ConfiguratorPage = () => {
       ...(carIds.length > 1
         ? [{ id: "model" as const, label: t("config.model"), value: car.name, icon: Car }]
         : []),
+      { id: "signature" as const, label: "Signature", value: signature?.name ?? "Custom", icon: Sparkles },
       { id: "exterior" as const, label: t("config.exterior"), value: PAINTS[config.paint].name, icon: Palette },
       { id: "wheels" as const, label: t("config.rims"), value: RIM_FINISHES[config.rimFinish].name, icon: Disc3 },
       { id: "kit" as const, label: t("config.kit"), value: KIT_PACKAGES[config.kitPackage].name, icon: Package },
@@ -448,7 +436,7 @@ const ConfiguratorPage = () => {
       { id: "interior" as const, label: t("config.interior"), value: INTERIOR_FINISHES[config.interior].name, icon: Armchair },
       { id: "overview" as const, label: t("config.overview"), value: "", icon: ClipboardList },
     ]),
-    [canOpen, car.name, carIds.length, config, t]
+    [canOpen, car.name, carIds.length, config, signature?.name, t]
   );
 
   const overviewRows = [
@@ -484,6 +472,16 @@ const ConfiguratorPage = () => {
           preview: <Car className="h-8 w-8" strokeWidth={1.4} />,
           title: CARS[id].name,
           subtitle: id === "base-basic-pbr" ? t("config.modelSourcePbr") : t("config.modelMain"),
+        }));
+
+      case "signature":
+        return SIGNATURE_BUILDS.map((build) => ({
+          key: `signature-${build.id}`,
+          selected: signature?.id === build.id,
+          onClick: () => apply({ ...build.config, saved: config.saved }, "default"),
+          preview: <PreviewImage src={SIGNATURE_COVERS[build.id]} alt={build.name} fallback="#111315" />,
+          title: build.name,
+          subtitle: build.tagline,
         }));
 
       case "exterior":
@@ -660,7 +658,7 @@ const ConfiguratorPage = () => {
     /* interiorViews пересобирается каждый рендер вместе с переводами — в
        зависимостях достаточно самого t. */
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeSection, canOpen, carIds, changeFocus, config, focus, set, t]);
+  }, [activeSection, apply, canOpen, carIds, changeFocus, config, focus, set, t]);
 
   const activeMeta = sections.find((item) => item.id === activeSection);
 
@@ -715,30 +713,6 @@ const ConfiguratorPage = () => {
         />
       </div>
 
-
-      <div className="pointer-events-none absolute inset-x-0 top-[5.25rem] z-20 flex justify-center px-4 sm:top-[5.75rem]">
-        <div className="pointer-events-auto flex items-center gap-1 rounded-xl border border-white/10 bg-black/45 p-1 shadow-[0_18px_48px_rgba(0,0,0,0.45)] backdrop-blur-xl">
-          <ToolbarButton label={copied ? t("config.shareCopied") : t("config.share")} onClick={handleShare}>
-            {copied ? <Check className="h-[18px] w-[18px]" /> : <Share2 className="h-[18px] w-[18px]" />}
-          </ToolbarButton>
-          <ToolbarButton
-            label={screenshotError ? "Screenshot unavailable" : screenshotFlash ? "Screenshot saved" : t("config.screenshot")}
-            onClick={handleScreenshot}
-          >
-            {screenshotFlash ? <Check className="h-[18px] w-[18px]" /> : <Camera className="h-[18px] w-[18px]" />}
-          </ToolbarButton>
-          <ToolbarButton label={savedFlash || config.saved ? "Saved" : "Save car"} onClick={handleSave}>
-            {savedFlash || config.saved ? <Check className="h-[18px] w-[18px]" /> : <Save className="h-[18px] w-[18px]" />}
-          </ToolbarButton>
-          <ToolbarButton label={isFullscreen ? "Exit fullscreen" : "Fullscreen"} onClick={handleFullscreen}>
-            {isFullscreen ? <Minimize2 className="h-[18px] w-[18px]" /> : <Maximize2 className="h-[18px] w-[18px]" />}
-          </ToolbarButton>
-          <ToolbarButton label="Reset" onClick={handleReset}>
-            <RotateCcw className="h-[18px] w-[18px]" />
-          </ToolbarButton>
-          <StudioAudio />
-        </div>
-      </div>
 
       {shareUrl && (
         <div className="absolute inset-x-0 top-[8.5rem] z-40 flex justify-center px-4">
@@ -827,14 +801,29 @@ const ConfiguratorPage = () => {
         <div className="flex shrink-0 items-center gap-3 border-b border-white/10 px-4 py-3">
           <SlidersHorizontal className="h-4 w-4 shrink-0 text-white/50" strokeWidth={1.8} />
           <span className="font-display text-[12px] uppercase tracking-[0.22em] text-white">Tuning</span>
-          <button
-            type="button"
-            onClick={() => setTuningOpen(false)}
-            aria-label="Close tuning"
-            className="-mr-1 ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-white/60 transition-colors hover:bg-white/10 hover:text-white"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          {/* Музыка и сброс жили на плашке поверх машины — единственном месте
+              кадра, которое должно быть пустым. Здесь они рядом с опциями,
+              которых и касаются. */}
+          <div className="ml-auto flex shrink-0 items-center gap-1">
+            <StudioAudio />
+            <button
+              type="button"
+              onClick={handleReset}
+              aria-label="Reset build"
+              title="Reset build"
+              className="flex h-8 w-8 items-center justify-center rounded-md text-white/55 transition-colors hover:bg-white/10 hover:text-white"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setTuningOpen(false)}
+              aria-label="Close tuning"
+              className="-mr-1 flex h-8 w-8 items-center justify-center rounded-md text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
         </div>
 
         <div className="flex min-h-0 flex-1 flex-col md:flex-row">
@@ -900,6 +889,27 @@ const ConfiguratorPage = () => {
                     </span>
                     <span className="font-body text-[10px] uppercase tracking-[0.12em] text-white/42">Local garage</span>
                   </button>
+                  {/* Поделиться и снимок — здесь, а не на плашке над машиной:
+                      человек доходит до Overview, когда сборка готова, и это
+                      ровно тот момент, когда её показывают другим. */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={handleShare}
+                      className="flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-white/12 bg-white/[0.04] px-2 py-3 font-body text-[9px] uppercase tracking-[0.1em] text-white/80 transition-colors hover:border-white/35 hover:bg-white/[0.09] hover:text-white"
+                    >
+                      {copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
+                      {copied ? t("config.shareCopied") : t("config.share")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleScreenshot}
+                      className="flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-white/12 bg-white/[0.04] px-2 py-3 font-body text-[9px] uppercase tracking-[0.1em] text-white/80 transition-colors hover:border-white/35 hover:bg-white/[0.09] hover:text-white"
+                    >
+                      {screenshotFlash ? <Check className="h-4 w-4" /> : <Camera className="h-4 w-4" />}
+                      {screenshotError ? "Unavailable" : screenshotFlash ? "Saved" : t("config.screenshot")}
+                    </button>
+                  </div>
                   {savedBuilds.length > 0 && (
                     <button
                       type="button"
