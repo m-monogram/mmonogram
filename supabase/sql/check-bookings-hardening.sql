@@ -1,4 +1,6 @@
--- Проверка, что миграция 20260827120000_harden_public_bookings применилась.
+-- Проверка, что миграции 20260827120000_harden_public_bookings,
+-- 20260827180000_throttle_public_bookings и
+-- 20260828090000_revoke_anon_select_bookings применились.
 -- Ничего не меняет, только читает системные каталоги.
 --
 -- Один запрос, а не несколько: SQL Editor в Supabase показывает результат
@@ -40,7 +42,10 @@ SELECT 'Права анонима на таблицу целиком',
        CASE WHEN has_table_privilege('anon', 'public.bookings', 'INSERT')
               OR has_table_privilege('anon', 'public.bookings', 'UPDATE')
               OR has_table_privilege('anon', 'public.bookings', 'DELETE')
-            THEN 'ПРОБЛЕМА: REVOKE не отработал' ELSE 'ОК' END
+            THEN 'ПРОБЛЕМА: REVOKE не отработал'
+            WHEN has_table_privilege('anon', 'public.bookings', 'SELECT')
+            THEN 'ПРОБЛЕМА: аноним держит SELECT, база лидов защищена только RLS'
+            ELSE 'ОК' END
 
 UNION ALL
 
