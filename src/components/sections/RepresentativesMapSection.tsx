@@ -163,7 +163,7 @@ const LocationCard = memo(function LocationCard({
       onFocus={() => onHover(id)}
       onBlur={() => onHover(null)}
       onClick={() => onOpen(id)}
-      className={`group relative w-full overflow-hidden text-left border px-5 py-6 sm:px-6 sm:py-7 md:px-7 md:py-8 transition-all duration-300 cursor-pointer ${
+      className={`group relative w-full overflow-hidden text-left border px-5 py-4 sm:px-6 sm:py-5 transition-all duration-300 cursor-pointer ${
         isActive
           ? "border-white/40 bg-white/[0.055]"
           : "border-white/10 bg-transparent hover:border-white/30 hover:bg-white/[0.03]"
@@ -176,7 +176,7 @@ const LocationCard = memo(function LocationCard({
         aria-hidden
       />
 
-      <div className="flex items-start justify-between gap-4 mb-5 sm:mb-6">
+      <div className="flex items-start justify-between gap-4 mb-3.5">
         <span className="font-body text-[10px] sm:text-[11px] tracking-[0.38em] text-white/40 uppercase">
           {String(index + 1).padStart(2, "0").split("").join(" ")}
         </span>
@@ -194,14 +194,14 @@ const LocationCard = memo(function LocationCard({
         </span>
       </div>
 
-      <div className="font-display text-2xl sm:text-[28px] md:text-[32px] tracking-[0.12em] uppercase text-white font-bold leading-none">
+      <div className="font-display text-xl sm:text-2xl md:text-[26px] tracking-[0.12em] uppercase text-white font-bold leading-none">
         {city}
       </div>
-      <div className="mt-2.5 sm:mt-3 font-body text-[12px] sm:text-[13px] text-white/45 tracking-[0.02em]">
+      <div className="mt-2 font-body text-[12px] sm:text-[13px] text-white/45 tracking-[0.02em]">
         {region}
       </div>
 
-      <div className="mt-7 sm:mt-8 flex items-center gap-3 text-white/40 group-hover:text-white/70 transition-colors duration-300">
+      <div className="mt-4 sm:mt-5 flex items-center gap-3 text-white/40 group-hover:text-white/70 transition-colors duration-300">
         <span className="shrink-0 font-body text-[10px] sm:text-[11px] uppercase tracking-[0.28em]">
           {atelierLabel}
         </span>
@@ -241,9 +241,9 @@ const RepresentativesMapSection = () => {
         aria-hidden
       />
 
-      <div className="relative z-10 w-full px-5 sm:px-8 lg:px-12 pt-16 sm:pt-20 md:pt-24 pb-16 sm:pb-20 md:pb-28">
+      <div className="relative z-10 w-full px-5 sm:px-8 lg:px-12 pt-14 sm:pt-16 md:pt-20 pb-14 sm:pb-16 md:pb-20">
         {/* Header */}
-        <div className="mb-10 sm:mb-12 md:mb-14">
+        <div className="mb-8 sm:mb-10">
           <motion.p
             initial={{ opacity: 0, y: 8 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -278,27 +278,6 @@ const RepresentativesMapSection = () => {
                 {t("representatives.subtitle")}
               </motion.p>
             </div>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="shrink-0 font-body text-[10px] sm:text-[11px] uppercase tracking-[0.28em] text-white/35"
-            >
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={activeCity ?? "hint"}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  transition={{ duration: 0.25 }}
-                  className="inline-block"
-                >
-                  {activeCity ? activeCity.toUpperCase() : t("representatives.mapHint")}
-                </motion.span>
-              </AnimatePresence>
-            </motion.div>
           </div>
         </div>
 
@@ -310,9 +289,9 @@ const RepresentativesMapSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="relative lg:col-span-7 xl:col-span-8"
+            className="relative lg:col-span-7 xl:col-span-8 lg:h-full"
           >
-            <div className="relative overflow-hidden border border-white/10 bg-neutral-950">
+            <div className="relative flex h-full flex-col overflow-hidden border border-white/10 bg-neutral-950">
               {/* Corner marks */}
               <span className="pointer-events-none absolute left-3 top-3 z-10 h-4 w-4 border-l border-t border-white/35" aria-hidden />
               <span className="pointer-events-none absolute right-3 top-3 z-10 h-4 w-4 border-r border-t border-white/35" aria-hidden />
@@ -320,14 +299,19 @@ const RepresentativesMapSection = () => {
               <span className="pointer-events-none absolute bottom-3 right-3 z-10 h-4 w-4 border-b border-r border-white/35" aria-hidden />
 
               <div
-                className="aspect-[16/11] sm:aspect-[21/11] lg:aspect-auto lg:h-full lg:min-h-[520px] xl:min-h-[560px] w-full overscroll-contain"
+                className="aspect-[16/11] sm:aspect-[21/11] lg:aspect-auto lg:h-full lg:min-h-[420px] xl:min-h-[450px] w-full flex-1 overscroll-contain"
                 style={{ touchAction: "pan-y" }}
               >
                 <ComposableMap
                   projection="geoEqualEarth"
                   width={800}
                   height={450}
-                  projectionConfig={{ scale: 760, center: [8.2, 46.8] }}
+                  /* Масштаб 760 показывал пол-Африки и Ближний Восток, а три
+                     точки сидели крошечным пятном в углу. На 2600 в кадре
+                     Швейцария, восток Франции, юг Германии и север Италии:
+                     страны узнаются, а Цюрих, Мюнхен и Ницца разнесены по полю,
+                     а не слипаются в одну точку. */
+                  projectionConfig={{ scale: 2600, center: [8.6, 46.2] }}
                   style={{ width: "100%", height: "100%", display: "block" }}
                 >
                   <defs>
@@ -351,6 +335,24 @@ const RepresentativesMapSection = () => {
                 aria-hidden
               />
               <MediaEdgeFade edges="bottom" />
+
+              {/* Подсказка живёт внутри карты, а не в правом верхнем углу секции:
+                  там она при прокрутке наезжала на язык и бургер закреплённой
+                  шапки — две строки текста поверх друг друга. */}
+              <div className="pointer-events-none absolute bottom-4 left-5 z-10 font-body text-[10px] sm:text-[11px] uppercase tracking-[0.28em] text-white/45 sm:bottom-5 sm:left-6">
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={activeCity ?? "hint"}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.25 }}
+                    className="inline-block"
+                  >
+                    {activeCity ? activeCity.toUpperCase() : t("representatives.mapHint")}
+                  </motion.span>
+                </AnimatePresence>
+              </div>
             </div>
           </motion.div>
 
