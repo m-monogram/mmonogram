@@ -75,13 +75,18 @@ export interface KitPackage {
   name: string;
 }
 
-/* Обвес приходит одним файлом body-kit-wheels.glb, и переключать нечего:
-   он либо стоит на машине, либо нет. Раньше пакетов было четыре — Signature,
-   Blackline, Heritage выглядели в сцене абсолютно одинаково, посетитель
-   нажимал и не понимал, почему ничего не происходит. Появятся отдельные
-   выгрузки под каждый пакет — вернём и остальные. */
+/* Обвес приходит одним файлом body-kit-wheels.glb. Раньше пакетов было
+   четыре — Signature, Blackline, Heritage выглядели в сцене абсолютно
+   одинаково, посетитель нажимал и не понимал, почему ничего не происходит.
+
+   «Stock Version» убран следом и по той же причине, только хуже: он прятал
+   весь файл обвеса, а там лежат не только накладки, но и колёса, арки и
+   бамперы. Оставался голый каркас с открытой подвеской и без единого
+   колеса — машина выглядела разобранной. Стокового кузова, пригодного для
+   показа, у нас просто нет: отдельной выгрузки под него никто не делал.
+
+   Появятся отдельные файлы — вернём и выбор. */
 export const KIT_PACKAGES: KitPackage[] = [
-  { id: "stock", name: "Stock Version" },
   { id: "signature", name: "M Monogram ICONIC" },
 ];
 
@@ -151,7 +156,7 @@ export const DEFAULT_CONFIG: BuildConfig = {
   rim: 1,
   rimFinish: 0,
   caliper: 0,
-  kitPackage: 1,
+  kitPackage: 0,
   kit: true,
   carbon: true,
   lights: true,
@@ -303,8 +308,15 @@ export function decodeConfig(raw: string | null): BuildConfig {
     rimFinish: clamp(p[2], RIM_FINISHES.length - 1),
     caliper: fromV4 ? clamp(p[8], CALIPER_FINISHES.length - 1) : DEFAULT_CONFIG.caliper,
     kitPackage,
-    kit: kitPackage > 0,
-    carbon: p[4] === 1,
+    /* Обвес стоит всегда. Раньше признак выводился из номера пакета
+       (kitPackage > 0), но пакет теперь один и его номер — ноль, так что
+       старое правило выключало обвес на каждой ссылке и оставляло машину
+       без колёс. Выбирать тут нечего, пока нет отдельной стоковой выгрузки. */
+    kit: true,
+    /* Карбон-пакет входит в сборку всегда: выбирать его больше негде (см.
+       ConfiguratorPage), а старая ссылка с нулём показывала бы в
+       спецификации «нет», хотя на машине ничего не меняется. */
+    carbon: true,
     lights: p[5] === 1,
     night: p[6] === 1,
     grille: clamp(p[7] ?? DEFAULT_CONFIG.grille, GRILLE_FINISHES.length - 1),

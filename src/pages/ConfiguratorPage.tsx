@@ -115,8 +115,6 @@ type StudioSection =
   | "model"
   | "exterior"
   | "wheels"
-  | "kit"
-  | "carbon"
   | "openings"
   | "lights"
   | "env"
@@ -152,37 +150,42 @@ const SECTION_FOCUS: Partial<Record<StudioSection, CameraFocus>> = {
   signature: "default",
   exterior: "exterior",
   wheels: "wheels",
-  kit: "kit",
-  carbon: "carbon",
   openings: "kit",
   lights: "lights",
   env: "env",
 };
 
+const TILE = "h-12 w-[76px] shrink-0 rounded-[3px] ring-1 ring-white/15";
+
 /**
- * Образец отделки салона: основной тон плашкой, акцент — полосой снизу,
- * как на карточке кожи у обивщика. Два кружка рядом читались как «два цвета
- * на выбор», хотя это один комплект: кожа и строчка с кантом.
+ * Выкраска в той же плитке, что и фотография.
+ *
+ * Фотографии есть только у шести красок из десяти и у трёх отделок дисков из
+ * пяти — дорисовать остальные нечем, рендеров нет. Поэтому у цвета без снимка
+ * своя честная подача: не «недостающая картинка», а образец краски. Блик
+ * сверху и затемнение снизу дают ту же кривизну, что видна на кузове, и в
+ * ряду с фотографиями чип не выглядит заплаткой.
  */
-function LeatherSwatch({ primary, accent }: { primary: string; accent: string }) {
+function PaintChip({ color }: { color: string }) {
   return (
-    <span
-      className="relative block h-11 w-[52px] shrink-0 overflow-hidden rounded-[3px] ring-1 ring-white/20"
-      style={{ backgroundColor: primary }}
-    >
-      <span className="absolute inset-x-0 bottom-0 h-[9px]" style={{ backgroundColor: accent }} />
-      {/* Косой блик — без него тёмная кожа выглядит просто чёрным квадратом. */}
-      <span className="absolute inset-0 bg-gradient-to-br from-white/12 via-transparent to-black/25" />
+    <span className={`relative block overflow-hidden ${TILE}`} style={{ backgroundColor: color }}>
+      <span className="absolute inset-0 bg-gradient-to-b from-white/22 via-transparent to-black/35" />
+      <span className="absolute inset-x-0 top-[18%] h-[14%] bg-white/12 blur-[2px]" />
     </span>
   );
 }
 
-function Swatch({ color, className = "" }: { color: string; className?: string }) {
+/**
+ * Отделка салона: основной тон плашкой, акцент полосой снизу — как на
+ * карточке кожи у обивщика. Габарит тот же, что у остальных плиток, иначе
+ * столбец предпросмотра в списке гуляет.
+ */
+function LeatherChip({ primary, accent }: { primary: string; accent: string }) {
   return (
-    <span
-      className={`block h-10 w-10 shrink-0 rounded-full ring-1 ring-white/20 ${className}`}
-      style={{ backgroundColor: color }}
-    />
+    <span className={`relative block overflow-hidden ${TILE}`} style={{ backgroundColor: primary }}>
+      <span className="absolute inset-x-0 bottom-0 h-[22%]" style={{ backgroundColor: accent }} />
+      <span className="absolute inset-0 bg-gradient-to-br from-white/12 via-transparent to-black/25" />
+    </span>
   );
 }
 
@@ -205,7 +208,7 @@ function OptionCard({
           : "border-white/10 bg-white/[0.035] hover:border-white/35 hover:bg-white/[0.08]"
       )}
     >
-      <span className="flex h-12 w-[68px] shrink-0 items-center justify-center text-white/75">{preview}</span>
+      <span className="flex h-12 w-[76px] shrink-0 items-center justify-center text-white/75">{preview}</span>
       <span className="min-w-0 flex-1">
         <span className="block truncate font-body text-[13px] text-white">{title}</span>
         {subtitle && (
@@ -224,15 +227,8 @@ function OptionCard({
 }
 
 function PreviewImage({ src, alt, fallback }: { src?: string; alt: string; fallback: string }) {
-  if (!src) return <Swatch color={fallback} />;
-  return (
-    <img
-      src={src}
-      alt={alt}
-      loading="lazy"
-      className="h-12 w-[82px] shrink-0 rounded-md object-cover ring-1 ring-white/15"
-    />
-  );
+  if (!src) return <PaintChip color={fallback} />;
+  return <img src={src} alt={alt} loading="lazy" className={`${TILE} object-cover`} />;
 }
 
 const ConfiguratorPage = () => {
@@ -463,8 +459,14 @@ const ConfiguratorPage = () => {
       { id: "signature" as const, label: "Signature", value: signature?.name ?? "Custom", icon: Sparkles },
       { id: "exterior" as const, label: t("config.exterior"), value: PAINTS[config.paint].name, icon: Palette },
       { id: "wheels" as const, label: t("config.rims"), value: RIM_FINISHES[config.rimFinish].name, icon: Disc3 },
-      { id: "kit" as const, label: t("config.kit"), value: KIT_PACKAGES[config.kitPackage].name, icon: Package },
-      { id: "carbon" as const, label: t("config.carbon"), value: config.carbon ? t("config.carbonOn") : t("config.carbonOff"), icon: Gem },
+      /* Раздела «Body Kit» в списке нет: пакет остался один, и вкладка с
+         единственной несменяемой строкой — то же самое, что вкладка выбора
+         машины при одной машине. Обвес показан в Overview. */
+      /* Раздела «Carbon Package» в списке нет. В выгрузке кузова карбоном
+         помечен ровно один примитив из восьмидесяти восьми — переключатель
+         менял материал, которого на машине почти нет, и посетитель жал
+         кнопку, не видя разницы. Вернём, когда в модели появятся размеченные
+         карбоновые детали: капот, зеркала, накладки порогов. */
       ...(canOpen
         ? [{ id: "openings" as const, label: "Openings", value: [config.doors && "Doors", config.hood && "Hood", config.trunk && "Trunk"].filter(Boolean).join(" · ") || "Closed", icon: DoorOpen }]
         : []),
@@ -534,7 +536,7 @@ const ConfiguratorPage = () => {
             key: `grille-${finish.id}`,
             selected: config.grille === index,
             onClick: () => set({ grille: index }),
-            preview: <Swatch color={finish.color} />,
+            preview: <PaintChip color={finish.color} />,
             title: finish.name,
             subtitle: t("config.grille"),
           })),
@@ -553,35 +555,6 @@ const ConfiguratorPage = () => {
           title: finish.name,
           subtitle: t("config.rimColor"),
         }));
-
-      case "kit":
-        return KIT_PACKAGES.map((pack, index) => ({
-          key: pack.id,
-          selected: config.kitPackage === index,
-          onClick: () => set({ kitPackage: index, kit: index > 0 }),
-          preview:
-            index === 0 ? <Car className="h-8 w-8" strokeWidth={1.4} /> : <Sparkles className="h-8 w-8" strokeWidth={1.4} />,
-          title: pack.name,
-          subtitle: index === 0 ? "Without body kit" : "M Monogram body kit",
-        }));
-
-      case "carbon":
-        return [
-          {
-            key: "carbon-off",
-            selected: !config.carbon,
-            onClick: () => set({ carbon: false }),
-            preview: <Swatch color={PAINTS[config.paint].color} />,
-            title: t("config.carbonOff"),
-          },
-          {
-            key: "carbon-on",
-            selected: config.carbon,
-            onClick: () => set({ carbon: true }),
-            preview: <Swatch color="#15161a" />,
-            title: t("config.carbonOn"),
-          },
-        ];
 
       case "openings":
         return canOpen
@@ -653,14 +626,14 @@ const ConfiguratorPage = () => {
             key: "env-studio",
             selected: !config.night,
             onClick: () => set({ night: false }),
-            preview: <Swatch color="#c7cbce" />,
+            preview: <PaintChip color="#c7cbce" />,
             title: t("config.envStudio"),
           },
           {
             key: "env-night",
             selected: config.night,
             onClick: () => set({ night: true }),
-            preview: <Swatch color="#0a0a0c" />,
+            preview: <PaintChip color="#0a0a0c" />,
             title: t("config.envNight"),
           },
         ];
@@ -671,7 +644,7 @@ const ConfiguratorPage = () => {
             key: `interior-${finish.id}`,
             selected: config.interior === index,
             onClick: () => set({ interior: index }),
-            preview: <LeatherSwatch primary={finish.primary} accent={finish.accent} />,
+            preview: <LeatherChip primary={finish.primary} accent={finish.accent} />,
             title: finish.name,
             subtitle: index === 0 ? "Atelier standard" : "Bespoke order",
             group: index === 0 ? "Leather" : undefined,

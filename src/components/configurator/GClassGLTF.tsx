@@ -305,7 +305,7 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
   }, []);
 
   const groundOffset = useMemo(() => {
-    const kitVisible = config.kitPackage > 0 || config.kit;
+    const kitVisible = config.kit;
     const active = Object.entries(grounds).filter(([url]) => {
       /* Только файлы текущей машины: замеры предыдущей остаются в Record,
          и без этой проверки пол считался по объединению двух сборок. */
@@ -313,7 +313,7 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
       return url !== car.files.kit || kitVisible;
     });
     return active.length ? -Math.min(...active.map(([, y]) => y)) : 0;
-  }, [grounds, config.kit, config.kitPackage, car.files.body, car.files.kit, car.files.interior]);
+  }, [grounds, config.kit, car.files.body, car.files.kit, car.files.interior]);
 
   // frameloop="demand": без явного запроса сдвиг пола не попал бы в кадр
   const invalidate = useThree((s) => s.invalidate);
@@ -342,7 +342,7 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
             fit={fit}
             kind="exterior"
             materials={materials}
-            visible={config.kitPackage > 0 || config.kit}
+            visible={config.kit}
             onGround={reportGround}
           />
         </OptionalBoundary>
