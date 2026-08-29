@@ -58,7 +58,7 @@ export const CARS: Record<CarId, CarModel> = {
     name: "G63 Iconic",
     length: 4.82,
     files: {
-      body: `${MODEL_BASE}/stock-body.glb`,
+      body: `${MODEL_BASE}/parts/stock-body.glb`,
       kit: `${MODEL_BASE}/parts/body-kit-wheels.glb`,
       interior: `${MODEL_BASE}/parts/custom-interior.glb`,
       steering: `${MODEL_BASE}/parts/steering-wheel.glb`,
