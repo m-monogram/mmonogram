@@ -52,14 +52,33 @@ if (!carsBlock) {
   process.exit(1);
 }
 
+/** Разбирает один блок «files: { ... }» в набор путей. */
+function parseFiles(block) {
+  const files = {};
+  for (const f of block.matchAll(/(body|kit|interior|steering):\s*`\$\{MODEL_BASE\}([^`]+)`/g)) {
+    files[f[1]] = f[2];
+  }
+  return files;
+}
+
+/* Наборов у машины может быть два: основной и тяжёлый под ?hq=1. Разбираем
+   их порознь — иначе пути сливаются в один объект, последний затирает
+   первый, и лёгкие выгрузки объявляются никому не нужными. */
+const setOf = (body, key) => {
+  const re = new RegExp(`${key}:\\s*\\{([\\s\\S]*?)\\n    \\}`);
+  const m = body.match(re);
+  return m ? parseFiles(m[1]) : null;
+};
+
 const cars = [];
 for (const m of carsBlock[1].matchAll(/"([a-z0-9-]+)":\s*\{([\s\S]*?)\n  \},/g)) {
   const [, id, body] = m;
-  const files = {};
-  for (const f of body.matchAll(/(body|kit|interior|steering):\s*`\$\{MODEL_BASE\}([^`]+)`/g)) {
-    files[f[1]] = f[2];
-  }
-  cars.push({ id, files, devOnly: /devOnly:\s*true/.test(body) });
+  cars.push({
+    id,
+    files: setOf(body, "files") ?? {},
+    filesHq: setOf(body, "filesHq"),
+    devOnly: /devOnly:\s*true/.test(body),
+  });
 }
 
 if (!cars.length) {
@@ -133,6 +152,17 @@ function roleCounts(json) {
   return counts;
 }
 
+/*
+ * Потолок веса набора, который грузится по умолчанию.
+ *
+ * Появился не из головы: 29 августа в main приехали CAD-выгрузки, и
+ * конфигуратор стал тянуть 66 МБ вместо 8.9. На телефоне это кончилось тем,
+ * что страница перестала открываться вовсе — скачивание идёт минутами, а
+ * буферы такой плотности кладут вкладку по памяти. Пять коммитов подряд
+ * прошли проверку и деплой, потому что смотреть на вес было некому.
+ */
+const MAX_DEFAULT_MB = 20;
+
 /* Ниже этого числа деталей роль считается ненаполненной: переключатель есть,
    менять нечего. Пороги подобраны по живой машине — у неё пять примитивов
    фар и по одному на каждое из четырёх колёс с покрышками. */
@@ -153,6 +183,11 @@ for (const car of cars) {
   const parts = {};
   let missing = false;
 
+  /* Тяжёлый набор в индекс ссылок попадает, чтобы его файлы не считались
+     брошенными, но на полноту и вес проверяется только основной. */
+  for (const webPath of Object.values(car.filesHq ?? {})) referenced.add(onDisk(webPath));
+
+  let totalBytes = 0;
   for (const [key, webPath] of Object.entries(car.files)) {
     const path = onDisk(webPath);
     referenced.add(path);
@@ -162,6 +197,7 @@ for (const car of cars) {
       continue;
     }
     try {
+      totalBytes += statSync(path).size;
       for (const [role, n] of Object.entries(roleCounts(readGlb(path)))) {
         parts[role] = (parts[role] ?? 0) + n;
       }
@@ -172,6 +208,16 @@ for (const car of cars) {
   }
 
   if (missing) continue;
+
+  const mb = totalBytes / 1024 / 1024;
+  if (mb > MAX_DEFAULT_MB) {
+    const message =
+      `${label}: набор по умолчанию весит ${mb.toFixed(1)} МБ при потолке ${MAX_DEFAULT_MB}. ` +
+      `Столько браузер телефона не вывозит — страница 3D-студии перестанет открываться. ` +
+      `Тяжёлые выгрузки кладите в filesHq: они доступны по ?hq=1 и не мешают боевому сайту`;
+    if (car.devOnly) warnings.push(message);
+    else errors.push(message);
+  }
 
   /* Обвес обязателен: колёса лежат в нём, а не в кузове. Машина без него
      рисуется голым каркасом — этим и был сломан «Stock Version». */
@@ -197,6 +243,7 @@ for (const car of cars) {
 
   console.log(
     `${DIM}  ${car.id}: ` +
+      `${(totalBytes / 1024 / 1024).toFixed(1)} МБ · ` +
       Object.entries(parts)
         .sort((a, b) => b[1] - a[1])
         .map(([r, n]) => `${r} ${n}`)

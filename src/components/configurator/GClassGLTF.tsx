@@ -3,7 +3,7 @@ import { useGLTF } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { BuildConfig, GRILLE_FINISHES, INTERIOR_FINISHES, PAINTS, RIM_FINISHES } from "./config";
-import { CARS, DEFAULT_CAR, DRACO_PATH, ROLE_DEBUG_COLORS, type CarModel, type FileRole, type PartRole } from "./models";
+import { CARS, DEFAULT_CAR, DRACO_PATH, ROLE_DEBUG_COLORS, carFiles, type CarModel, type FileRole, type PartRole } from "./models";
 import {
   cabinDashAtMax,
   classifyCabin,
@@ -173,11 +173,13 @@ class OptionalBoundary extends Component<{ children: ReactNode; label: string },
 
 export default function GClassGLTF({ config }: { config: BuildConfig }) {
   const car: CarModel = CARS[config.model] ?? CARS[DEFAULT_CAR];
-  const body = useGLTF(car.files.body, DRACO_PATH);
+  /* Лёгкий набор по умолчанию, CAD — по ?hq=1. См. carFiles() в models.ts. */
+  const files = useMemo(() => carFiles(car), [car]);
+  const body = useGLTF(files.body, DRACO_PATH);
   const fit = useMemo(() => computeFit(body.scene.clone(true), car.length), [body.scene, car.length]);
   const interiorSteeringMask = useMemo(
-    () => (car.files.interior && car.files.steering ? fitSourceBox(STEERING_WHEEL_SOURCE_BOX, fit) : undefined),
-    [car.files.interior, car.files.steering, fit],
+    () => (files.interior && files.steering ? fitSourceBox(STEERING_WHEEL_SOURCE_BOX, fit) : undefined),
+    [files.interior, files.steering, fit],
   );
 
   const debugRoles = useMemo(
@@ -335,11 +337,11 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
     const active = Object.entries(grounds).filter(([url]) => {
       /* Только файлы текущей машины: замеры предыдущей остаются в Record,
          и без этой проверки пол считался по объединению двух сборок. */
-      if (url !== car.files.body && url !== car.files.kit && url !== car.files.interior && url !== car.files.steering) return false;
-      return url !== car.files.kit || kitVisible;
+      if (url !== files.body && url !== files.kit && url !== files.interior && url !== files.steering) return false;
+      return url !== files.kit || kitVisible;
     });
     return active.length ? -Math.min(...active.map(([, y]) => y)) : 0;
-  }, [grounds, config.kit, car.files.body, car.files.kit, car.files.interior, car.files.steering]);
+  }, [grounds, config.kit, files.body, files.kit, files.interior, files.steering]);
 
   // frameloop="demand": без явного запроса сдвиг пола не попал бы в кадр
   const invalidate = useThree((s) => s.invalidate);
@@ -348,7 +350,7 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
   return (
     <group position-y={groundOffset}>
       <Parts
-        url={car.files.body}
+        url={files.body}
         fit={fit}
         kind="exterior"
         materials={materials}
@@ -361,10 +363,10 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
           них в кадре стоковый G-Class, и посетитель успевал увидеть сначала его,
           а потом машину с обвесом. Салон снаружи не виден — он догружается сам,
           под своим Suspense, и до него уже можно крутить готовую машину. */}
-      {car.files.kit && (
+      {files.kit && (
         <OptionalBoundary label="обвес и колёса">
           <Parts
-            url={car.files.kit}
+            url={files.kit}
             fit={fit}
             kind="exterior"
             materials={materials}
@@ -374,11 +376,11 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
         </OptionalBoundary>
       )}
 
-      {car.files.interior && (
+      {files.interior && (
         <OptionalBoundary label="интерьер">
           <Suspense fallback={null}>
             <Parts
-              url={car.files.interior}
+              url={files.interior}
               fit={fit}
               kind="interior"
               materials={materials}
@@ -388,10 +390,10 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
         </OptionalBoundary>
       )}
 
-      {car.files.steering && (
+      {files.steering && (
         <OptionalBoundary label="руль">
           <Suspense fallback={null}>
-            <Parts url={car.files.steering} fit={fit} kind="interior" materials={materials} />
+            <Parts url={files.steering} fit={fit} kind="interior" materials={materials} />
           </Suspense>
         </OptionalBoundary>
       )}
@@ -403,8 +405,8 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
    Раньше цикл шёл по всем CARS и тянул referenсe-модель, которой нет в
    публичном списке, — лишние 1.9 МБ на каждом заходе. */
 {
-  const car = CARS[DEFAULT_CAR];
-  useGLTF.preload(car.files.body, DRACO_PATH);
-  if (car.files.kit) useGLTF.preload(car.files.kit, DRACO_PATH);
-  if (car.files.steering) useGLTF.preload(car.files.steering, DRACO_PATH);
+  const files = carFiles(CARS[DEFAULT_CAR]);
+  useGLTF.preload(files.body, DRACO_PATH);
+  if (files.kit) useGLTF.preload(files.kit, DRACO_PATH);
+  if (files.steering) useGLTF.preload(files.steering, DRACO_PATH);
 }

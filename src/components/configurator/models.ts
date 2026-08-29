@@ -25,6 +25,13 @@ export const DRACO_PATH = "/draco/";
 export type CarId = "g63-iconic";
 export type CarFileKey = "body" | "kit" | "interior" | "steering";
 
+export type CarFiles = {
+  readonly body: string;
+  readonly kit?: string;
+  readonly interior?: string;
+  readonly steering?: string;
+};
+
 export type CarModel = {
   /** Подпись в панели выбора. */
   readonly name: string;
@@ -35,12 +42,12 @@ export type CarModel = {
    * всё остальное. Обвес и салон необязательны: не у каждой машины они
    * оцифрованы, и без них сборка должна просто собраться из того, что есть.
    */
-  readonly files: {
-    readonly body: string;
-    readonly kit?: string;
-    readonly interior?: string;
-    readonly steering?: string;
-  };
+  readonly files: CarFiles;
+  /**
+   * Тяжёлые CAD-выгрузки той же машины. Не грузятся сами: включаются
+   * параметром ?hq=1 — см. carFiles().
+   */
+  readonly filesHq?: CarFiles;
   /** Монолитные референс-модели оставляем со встроенными PBR-текстурами. */
   readonly sourceMaterials?: boolean;
   /**
@@ -57,7 +64,28 @@ export const CARS: Record<CarId, CarModel> = {
   "g63-iconic": {
     name: "G63 Iconic",
     length: 4.82,
+    /*
+     * По умолчанию — прореженные выгрузки на 8.9 МБ. Они и стоят на сайте с
+     * самого начала: с ними страница открывается за пару секунд и работает
+     * на телефоне.
+     */
     files: {
+      body: `${MODEL_BASE}/stock-body.glb`,
+      kit: `${MODEL_BASE}/body-kit-wheels.glb`,
+      interior: `${MODEL_BASE}/custom-interior.glb`,
+    },
+    /*
+     * CAD-выгрузки из parts/ — те же детали без прореживания, 66 МБ на
+     * сборку против 8.9. Геометрия там честно лучше, но столько браузер
+     * телефона не вывозит: скачивание по мобильной сети идёт минутами, а
+     * буферы такой плотности кладут вкладку по памяти. Поэтому они не
+     * стоят по умолчанию, а открываются по ?hq=1 — чтобы их можно было
+     * смотреть и доводить, не роняя боевой сайт.
+     *
+     * Чтобы сделать их основными, геометрию надо проредить до уровня,
+     * сравнимого с обычным набором.
+     */
+    filesHq: {
       body: `${MODEL_BASE}/parts/stock-body.glb`,
       kit: `${MODEL_BASE}/parts/body-kit-wheels.glb`,
       interior: `${MODEL_BASE}/parts/custom-interior.glb`,
@@ -65,6 +93,17 @@ export const CARS: Record<CarId, CarModel> = {
     },
   },
 };
+
+/**
+ * Какой набор файлов грузить. По умолчанию лёгкий; тяжёлый — по ?hq=1.
+ * Параметр читается один раз при обращении, состояния не заводим: набор
+ * не меняется на лету, страница с другим параметром открывается заново.
+ */
+export function carFiles(car: CarModel): CarFiles {
+  if (typeof window === "undefined") return car.files;
+  const hq = new URLSearchParams(window.location.search).has("hq");
+  return hq && car.filesHq ? car.filesHq : car.files;
+}
 
 export const CAR_IDS = Object.keys(CARS) as CarId[];
 export const DEFAULT_CAR: CarId = "g63-iconic";
