@@ -23,7 +23,7 @@ export const DRACO_PATH = "/draco/";
  */
 
 /** Какая машина собрана в конфигураторе. */
-export type CarId = "g63-iconic" | "base-basic-pbr";
+export type CarId = "g63-iconic";
 
 export type CarModel = {
   /** Подпись в панели выбора. */
@@ -50,12 +50,6 @@ export type CarModel = {
    * на глазах у посетителя превращалась в другую.
    */
   readonly supportsOpenings?: boolean;
-  /**
-   * Референс-модель, которую не показываем в публичном выборе. Открывается
-   * только с ?dev=1: это чужая машина (Rolls-Royce Dawn) с вшитыми
-   * материалами, на ней не работает ни один пункт конфигуратора.
-   */
-  readonly devOnly?: boolean;
 };
 
 export const CARS: Record<CarId, CarModel> = {
@@ -68,26 +62,12 @@ export const CARS: Record<CarId, CarModel> = {
       interior: `${MODEL_BASE}/custom-interior.glb`,
     },
   },
-  "base-basic-pbr": {
-    name: "Base Basic PBR",
-    length: 4.82,
-    sourceMaterials: true,
-    devOnly: true,
-    files: {
-      body: `${MODEL_BASE}/variants/base-basic-pbr.glb`,
-    },
-  },
 };
 
 export const CAR_IDS = Object.keys(CARS) as CarId[];
 export const DEFAULT_CAR: CarId = "g63-iconic";
 
 /** Машины, которые показываем в панели. Референсные — только с ?dev=1. */
-export function selectableCarIds(): CarId[] {
-  const dev =
-    typeof window !== "undefined" && new URLSearchParams(window.location.search).has("dev");
-  return CAR_IDS.filter((id) => dev || !CARS[id].devOnly);
-}
 
 /** Длина G63 по кузову, метры. Значение по умолчанию для computeFit. */
 export const TARGET_LENGTH = CARS[DEFAULT_CAR].length;

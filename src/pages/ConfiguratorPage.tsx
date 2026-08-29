@@ -8,7 +8,6 @@ import {
   DoorOpen,
   Disc3,
   Gauge,
-  Gem,
   Lightbulb,
   Package,
   Palette,
@@ -44,7 +43,7 @@ import {
 import SceneErrorBoundary from "@/components/configurator/SceneErrorBoundary";
 import StudioAudio from "@/components/configurator/StudioAudio";
 import StudioIntro from "@/components/configurator/StudioIntro";
-import { CARS, DEFAULT_CAR, selectableCarIds } from "@/components/configurator/models";
+import { CARS, DEFAULT_CAR } from "@/components/configurator/models";
 import signatureBlack from "@/assets/g-2.jpg";
 import signatureGold from "@/assets/g3-iconic-gold-front.jpg";
 import signatureSilver from "@/assets/g3-grey-cover.jpg";
@@ -112,7 +111,6 @@ const FINISH_PREVIEWS = Object.values(
 
 type StudioSection =
   | "signature"
-  | "model"
   | "exterior"
   | "wheels"
   | "openings"
@@ -189,6 +187,34 @@ function LeatherChip({ primary, accent }: { primary: string; accent: string }) {
   );
 }
 
+/**
+ * Плитка фар: два блока в корпусе, зажжённые или потухшие.
+ *
+ * Раньше в обеих строках стояла одна и та же лампочка, отличавшаяся только
+ * прозрачностью, — по списку было не понять, что вообще выбираешь. Здесь
+ * видно то же, что произойдёт на машине: свет либо горит, либо нет.
+ */
+function LightChip({ on }: { on: boolean }) {
+  return (
+    <span
+      className={`relative flex items-center justify-center gap-1.5 ${TILE}`}
+      style={{ backgroundColor: on ? "#15181c" : "#0d0e10" }}
+    >
+      {[0, 1].map((i) => (
+        <span
+          key={i}
+          className="block h-5 w-5 rounded-full transition-colors"
+          style={
+            on
+              ? { backgroundColor: "#f4f7ff", boxShadow: "0 0 10px 3px rgba(210,226,255,0.55)" }
+              : { backgroundColor: "#23262b", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.6)" }
+          }
+        />
+      ))}
+    </span>
+  );
+}
+
 function OptionCard({
   selected,
   onClick,
@@ -255,7 +281,6 @@ const ConfiguratorPage = () => {
   });
 
   /** Машины в публичном выборе; референсные — только с ?dev=1. */
-  const carIds = useMemo(() => selectableCarIds(), []);
   const car = CARS[config.model] ?? CARS[DEFAULT_CAR];
   /* У оцифрованного кузова двери из одного меша не вынуть, и раздел
      «Openings» раньше подменял всю машину процедурной заглушкой. */
@@ -453,9 +478,6 @@ const ConfiguratorPage = () => {
     () => ([
       /* Раздел выбора машины прячем, когда выбирать не из чего: одна карточка
          с единственной моделью занимала место и выглядела недоделкой. */
-      ...(carIds.length > 1
-        ? [{ id: "model" as const, label: t("config.model"), value: car.name, icon: Car }]
-        : []),
       { id: "signature" as const, label: "Signature", value: signature?.name ?? "Custom", icon: Sparkles },
       { id: "exterior" as const, label: t("config.exterior"), value: PAINTS[config.paint].name, icon: Palette },
       { id: "wheels" as const, label: t("config.rims"), value: RIM_FINISHES[config.rimFinish].name, icon: Disc3 },
@@ -475,7 +497,7 @@ const ConfiguratorPage = () => {
       { id: "interior" as const, label: t("config.interior"), value: INTERIOR_FINISHES[config.interior].name, icon: Armchair },
       { id: "overview" as const, label: t("config.overview"), value: "", icon: ClipboardList },
     ]),
-    [canOpen, car.name, carIds.length, config, signature?.name, t]
+    [canOpen, config, signature?.name, t]
   );
 
   const overviewRows = [
@@ -503,16 +525,6 @@ const ConfiguratorPage = () => {
      кусок JSX с одинаковыми карточками — десять почти одинаковых веток. */
   const options = useMemo<OptionItem[]>(() => {
     switch (activeSection) {
-      case "model":
-        return carIds.map((id) => ({
-          key: id,
-          selected: config.model === id,
-          onClick: () => set({ model: id }),
-          preview: <Car className="h-8 w-8" strokeWidth={1.4} />,
-          title: CARS[id].name,
-          subtitle: id === "base-basic-pbr" ? t("config.modelSourcePbr") : t("config.modelMain"),
-        }));
-
       case "signature":
         return SIGNATURE_BUILDS.map((build) => ({
           key: `signature-${build.id}`,
@@ -608,15 +620,17 @@ const ConfiguratorPage = () => {
             key: "lights-on",
             selected: config.lights,
             onClick: () => set({ lights: true }),
-            preview: <Lightbulb className="h-8 w-8 text-white" strokeWidth={1.4} />,
+            preview: <LightChip on />,
             title: t("config.lightsOn"),
+            subtitle: "Headlamps and tail lamps lit",
           },
           {
             key: "lights-off",
             selected: !config.lights,
             onClick: () => set({ lights: false }),
-            preview: <Lightbulb className="h-8 w-8 text-white/42" strokeWidth={1.4} />,
+            preview: <LightChip on={false} />,
             title: t("config.lightsOff"),
+            subtitle: "Parked, lamps dark",
           },
         ];
 
@@ -670,7 +684,7 @@ const ConfiguratorPage = () => {
     /* interiorViews пересобирается каждый рендер вместе с переводами — в
        зависимостях достаточно самого t. */
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeSection, apply, canOpen, carIds, changeFocus, config, focus, set, t]);
+  }, [activeSection, apply, canOpen, changeFocus, config, focus, set, t]);
 
   const activeMeta = sections.find((item) => item.id === activeSection);
 
