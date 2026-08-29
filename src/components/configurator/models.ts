@@ -24,6 +24,7 @@ export const DRACO_PATH = "/draco/";
 
 /** Какая машина собрана в конфигураторе. */
 export type CarId = "g63-iconic";
+export type CarFileKey = "body" | "kit" | "interior" | "steering";
 
 export type CarModel = {
   /** Подпись в панели выбора. */
@@ -39,6 +40,7 @@ export type CarModel = {
     readonly body: string;
     readonly kit?: string;
     readonly interior?: string;
+    readonly steering?: string;
   };
   /** Монолитные референс-модели оставляем со встроенными PBR-текстурами. */
   readonly sourceMaterials?: boolean;
@@ -194,10 +196,11 @@ export const GLASS_PANEL = {
 /** Роль, назначаемая всем мешам файла целиком, без разбора материалов. */
 export type FileRole = "exterior" | "interior";
 
-export const FILE_ROLES: Record<keyof CarModel["files"], FileRole> = {
+export const FILE_ROLES: Record<CarFileKey, FileRole> = {
   body: "exterior",
   kit: "exterior",
   interior: "interior",
+  steering: "interior",
 };
 
 /**
