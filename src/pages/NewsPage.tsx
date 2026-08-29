@@ -94,7 +94,7 @@ const NewsPage = () => {
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 mb-6 text-white/85 hover:text-white transition-colors self-start drop-shadow-[0_1px_8px_rgba(0,0,0,0.85)]"
+            className="tap-target inline-flex items-center gap-2 mb-6 text-white/85 hover:text-white transition-colors self-start drop-shadow-[0_1px_8px_rgba(0,0,0,0.85)]"
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="font-display text-[11px] uppercase tracking-[0.25em]">
@@ -140,7 +140,7 @@ const NewsPage = () => {
                   key={f.id}
                   type="button"
                   onClick={() => setFilter(f.id)}
-                  className={`px-4 py-2 sm:px-5 sm:py-2.5 border transition-all duration-300 font-display text-[11px] uppercase tracking-[0.25em] ${
+                  className={`min-h-11 px-4 py-2 sm:px-5 sm:py-2.5 border transition-all duration-300 font-display text-[11px] uppercase tracking-[0.25em] ${
                     active
                       ? "bg-white text-black border-white"
                       : "bg-white/5 text-white/65 border-white/15 hover:border-white/40 hover:text-white"

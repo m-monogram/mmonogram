@@ -77,7 +77,10 @@ const MapMarkers = memo(function MapMarkers({
                 }
               }}
             >
-              <circle r={48} fill="transparent" />
+              {/* Невидимая площадь касания. r=48 давало 33 css-пикселя после
+                 масштабирования карты — мимо пальца; 68 даёт около 47. Метки
+                 стоят достаточно далеко друг от друга, чтобы не перекрыться. */}
+              <circle r={68} fill="transparent" />
               <circle
                 r={isActive ? 26 : 18}
                 fill="url(#marker-glow)"

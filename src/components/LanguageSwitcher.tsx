@@ -24,7 +24,7 @@ const LanguageSwitcher = ({ variant = 'dark' }: LanguageSwitcherProps) => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 px-3 py-2 transition-colors duration-200 ${
+        className={`flex min-h-11 items-center gap-2 px-3 py-2 transition-colors duration-200 ${
           variant === 'light' ? 'text-black/70 hover:text-black' : 'text-foreground/80 hover:text-foreground'
         }`}
       >

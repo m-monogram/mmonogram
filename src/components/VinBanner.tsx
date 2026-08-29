@@ -64,7 +64,7 @@ const VinBanner = ({
             </div>
 
             {/* Full Details Link */}
-            <button type="button" onClick={() => navigateToView("verify")} className="mt-6 font-body text-subtitle text-white/40 uppercase tracking-wider hover:text-white/70 transition-colors cursor-pointer underline underline-offset-4">
+            <button type="button" onClick={() => navigateToView("verify")} className="tap-target mt-6 font-body text-subtitle text-white/40 uppercase tracking-wider hover:text-white/70 transition-colors cursor-pointer underline underline-offset-4">
               {t("common.learnMore")}
             </button>
           </motion.div>

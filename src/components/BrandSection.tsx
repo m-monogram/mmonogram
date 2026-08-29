@@ -129,7 +129,7 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
           {/* Left: label + description */}
           <motion.div
           >
-            <p className="font-body text-[9px] sm:text-[10px] tracking-widest text-white/25 uppercase mb-6 flex items-center gap-3">
+            <p className="font-body text-[10px] sm:text-[11px] tracking-widest text-white/25 uppercase mb-6 flex items-center gap-3">
               <span className="inline-block w-8 h-px bg-white/20" />
               Est. 2018 — Dubai
             </p>
@@ -243,8 +243,8 @@ const BrandSection = memo(forwardRef<HTMLDivElement, BrandSectionProps>(({
                 key={label}
                 className="py-6 sm:py-8 flex flex-col items-center gap-2 group"
               >
-                <span className="font-body text-[8px] tracking-widest text-white/15 uppercase">{num}</span>
-                <span className="font-body text-[9px] sm:text-[10px] md:text-xs tracking-widest uppercase text-white/40 group-hover:text-white/60 transition-colors duration-500">
+                <span className="font-body text-[10px] tracking-widest text-white/15 uppercase">{num}</span>
+                <span className="font-body text-[10px] sm:text-[11px] md:text-xs tracking-widest uppercase text-white/40 group-hover:text-white/60 transition-colors duration-500">
                   {label}
                 </span>
               </motion.div>

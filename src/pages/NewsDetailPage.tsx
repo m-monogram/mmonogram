@@ -184,11 +184,11 @@ const NewsDetailPage = () => {
               transition={{ duration: 0.5 }}
               className="mb-6 flex items-center gap-2 font-display text-[10px] uppercase tracking-[0.25em] text-white/55"
             >
-              <Link to="/" className="hover:text-white transition-colors">
+              <Link to="/" className="tap-target hover:text-white transition-colors">
                 {t("news.backToHome")}
               </Link>
               <ChevronRight className="w-3 h-3" />
-              <Link to="/press" className="hover:text-white transition-colors">
+              <Link to="/press" className="tap-target hover:text-white transition-colors">
                 {t("news.title")}
               </Link>
               <ChevronRight className="w-3 h-3" />
@@ -280,7 +280,7 @@ const NewsDetailPage = () => {
               <button
                 type="button"
                 onClick={handleShare}
-                className="inline-flex items-center gap-2 px-4 py-2 border border-white/15 hover:border-white/40 bg-white/5 hover:bg-white/10 transition-all text-white/80"
+                className="min-h-11 inline-flex items-center gap-2 px-4 py-2 border border-white/15 hover:border-white/40 bg-white/5 hover:bg-white/10 transition-all text-white/80"
               >
                 <Share2 className="w-4 h-4" />
                 <span className="font-display text-[11px] uppercase tracking-[0.25em]">
@@ -290,7 +290,7 @@ const NewsDetailPage = () => {
               <button
                 type="button"
                 onClick={handleCopy}
-                className="inline-flex items-center gap-2 px-4 py-2 border border-white/15 hover:border-white/40 bg-white/5 hover:bg-white/10 transition-all text-white/80"
+                className="min-h-11 inline-flex items-center gap-2 px-4 py-2 border border-white/15 hover:border-white/40 bg-white/5 hover:bg-white/10 transition-all text-white/80"
               >
                 {copied ? <Check className="w-4 h-4" /> : <LinkIcon className="w-4 h-4" />}
                 <span className="font-display text-[11px] uppercase tracking-[0.25em]">

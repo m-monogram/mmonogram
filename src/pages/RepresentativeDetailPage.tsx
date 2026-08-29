@@ -153,7 +153,7 @@ const RepresentativeDetailPage = () => {
         <button
           type="button"
           onClick={goBackToMap}
-          className="group inline-flex items-center gap-2 text-[10px] sm:text-xs tracking-[0.25em] uppercase text-foreground/50 hover:text-foreground transition-colors"
+          className="tap-target group inline-flex items-center gap-2 text-[10px] sm:text-xs tracking-[0.25em] uppercase text-foreground/50 hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
           {t("representatives.back")}
@@ -285,7 +285,7 @@ const RepresentativeDetailPage = () => {
                   <button
                     type="button"
                     onClick={handleShare}
-                    className="inline-flex items-center gap-1.5 text-[10px] tracking-[0.25em] uppercase text-foreground/50 hover:text-foreground transition-colors"
+                    className="tap-target inline-flex items-center gap-1.5 text-[10px] tracking-[0.25em] uppercase text-foreground/50 hover:text-foreground transition-colors"
                   >
                     {copied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
                     {copied ? t("representatives.copied") : t("representatives.shareLocation")}

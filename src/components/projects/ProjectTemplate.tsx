@@ -334,14 +334,14 @@ const ProjectTemplate = memo(function ProjectTemplate({
       {/* ——— E) NAV ——— bottom text-only Prev/Next; subtle divider ——— */}
       <nav className="relative bg-black border-t border-white/10 py-10 sm:py-12" aria-label="Project navigation">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 flex items-center justify-between">
-          {prev ? <button type="button" onClick={() => navigate(`/projects/${prev.slug}`)} className="flex items-center gap-2 text-white/50 hover:text-white transition-colors font-body text-xs sm:text-sm uppercase tracking-widest cursor-pointer">
+          {prev ? <button type="button" onClick={() => navigate(`/projects/${prev.slug}`)} className="tap-target flex items-center gap-2 text-white/50 hover:text-white transition-colors font-body text-xs sm:text-sm uppercase tracking-widest cursor-pointer">
               <ChevronLeft className="w-4 h-4" aria-hidden />
               <span>Previous</span>
             </button> : <span aria-hidden />}
           <span className="text-foreground/30 text-xs tracking-widest font-body uppercase text-center max-w-[50%] truncate">
             {title} — {subtitle}
           </span>
-          {next ? <button type="button" onClick={() => navigate(`/projects/${next.slug}`)} className="flex items-center gap-2 text-white/50 hover:text-white transition-colors font-body text-xs sm:text-sm uppercase tracking-widest cursor-pointer">
+          {next ? <button type="button" onClick={() => navigate(`/projects/${next.slug}`)} className="tap-target flex items-center gap-2 text-white/50 hover:text-white transition-colors font-body text-xs sm:text-sm uppercase tracking-widest cursor-pointer">
               <span>Next</span>
               <ChevronRight className="w-4 h-4" aria-hidden />
             </button> : <span aria-hidden />}

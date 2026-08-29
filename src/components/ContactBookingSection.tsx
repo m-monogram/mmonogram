@@ -431,7 +431,7 @@ const ContactBookingSection = memo(({ setCurrentView, prefilledModel }: ContactB
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => handleCall(phone.number)}
-                          className="flex items-center gap-2 w-full text-left group cursor-pointer"
+                          className="tap-target flex w-full items-center gap-2 text-left group cursor-pointer"
                         >
                           <span className="font-body text-[10px] text-white/40 uppercase tracking-wider w-10">
                             {phone.label}
