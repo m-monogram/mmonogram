@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "seo:check": "node scripts/seo-check.mjs",
-    "verify": "npm run lint && npm run typecheck && npm run build && npm run seo:check"
+    "verify": "npm run lint && npm run typecheck && npm run check:configurator && npm run build && npm run seo:check",
+    "check:configurator": "node scripts/check-configurator.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

@@ -102,6 +102,12 @@ export type PartRole =
  * «car paint», «glass_0» это красный фонарь, а не окно.
  */
 export const MATERIAL_RULES: ReadonlyArray<{ test: RegExp; role: PartRole }> = [
+  /* Фары и фонари. В выгрузке они названы «light on », «light on _0» и
+     «light on _1» — пять примитивов на всю машину. Правило идёт первым не
+     случайно: без него они проваливались в проверку по свойствам и уходили в
+     стекло с бронзой (у стекла фары металличность высокая), переключатель
+     Lights менял яркость роли, не назначенной ни одной детали, и свет не
+     включался вовсе. */
   { test: /light\s*on/i, role: "light" },
   { test: /glass_0|qara_0/i, role: "taillight" },
   { test: /glass/i, role: "glass" },
@@ -112,15 +118,6 @@ export const MATERIAL_RULES: ReadonlyArray<{ test: RegExp; role: PartRole }> = [
      уходили в trim и вся «оранжерея» была матово-серой поверх глянцевого
      чёрного низа. */
   { test: /maybach\s*g\s*900/i, role: "body" },
-  /* Фары и фонари. В выгрузке они названы «light on », «light on _0» и
-     «light on _1» — пять примитивов на всю машину. Под правила они не
-     подходили ни одним, проваливались в проверку по свойствам и уходили в
-     стекло с бронзой: переключатель Lights менял яркость материала, который
-     не был назначен ни одной детали, и свет не включался вовсе.
-
-     Правило стоит раньше chrome: у стекла фары металличность высокая, и по
-     свойствам оно иначе уезжает в полированный металл. */
-  { test: /light\s*on/i, role: "light" },
   { test: /chrome/i, role: "brightwork" },
   { test: /carbon/i, role: "carbon" },
   { test: /leather/i, role: "cabinLeather" },
