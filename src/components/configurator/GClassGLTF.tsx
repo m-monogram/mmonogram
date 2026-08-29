@@ -406,6 +406,5 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
   const car = CARS[DEFAULT_CAR];
   useGLTF.preload(car.files.body, DRACO_PATH);
   if (car.files.kit) useGLTF.preload(car.files.kit, DRACO_PATH);
-  if (car.files.interior) useGLTF.preload(car.files.interior, DRACO_PATH);
   if (car.files.steering) useGLTF.preload(car.files.steering, DRACO_PATH);
 }

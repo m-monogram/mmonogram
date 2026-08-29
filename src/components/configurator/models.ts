@@ -60,7 +60,7 @@ export const CARS: Record<CarId, CarModel> = {
     files: {
       body: `${MODEL_BASE}/stock-body.glb`,
       kit: `${MODEL_BASE}/body-kit-wheels.glb`,
-      interior: `${MODEL_BASE}/custom-interior.glb`,
+      interior: `${MODEL_BASE}/parts/cad-interior.glb`,
       steering: `${MODEL_BASE}/parts/steering-wheel.glb`,
     },
   },
