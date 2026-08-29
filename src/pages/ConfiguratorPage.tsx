@@ -84,14 +84,17 @@ function readSavedBuilds(): SavedBuild[] {
 
 function estimateBuildPrice(c: BuildConfig): number {
   const interiorPrices = [0, 12000, 18000, 22000];
+  const car = CARS[c.model] ?? CARS[DEFAULT_CAR];
+  const hasKit = Boolean(car.files.kit);
+  const hasInterior = Boolean(car.files.interior);
   return (
     349000 +
-    (c.kitPackage === 0 ? -42000 : 0) +
+    (hasKit && c.kitPackage === 0 ? -42000 : 0) +
     (c.paint > 0 ? 6500 : 0) +
     c.rimFinish * 1200 +
     (c.carbon ? 18500 : 0) +
     (c.grille > 0 ? 2500 : 0) +
-    (interiorPrices[c.interior] ?? 0)
+    (hasInterior ? interiorPrices[c.interior] ?? 0 : 0)
   );
 }
 
@@ -260,6 +263,8 @@ const ConfiguratorPage = () => {
   /* У оцифрованного кузова двери из одного меша не вынуть, и раздел
      «Openings» раньше подменял всю машину процедурной заглушкой. */
   const canOpen = !!car.supportsOpenings;
+  const hasKit = Boolean(car.files.kit);
+  const hasInterior = Boolean(car.files.interior);
 
   /* Ракурс держим в адресе рядом со сборкой: страница его читает при загрузке,
      а до этого записывала только код сборки — присланная ссылка открывалась
@@ -472,21 +477,23 @@ const ConfiguratorPage = () => {
         : []),
       { id: "lights" as const, label: t("config.lights"), value: config.lights ? t("config.lightsOn") : t("config.lightsOff"), icon: Lightbulb },
       { id: "env" as const, label: t("config.environment"), value: config.night ? t("config.envNight") : t("config.envStudio"), icon: SunMoon },
-      { id: "interior" as const, label: t("config.interior"), value: INTERIOR_FINISHES[config.interior].name, icon: Armchair },
+      ...(hasInterior
+        ? [{ id: "interior" as const, label: t("config.interior"), value: INTERIOR_FINISHES[config.interior].name, icon: Armchair }]
+        : []),
       { id: "overview" as const, label: t("config.overview"), value: "", icon: ClipboardList },
     ]),
-    [canOpen, car.name, carIds.length, config, signature?.name, t]
+    [canOpen, car.name, carIds.length, config, hasInterior, signature?.name, t]
   );
 
   const overviewRows = [
     { label: t("config.model"), value: car.name },
     { label: t("config.exterior"), value: `${PAINTS[config.paint].name} · ${GRILLE_FINISHES[config.grille].name}` },
     { label: t("config.rims"), value: RIM_FINISHES[config.rimFinish].name },
-    { label: t("config.kit"), value: KIT_PACKAGES[config.kitPackage].name },
+    ...(hasKit ? [{ label: t("config.kit"), value: KIT_PACKAGES[config.kitPackage].name }] : []),
     { label: t("config.carbon"), value: config.carbon ? t("config.carbonOn") : t("config.carbonOff") },
     { label: t("config.lights"), value: config.lights ? t("config.lightsOn") : t("config.lightsOff") },
     { label: t("config.environment"), value: config.night ? t("config.envNight") : t("config.envStudio") },
-    { label: t("config.interior"), value: INTERIOR_FINISHES[config.interior].name },
+    ...(hasInterior ? [{ label: t("config.interior"), value: INTERIOR_FINISHES[config.interior].name }] : []),
     ...(canOpen
       ? [{ label: "Openings", value: [config.doors && "4 doors", config.hood && "hood", config.trunk && "trunk"].filter(Boolean).join(" · ") || "closed" }]
       : []),
@@ -499,6 +506,15 @@ const ConfiguratorPage = () => {
     ["interiorRear", t("config.interiorRear")],
   ];
 
+  const modelSubtitle = useCallback(
+    (id: string) => {
+      if (id === "base-basic-pbr") return t("config.modelSourcePbr");
+      if (id === "g63-iconic-source") return "Yandex FBX source";
+      return t("config.modelMain");
+    },
+    [t]
+  );
+
   /* Опции активного раздела одним списком. Раньше на каждый раздел был свой
      кусок JSX с одинаковыми карточками — десять почти одинаковых веток. */
   const options = useMemo<OptionItem[]>(() => {
@@ -510,7 +526,7 @@ const ConfiguratorPage = () => {
           onClick: () => set({ model: id }),
           preview: <Car className="h-8 w-8" strokeWidth={1.4} />,
           title: CARS[id].name,
-          subtitle: id === "base-basic-pbr" ? t("config.modelSourcePbr") : t("config.modelMain"),
+          subtitle: modelSubtitle(id),
         }));
 
       case "signature":
@@ -670,7 +686,7 @@ const ConfiguratorPage = () => {
     /* interiorViews пересобирается каждый рендер вместе с переводами — в
        зависимостях достаточно самого t. */
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeSection, apply, canOpen, carIds, changeFocus, config, focus, set, t]);
+  }, [activeSection, apply, canOpen, carIds, changeFocus, config, focus, modelSubtitle, set, t]);
 
   const activeMeta = sections.find((item) => item.id === activeSection);
 

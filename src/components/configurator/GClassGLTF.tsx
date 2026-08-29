@@ -309,11 +309,11 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
     const active = Object.entries(grounds).filter(([url]) => {
       /* Только файлы текущей машины: замеры предыдущей остаются в Record,
          и без этой проверки пол считался по объединению двух сборок. */
-      if (url !== car.files.body && url !== car.files.kit && url !== car.files.interior) return false;
+      if (url !== car.files.body && url !== car.files.kit && url !== car.files.interior && url !== car.files.steering) return false;
       return url !== car.files.kit || kitVisible;
     });
     return active.length ? -Math.min(...active.map(([, y]) => y)) : 0;
-  }, [grounds, config.kit, car.files.body, car.files.kit, car.files.interior]);
+  }, [grounds, config.kit, car.files.body, car.files.kit, car.files.interior, car.files.steering]);
 
   // frameloop="demand": без явного запроса сдвиг пола не попал бы в кадр
   const invalidate = useThree((s) => s.invalidate);
@@ -352,6 +352,14 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
         <OptionalBoundary label="интерьер">
           <Suspense fallback={null}>
             <Parts url={car.files.interior} fit={fit} kind="interior" materials={materials} />
+          </Suspense>
+        </OptionalBoundary>
+      )}
+
+      {car.files.steering && (
+        <OptionalBoundary label="руль">
+          <Suspense fallback={null}>
+            <Parts url={car.files.steering} fit={fit} kind="interior" materials={materials} />
           </Suspense>
         </OptionalBoundary>
       )}
