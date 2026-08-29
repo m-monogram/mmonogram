@@ -9,9 +9,9 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "sitemap": "node scripts/generate-sitemap.mjs",
-    "prebuild": "node scripts/generate-sitemap.mjs",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "seo:check": "node scripts/seo-check.mjs",
+    "verify": "npm run lint && npm run typecheck && npm run build && npm run seo:check"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

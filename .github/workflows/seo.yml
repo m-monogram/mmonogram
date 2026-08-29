@@ -1,0 +1,26 @@
+name: SEO
+
+# Проверка идёт на каждый push и pull request: разойтись справочник и данные
+# сайта могут в любом коммите, а заметить это по выдаче можно только недели
+# спустя, когда страница уже выпала из индекса.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run seo:check
+      # Карта сайта и robots.txt собираются при сборке. Если после неё в
+      # репозитории что-то изменилось — значит, их забыли закоммитить.
+      - name: Карта сайта в репозитории не отстала
+        run: git diff --exit-code -- public/sitemap.xml public/robots.txt
