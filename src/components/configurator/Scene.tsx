@@ -532,7 +532,17 @@ export default function ConfiguratorScene({
           </group>
         )}
 
-        <Showroom key={config.night ? "night" : "day"} night={config.night} />
+        <Showroom
+          key={config.night ? "night" : "day"}
+          night={config.night}
+          /* Отражения только ночью и только не на телефоне. Днём пол
+             нарисован градиентом и намеренно не освещается: под отражающим
+             материалом, который свет всё-таки красит, софтбокс силой 7 съедал
+             световое пятно под машиной и обнажал шов на стыке пола с
+             циклорамой. Ночью пол и так освещается сценой — там отражение
+             ложится ровно и даёт ту самую студийную картинку. */
+          reflections={!isMobile && config.night}
+        />
         <WarmUpFrames reducedMotion={reducedMotion} />
         <SoftGroundShadow night={config.night} interior={interior} />
 

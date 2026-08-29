@@ -129,7 +129,10 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
         </section>
 
         {/* Projects Carousel */}
+        {/* На этой странице карточки и есть первый экран — первую грузим
+            наперёд, она же и главная картинка страницы. */}
         <LatestAdditionsCarousel
+          priority
           onProjectClick={onProjectClick}
         />
 

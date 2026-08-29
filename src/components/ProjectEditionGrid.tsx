@@ -10,6 +10,12 @@ export interface ProjectEditionGridProps {
   columns?: 2 | 3;
   /** light = home Latest Additions; dark = project hub pages */
   variant?: "light" | "dark";
+  /**
+   * Сетка стоит в первом экране, и первую карточку нужно грузить наперёд.
+   * По умолчанию нет: на главной и на /brand эта сетка лежит на второй-третьей
+   * прокрутке, и её снимок отбирал канал у первого экрана.
+   */
+  priority?: boolean;
 }
 
 const EditionCard = memo(function EditionCard({
@@ -17,11 +23,13 @@ const EditionCard = memo(function EditionCard({
   index,
   onClick,
   variant,
+  priority,
 }: {
   project: DBProject;
   index: number;
   onClick: () => void;
   variant: "light" | "dark";
+  priority: boolean;
 }) {
   const [loaded, setLoaded] = useState(false);
   const isDark = variant === "dark";
@@ -58,9 +66,9 @@ const EditionCard = memo(function EditionCard({
         <img
           src={project.cover_image}
           alt={project.title}
-          loading={index === 0 ? "eager" : "lazy"}
-          decoding={index === 0 ? "sync" : "async"}
-          fetchpriority={index === 0 ? "high" : "auto"}
+          loading={priority && index === 0 ? "eager" : "lazy"}
+          decoding={priority && index === 0 ? "sync" : "async"}
+          fetchpriority={priority && index === 0 ? "high" : "auto"}
           onLoad={() => setLoaded(true)}
           className={cn(
             "absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]",
@@ -106,6 +114,7 @@ const ProjectEditionGrid = memo(function ProjectEditionGrid({
   className,
   columns = 3,
   variant = "light",
+  priority = false,
 }: ProjectEditionGridProps) {
   return (
     <div
@@ -121,6 +130,7 @@ const ProjectEditionGrid = memo(function ProjectEditionGrid({
           project={project}
           index={index}
           variant={variant}
+          priority={priority}
           onClick={() => onProjectClick?.(project.slug || project.id)}
         />
       ))}

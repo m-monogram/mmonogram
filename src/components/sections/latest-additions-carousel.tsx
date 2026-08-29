@@ -9,6 +9,8 @@ import { getLatestAdditionHubs } from "@/data/projects";
 export interface LatestAdditionsCarouselProps {
   onProjectClick?: (projectId: string) => void;
   className?: string;
+  /** Карусель — главное содержимое первого экрана (страница /projects). */
+  priority?: boolean;
 }
 
 /**
@@ -16,7 +18,7 @@ export interface LatestAdditionsCarouselProps {
  * Opening a hub shows that model's colour/edition cards.
  */
 const LatestAdditionsCarousel = memo(
-  ({ onProjectClick, className }: LatestAdditionsCarouselProps) => {
+  ({ onProjectClick, className, priority = false }: LatestAdditionsCarouselProps) => {
     const { t } = useLanguage();
     const { projects: dbProjects } = useProjects();
 
@@ -39,6 +41,7 @@ const LatestAdditionsCarousel = memo(
           <ProjectEditionGrid
             columns={2}
             projects={hubs}
+            priority={priority}
             onProjectClick={handleProjectClick}
           />
         </div>

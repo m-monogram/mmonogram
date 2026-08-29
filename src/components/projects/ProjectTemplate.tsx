@@ -80,7 +80,7 @@ function ProjectGallery({
                   <img
                     src={img.src}
                     alt={img.alt ?? ""}
-                    loading={index < 4 ? "eager" : "lazy"}
+                    loading="lazy"
                     decoding={index < 4 ? "sync" : "async"}
                     className="w-full h-full object-cover object-center transition-transform duration-700 md:group-hover:scale-[1.02]"
                   />

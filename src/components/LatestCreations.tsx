@@ -131,7 +131,11 @@ const LatestCreations = memo(({ onProjectClick }: LatestCreationsProps) => {
                 <img
                   src={currentProject.image}
                   alt={currentProject.title}
-                  loading="eager"
+                  /* Карусель стоит далеко внизу главной. Грузить её снимок
+                     наперёд — значит отбирать канал у первого экрана; когда
+                     до неё долистают, картинка подгрузится, а дальше смена
+                     слайда идёт мгновенно: элемент уже в зоне видимости. */
+                  loading="lazy"
                   decoding="async"
                   className="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105"
                 />
