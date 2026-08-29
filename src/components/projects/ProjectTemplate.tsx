@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
+import Picture from "@/components/Picture";
 export interface ProjectTemplateSpec {
   label: string;
   value: string;
@@ -77,11 +78,11 @@ function ProjectGallery({
                 onClick={() => setSelectedIdx(index)}
               >
                 <div className="relative aspect-square md:aspect-[4/3] overflow-hidden bg-black rounded-none border border-white/10 md:group-hover:border-white/30 transition-all duration-500 shadow-lg md:group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
-                  <img
+                  <Picture
                     src={img.src}
                     alt={img.alt ?? ""}
-                    loading="lazy"
-                    decoding={index < 4 ? "sync" : "async"}
+                    /* Галерея в две колонки от планшета, на телефоне в одну. */
+                    sizes="(max-width: 767px) 100vw, (max-width: 1280px) 50vw, 620px"
                     className="w-full h-full object-cover object-center transition-transform duration-700 md:group-hover:scale-[1.02]"
                   />
                   <div className="absolute inset-0 opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-t from-black/30 via-transparent to-transparent" aria-hidden />
@@ -194,7 +195,8 @@ const ProjectTemplate = memo(function ProjectTemplate({
             поисковику и скринридеру страница перестаёт быть безымянной. */}
         <h1 className="sr-only">{title} — {subtitle}</h1>
         <div className="absolute inset-0 bg-black">
-          <img src={heroImage} alt={title} loading="eager" decoding="sync" fetchpriority="high" className="w-full h-full object-cover object-center" />
+          {/* Главная картинка страницы: во всю ширину окна на любом экране. */}
+          <Picture src={heroImage} alt={title} priority sizes="100vw" className="w-full h-full object-cover object-center" />
         </div>
         {/* Subtle spotlight effect */}
         <div className="absolute inset-0 pointer-events-none opacity-30" aria-hidden>

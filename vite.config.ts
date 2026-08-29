@@ -4,6 +4,7 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 import seoPlugin from "./vite-plugin-seo";
+import responsiveImagesPlugin from "./vite-plugin-responsive-images";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -23,6 +24,7 @@ export default defineConfig(({ mode }) => ({
       avif: { quality: 75 },
     }),
     seoPlugin(),
+    responsiveImagesPlugin(),
   ].filter(Boolean),
   resolve: {
     alias: {

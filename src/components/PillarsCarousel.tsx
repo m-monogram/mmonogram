@@ -2,6 +2,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Picture from "@/components/Picture";
 
 interface Pillar {
   title: string;
@@ -48,11 +49,10 @@ export const PillarsCarousel = ({ items, className }: PillarsCarouselProps) => {
               <div className="relative group h-full">
                 {/* Premium glass card with light effect */}
                 <div className="aspect-[4/5] overflow-hidden relative bg-gradient-to-b from-white/5 to-transparent border border-white/20 hover:border-white/40 transition-all duration-500 shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.4)]">
-                  <img
+                  <Picture
                     src={item.image}
                     alt={item.title}
-                    loading="lazy"
-                    decoding="async"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   {/* Premium light overlay on hover */}

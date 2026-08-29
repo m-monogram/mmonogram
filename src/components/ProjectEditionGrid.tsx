@@ -1,6 +1,7 @@
 import { memo, useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import Picture from "@/components/Picture";
 import { DBProject } from "@/hooks/useProjects";
 
 export interface ProjectEditionGridProps {
@@ -63,12 +64,13 @@ const EditionCard = memo(function EditionCard({
             )}
           />
         )}
-        <img
+        <Picture
           src={project.cover_image}
           alt={project.title}
-          loading={priority && index === 0 ? "eager" : "lazy"}
-          decoding={priority && index === 0 ? "sync" : "async"}
-          fetchpriority={priority && index === 0 ? "high" : "auto"}
+          priority={priority && index === 0}
+          /* Карточек в ряду две (columns=2) или три; на телефоне — одна
+             во всю ширину. */
+          sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 540px"
           onLoad={() => setLoaded(true)}
           className={cn(
             "absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]",
