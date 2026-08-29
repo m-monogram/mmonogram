@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Fragment, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   Armchair,
   Camera,
@@ -7,14 +7,17 @@ import {
   ClipboardList,
   DoorOpen,
   Disc3,
+  Gauge,
   Gem,
   Lightbulb,
   Package,
   Palette,
+  PanelTop,
   RotateCcw,
   Save,
   Share2,
   SlidersHorizontal,
+  Sofa,
   Sparkles,
   SunMoon,
   X,
@@ -128,7 +131,20 @@ type OptionItem = {
   preview: ReactNode;
   selected: boolean;
   onClick: () => void;
+  /**
+   * Подзаголовок над первой опцией группы. Нужен там, где в одном списке
+   * лежат разные по смыслу вещи: в салоне это отделка кожи и ракурс камеры —
+   * одинаковыми карточками они читались как один ряд равнозначных кнопок.
+   */
+  group?: string;
 };
+
+/** Свой знак на каждый ракурс салона. */
+const INTERIOR_VIEW_ICONS = {
+  interiorFront: PanelTop,
+  interiorDriver: Gauge,
+  interiorRear: Sofa,
+} as const;
 
 const SECTION_FOCUS: Partial<Record<StudioSection, CameraFocus>> = {
   /* Готовый пакет показываем с общего ракурса: меняется вся машина сразу,
@@ -142,6 +158,24 @@ const SECTION_FOCUS: Partial<Record<StudioSection, CameraFocus>> = {
   lights: "lights",
   env: "env",
 };
+
+/**
+ * Образец отделки салона: основной тон плашкой, акцент — полосой снизу,
+ * как на карточке кожи у обивщика. Два кружка рядом читались как «два цвета
+ * на выбор», хотя это один комплект: кожа и строчка с кантом.
+ */
+function LeatherSwatch({ primary, accent }: { primary: string; accent: string }) {
+  return (
+    <span
+      className="relative block h-11 w-[52px] shrink-0 overflow-hidden rounded-[3px] ring-1 ring-white/20"
+      style={{ backgroundColor: primary }}
+    >
+      <span className="absolute inset-x-0 bottom-0 h-[9px]" style={{ backgroundColor: accent }} />
+      {/* Косой блик — без него тёмная кожа выглядит просто чёрным квадратом. */}
+      <span className="absolute inset-0 bg-gradient-to-br from-white/12 via-transparent to-black/25" />
+    </span>
+  );
+}
 
 function Swatch({ color, className = "" }: { color: string; className?: string }) {
   return (
@@ -267,7 +301,10 @@ const ConfiguratorPage = () => {
   const signature = matchSignatureBuild(config);
 
   const focusForSection = (section: StudioSection): CameraFocus =>
-    section === "interior" ? "interiorDriver" : SECTION_FOCUS[section] ?? "default";
+    /* Салон открывается видом на передние кресла, а не с места водителя:
+       оттуда в кадре почти один руль, а показать надо кожу. Место водителя
+       осталось отдельным ракурсом в списке. */
+    section === "interior" ? "interiorFront" : SECTION_FOCUS[section] ?? "default";
 
   const chooseSection = useCallback(
     (section: StudioSection) => {
@@ -634,22 +671,24 @@ const ConfiguratorPage = () => {
             key: `interior-${finish.id}`,
             selected: config.interior === index,
             onClick: () => set({ interior: index }),
-            preview: (
-              <span className="flex">
-                <Swatch color={finish.primary} className="relative z-10" />
-                <Swatch color={finish.accent} className="-ml-4" />
-              </span>
-            ),
+            preview: <LeatherSwatch primary={finish.primary} accent={finish.accent} />,
             title: finish.name,
+            subtitle: index === 0 ? "Atelier standard" : "Bespoke order",
+            group: index === 0 ? "Leather" : undefined,
           })),
-          ...interiorViews.map(([view, label]) => ({
-            key: view,
-            selected: focus === view,
-            onClick: () => changeFocus(view),
-            preview: <Armchair className="h-8 w-8" strokeWidth={1.35} />,
-            title: label,
-            subtitle: "Camera",
-          })),
+          ...interiorViews.map(([view, label], index) => {
+            const Icon = INTERIOR_VIEW_ICONS[view];
+            return {
+              key: view,
+              selected: focus === view,
+              onClick: () => changeFocus(view),
+              /* У каждого ракурса своя иконка: три одинаковых кресла подряд
+                 не давали понять, чем строки отличаются. */
+              preview: <Icon className="h-7 w-7" strokeWidth={1.35} />,
+              title: label,
+              group: index === 0 ? "Where to look from" : undefined,
+            };
+          }),
         ];
 
       default:
@@ -964,14 +1003,21 @@ const ConfiguratorPage = () => {
                 </>
               ) : (
                 options.map((option) => (
-                  <OptionCard
-                    key={option.key}
-                    selected={option.selected}
-                    onClick={option.onClick}
-                    title={option.title}
-                    subtitle={option.subtitle}
-                    preview={option.preview}
-                  />
+                  <Fragment key={option.key}>
+                    {option.group && (
+                      <p className="mt-1 flex items-center gap-2 font-body text-[10px] uppercase tracking-[0.2em] text-white/35 first:mt-0">
+                        {option.group}
+                        <span className="h-px flex-1 bg-white/10" />
+                      </p>
+                    )}
+                    <OptionCard
+                      selected={option.selected}
+                      onClick={option.onClick}
+                      title={option.title}
+                      subtitle={option.subtitle}
+                      preview={option.preview}
+                    />
+                  </Fragment>
                 ))
               )}
             </div>
