@@ -34,6 +34,21 @@ import {
 type PaintedRole = Exclude<PartRole, "debris">;
 type Materials = Record<PaintedRole, THREE.Material>;
 
+const STEERING_WHEEL_SOURCE_BOX = new THREE.Box3(
+  new THREE.Vector3(0.18, 0.94, -1.56),
+  new THREE.Vector3(0.63, 1.39, -1.2),
+);
+
+function fitSourceBox(box: THREE.Box3, fit: Fit) {
+  return box.clone().applyMatrix4(
+    new THREE.Matrix4().compose(
+      fit.position,
+      fit.quaternion,
+      new THREE.Vector3(fit.scale, fit.scale, fit.scale),
+    ),
+  );
+}
+
 /** Один загруженный файл: клон сцены, общий трансформ, материалы по ролям. */
 function Parts({
   url,
@@ -42,6 +57,7 @@ function Parts({
   materials,
   sourceMaterials = false,
   visible = true,
+  hideBox,
   onGround,
 }: {
   url: string;
@@ -50,6 +66,8 @@ function Parts({
   materials: Materials;
   sourceMaterials?: boolean;
   visible?: boolean;
+  /** Зона в уже посаженной сборке: ею заменяем дублирующуюся деталь. */
+  hideBox?: THREE.Box3;
   /** Нижняя точка файла после посадки — по ней выставляется уровень пола. */
   onGround?: (url: string, minY: number) => void;
 }) {
@@ -87,6 +105,10 @@ function Parts({
         mesh.visible = false;
         return;
       }
+      if (hideBox?.containsPoint(box.getCenter(new THREE.Vector3()))) {
+        mesh.visible = false;
+        return;
+      }
       kept.push({ mesh, box });
     });
 
@@ -112,7 +134,7 @@ function Parts({
     }
 
     return { root, byRole, fit, minY: new THREE.Box3().setFromObject(root).min.y };
-  }, [scene, shared, kind, url, sourceMaterials]);
+  }, [scene, shared, kind, url, sourceMaterials, hideBox]);
 
   useLayoutEffect(() => {
     onGround?.(url, prepared.minY);
@@ -153,6 +175,10 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
   const car: CarModel = CARS[config.model] ?? CARS[DEFAULT_CAR];
   const body = useGLTF(car.files.body, DRACO_PATH);
   const fit = useMemo(() => computeFit(body.scene.clone(true), car.length), [body.scene, car.length]);
+  const interiorSteeringMask = useMemo(
+    () => (car.files.interior && car.files.steering ? fitSourceBox(STEERING_WHEEL_SOURCE_BOX, fit) : undefined),
+    [car.files.interior, car.files.steering, fit],
+  );
 
   const debugRoles = useMemo(
     () => typeof window !== "undefined" && new URLSearchParams(window.location.search).has("parts"),
@@ -351,7 +377,13 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
       {car.files.interior && (
         <OptionalBoundary label="интерьер">
           <Suspense fallback={null}>
-            <Parts url={car.files.interior} fit={fit} kind="interior" materials={materials} />
+            <Parts
+              url={car.files.interior}
+              fit={fit}
+              kind="interior"
+              materials={materials}
+              hideBox={interiorSteeringMask}
+            />
           </Suspense>
         </OptionalBoundary>
       )}
@@ -374,4 +406,6 @@ export default function GClassGLTF({ config }: { config: BuildConfig }) {
   const car = CARS[DEFAULT_CAR];
   useGLTF.preload(car.files.body, DRACO_PATH);
   if (car.files.kit) useGLTF.preload(car.files.kit, DRACO_PATH);
+  if (car.files.interior) useGLTF.preload(car.files.interior, DRACO_PATH);
+  if (car.files.steering) useGLTF.preload(car.files.steering, DRACO_PATH);
 }
