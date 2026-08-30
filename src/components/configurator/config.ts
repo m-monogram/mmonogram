@@ -186,6 +186,11 @@ export interface SignatureBuild {
   tagline: string;
   /** Страница проекта на сайте — та же машина в фотографиях. */
   slug: string;
+  /**
+   * Пакет — это отделка металла: решётка, кант по борту, вставки порогов и
+   * диски. Кузов он не перекрашивает: цвет человек выбирает отдельно, и
+   * терять его выбор при нажатии на пакет нельзя.
+   */
   config: BuildConfig;
 }
 
@@ -193,60 +198,37 @@ export const SIGNATURE_BUILDS: SignatureBuild[] = [
   {
     id: "black",
     name: "Black Package",
-    tagline: "Stealth black-out",
+    tagline: "Grille, trim and wheels in gloss black",
     slug: "g3-iconic-black",
-    config: {
-      ...DEFAULT_CONFIG,
-      paint: 0,      /* Obsidian Black */
-      rimFinish: 3,  /* Gloss Black */
-      grille: 2,     /* Gloss Black */
-      interior: 1,   /* Onyx Black */
-    },
+    config: { ...DEFAULT_CONFIG, grille: 2 /* Gloss Black */, rimFinish: 3 /* Gloss Black */ },
   },
   {
     id: "gold",
     name: "Gold Package",
-    tagline: "Black and 24K gold",
+    tagline: "Brushed gold grille, gold-centred wheels",
     slug: "g3-iconic-gold",
-    config: {
-      ...DEFAULT_CONFIG,
-      paint: 0,      /* Obsidian Black */
-      rimFinish: 2,  /* Champagne Gold */
-      grille: 0,     /* Brushed Gold */
-      interior: 3,   /* Cognac Heritage */
-    },
+    config: { ...DEFAULT_CONFIG, grille: 0 /* Brushed Gold */, rimFinish: 2 /* Champagne Gold */ },
   },
   {
     id: "silver",
     name: "Silver Package",
-    tagline: "Graphite and chrome",
+    tagline: "Polished chrome grille and wheels",
     slug: "g3-iconic-grey",
-    config: {
-      ...DEFAULT_CONFIG,
-      paint: 2,      /* Nardo Silver */
-      rimFinish: 1,  /* Brushed Silver */
-      grille: 1,     /* Polished Silver */
-      interior: 1,   /* Onyx Black */
-    },
+    config: { ...DEFAULT_CONFIG, grille: 1 /* Polished Silver */, rimFinish: 1 /* Brushed Silver */ },
   },
 ];
 
 /**
- * Какому пакету отвечает текущая сборка. Сравниваются только те поля, которые
- * пакет и задаёт: свет, окружение и открытые двери человек крутит сам, и
- * из-за них подпись «Black Package» не должна слетать на «Custom».
+ * Какому пакету отвечает текущая сборка.
+ *
+ * Сравниваются только решётка и отделка дисков — то, что пакет и задаёт.
+ * Краска, салон, свет и окружение остаются за человеком: он выбирает цвет
+ * кузова сам, и подпись «Black Package» от смены краски слетать не должна.
  */
 export function matchSignatureBuild(c: BuildConfig): SignatureBuild | null {
   return (
-    SIGNATURE_BUILDS.find(
-      (b) =>
-        b.config.paint === c.paint &&
-        b.config.rimFinish === c.rimFinish &&
-        b.config.grille === c.grille &&
-        b.config.interior === c.interior &&
-        b.config.kitPackage === c.kitPackage &&
-        b.config.carbon === c.carbon
-    ) ?? null
+    SIGNATURE_BUILDS.find((b) => b.config.grille === c.grille && b.config.rimFinish === c.rimFinish) ??
+    null
   );
 }
 

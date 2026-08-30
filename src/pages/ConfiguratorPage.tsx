@@ -44,9 +44,6 @@ import SceneErrorBoundary from "@/components/configurator/SceneErrorBoundary";
 import StudioAudio from "@/components/configurator/StudioAudio";
 import StudioIntro from "@/components/configurator/StudioIntro";
 import { CARS, DEFAULT_CAR } from "@/components/configurator/models";
-import signatureBlack from "@/assets/g-2.jpg";
-import signatureGold from "@/assets/g3-iconic-gold-front.jpg";
-import signatureSilver from "@/assets/g3-grey-cover.jpg";
 
 const ConfiguratorScene = lazy(() => import("@/components/configurator/Scene"));
 
@@ -96,21 +93,6 @@ function estimateBuildPrice(c: BuildConfig): number {
     (hasInterior ? interiorPrices[c.interior] ?? 0 : 0)
   );
 }
-
-const PAINT_PREVIEWS = Object.values(
-  import.meta.glob("@/assets/previews/paint-*.jpg", { eager: true, import: "default" })
-) as string[];
-/* Обложки фирменных пакетов — те же снимки, что на страницах проектов:
-   человек узнаёт машину, которую видел в разделе Projects. */
-const SIGNATURE_COVERS: Record<string, string> = {
-  black: signatureBlack,
-  gold: signatureGold,
-  silver: signatureSilver,
-};
-
-const FINISH_PREVIEWS = Object.values(
-  import.meta.glob("@/assets/previews/finish-*.jpg", { eager: true, import: "default" })
-) as string[];
 
 type StudioSection =
   | "signature"
@@ -191,29 +173,55 @@ function LeatherChip({ primary, accent }: { primary: string; accent: string }) {
 }
 
 /**
- * Плитка фар: два блока в корпусе, зажжённые или потухшие.
+ * Плитка фар: две круглые фары, зажжённые или потухшие.
  *
- * Раньше в обеих строках стояла одна и та же лампочка, отличавшаяся только
- * прозрачностью, — по списку было не понять, что вообще выбираешь. Здесь
- * видно то же, что произойдёт на машине: свет либо горит, либо нет.
+ * Первый вариант рисовал ещё решётку и бампер, но плитка всего 76 пикселей
+ * шириной — вся эта мелочь сливалась в пятно. Осталось только то, что
+ * читается в таком размере: два круглых блока с хромированным ободком, свет
+ * из них и лучи в стороны. Сразу видно, о чём строка.
  */
 function LightChip({ on }: { on: boolean }) {
+  const lamp = (cx: number) => (
+    <g key={cx}>
+      {on && <circle cx={cx} cy="24" r="17" fill="url(#mm-glow)" />}
+      <circle cx={cx} cy="24" r="10" fill={on ? "#0f1216" : "#131619"} stroke="#5a6169" strokeWidth="1.6" />
+      <circle cx={cx} cy="24" r="7" fill={on ? "#f6faff" : "#20242a"} />
+      {on && <circle cx={cx - 2} cy="21" r="2.4" fill="#ffffff" />}
+    </g>
+  );
   return (
-    <span
-      className={`relative flex items-center justify-center gap-1.5 ${TILE}`}
-      style={{ backgroundColor: on ? "#15181c" : "#0d0e10" }}
-    >
-      {[0, 1].map((i) => (
-        <span
-          key={i}
-          className="block h-5 w-5 rounded-full transition-colors"
-          style={
-            on
-              ? { backgroundColor: "#f4f7ff", boxShadow: "0 0 10px 3px rgba(210,226,255,0.55)" }
-              : { backgroundColor: "#23262b", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.6)" }
-          }
-        />
-      ))}
+    <span className={`relative block overflow-hidden ${TILE}`} style={{ backgroundColor: "#0a0c0f" }}>
+      <svg viewBox="0 0 76 48" className="absolute inset-0 h-full w-full" aria-hidden>
+        <defs>
+          <radialGradient id="mm-glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#e2edff" stopOpacity="0.7" />
+            <stop offset="100%" stopColor="#e2edff" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        {/* Лучи наружу — по ним строка читается как «фары светят» */}
+        {on &&
+          [
+            [3, 24, 9, 24],
+            [5, 15, 10, 18],
+            [5, 33, 10, 30],
+            [73, 24, 67, 24],
+            [71, 15, 66, 18],
+            [71, 33, 66, 30],
+          ].map(([x1, y1, x2, y2]) => (
+            <line
+              key={`${x1}-${y1}`}
+              x1={x1}
+              y1={y1}
+              x2={x2}
+              y2={y2}
+              stroke="#dce9ff"
+              strokeOpacity="0.75"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+          ))}
+        {[24, 52].map(lamp)}
+      </svg>
     </span>
   );
 }
@@ -255,10 +263,6 @@ function OptionCard({
   );
 }
 
-function PreviewImage({ src, alt, fallback }: { src?: string; alt: string; fallback: string }) {
-  if (!src) return <PaintChip color={fallback} />;
-  return <img src={src} alt={alt} loading="lazy" className={`${TILE} object-cover`} />;
-}
 
 const ConfiguratorPage = () => {
   const { t } = useLanguage();
@@ -537,40 +541,35 @@ const ConfiguratorPage = () => {
           key: `signature-${build.id}`,
           selected: signature?.id === build.id,
           onClick: () => apply({ ...build.config, saved: config.saved }, "default"),
-          preview: <PreviewImage src={SIGNATURE_COVERS[build.id]} alt={build.name} fallback="#111315" />,
+          preview: <PaintChip color={GRILLE_FINISHES[build.config.grille].color} />,
           title: build.name,
           subtitle: build.tagline,
         }));
 
+      /*
+       * Только выкраски. Фотографии отсюда убраны: снимок делался на чёрной
+       * машине, и Emerald с Oxblood на нём выходили почти чёрными — цвет по
+       * ним не читался вовсе, а половина списка всё равно шла плашками, и
+       * столбец выглядел собранным из двух разных списков.
+       *
+       * Отделка решётки переехала в Signature: там она и есть содержание
+       * пакета, и держать её вторым списком здесь значило дублировать.
+       */
       case "exterior":
-        return [
-          ...PAINTS.map((paint, index) => ({
-            key: `paint-${paint.id}`,
-            selected: config.paint === index,
-            onClick: () => set({ paint: index }),
-            preview: <PreviewImage src={PAINT_PREVIEWS[index]} alt={paint.name} fallback={paint.color} />,
-            title: paint.name,
-          })),
-          ...GRILLE_FINISHES.map((finish, index) => ({
-            key: `grille-${finish.id}`,
-            selected: config.grille === index,
-            onClick: () => set({ grille: index }),
-            preview: <PaintChip color={finish.color} />,
-            title: finish.name,
-            subtitle: t("config.grille"),
-          })),
-        ];
+        return PAINTS.map((paint, index) => ({
+          key: `paint-${paint.id}`,
+          selected: config.paint === index,
+          onClick: () => set({ paint: index }),
+          preview: <PaintChip color={paint.color} />,
+          title: paint.name,
+        }));
 
-      /* Дизайны дисков (MG.1 Monoblock и прочие) отсюда убраны: колёса
-         приходят одним мешем внутри body-kit-wheels.glb, поменять рисунок
-         нечем — нажатие не меняло в сцене ничего. Осталась отделка, она
-         красит материал колеса по-настоящему. */
       case "wheels":
         return RIM_FINISHES.map((finish, index) => ({
           key: `rim-finish-${finish.id}`,
           selected: config.rimFinish === index,
           onClick: () => set({ rimFinish: index }),
-          preview: <PreviewImage src={FINISH_PREVIEWS[index]} alt={finish.name} fallback={finish.color} />,
+          preview: <PaintChip color={finish.color} />,
           title: finish.name,
           subtitle: t("config.rimColor"),
         }));
