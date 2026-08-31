@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { Plugin } from "vite";
-import { allPages, type PageSeo } from "./src/lib/seo/catalog";
+import { allPages, type PageSeo } from "./src/lib/seo/catalog.ts";
 
 /**
  * Раскладывает <head> по страницам и собирает карту сайта.

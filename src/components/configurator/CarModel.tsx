@@ -19,7 +19,7 @@ import { CARS, DEFAULT_CAR } from "./models";
  * Раньше заглушка подменяла сборку ещё и в рабочих режимах — при взгляде из
  * салона и при открытых дверях. На экране это выглядело как поломка: вместо
  * фотореалистичного G63 появлялась грубая коробка, а оцифрованный салон
- * (custom-interior.glb, 2.6 МБ) не показывался никогда, хотя грузился всегда.
+ * (custom-interior.glb) не показывался никогда, хотя грузился всегда.
  * Открывание дверей у оцифрованного кузова невозможно — он идёт одним мешем,
  * — поэтому раздел «Openings» теперь просто не показывается для таких машин
  * (см. CarModel.supportsOpenings), а не подменяет всю машину.
@@ -42,7 +42,7 @@ class ModelBoundary extends Component<{ children: ReactNode; fallback: ReactNode
 }
 
 /* Сигнал «машина в кадре»: монтируется только после того, как Suspense
-   отпустил, то есть кузов и обвес уже собраны. По нему страница убирает
+   отпустил, то есть базовый кузов уже собран. По нему страница убирает
    заставку, а камера начинает интро-наезд — до этого наезжать не на что. */
 function ReadySignal({ onReady }: { onReady?: () => void }) {
   useEffect(() => {
@@ -73,7 +73,7 @@ export default function CarModel({
   return (
     <ModelBoundary fallback={broken}>
       <Suspense fallback={<SceneLoader night={config.night} />}>
-        <GClassGLTF config={config} />
+        <GClassGLTF config={config} interiorVisible={doorsOpen} />
         <ReadySignal onReady={onReady} />
       </Suspense>
     </ModelBoundary>

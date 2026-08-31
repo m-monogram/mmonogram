@@ -15,7 +15,7 @@
  * загружает конфиг сборки, где ни того ни другого нет.
  */
 
-import { BRAND, COACHBUILD, CRAFT, PLACE, merge } from "./keywords";
+import { BRAND, COACHBUILD, CRAFT, PLACE, merge } from "./keywords.ts";
 
 export type ChangeFreq = "daily" | "weekly" | "monthly" | "yearly";
 

@@ -3,8 +3,8 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
-import seoPlugin from "./vite-plugin-seo";
-import responsiveImagesPlugin from "./vite-plugin-responsive-images";
+import seoPlugin from "./vite-plugin-seo.ts";
+import responsiveImagesPlugin from "./vite-plugin-responsive-images.ts";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
