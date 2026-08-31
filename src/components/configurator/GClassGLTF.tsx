@@ -184,8 +184,8 @@ export default function GClassGLTF({
   const body = useGLTF(files.body, DRACO_PATH);
   const fit = useMemo(() => computeFit(body.scene.clone(true), car.length), [body.scene, car.length]);
   const interiorSteeringMask = useMemo(
-    () => (interiorVisible && files.interior && files.steering ? fitSourceBox(STEERING_WHEEL_SOURCE_BOX, fit) : undefined),
-    [interiorVisible, files.interior, files.steering, fit],
+    () => (files.interior && files.steering ? fitSourceBox(STEERING_WHEEL_SOURCE_BOX, fit) : undefined),
+    [files.interior, files.steering, fit],
   );
 
   const debugRoles = useMemo(
@@ -338,17 +338,36 @@ export default function GClassGLTF({
     }, 0);
   }, []);
 
+  /*
+   * Салон грузится не сразу, но и не по открытию дверей.
+   *
+   * Стёкла у машины прозрачные: с обычного, наружного ракурса сквозь них
+   * видны кресла и подголовники. Пока салона нет, за стеклом чернота — машина
+   * выглядит пустой скорлупой, и это первое, что видит посетитель.
+   *
+   * При этом тянуть его в один заход с кузовом и обвесом незачем: 2.5 МБ на
+   * критическом пути отодвигают момент, когда машину уже можно крутить.
+   * Поэтому ждём, пока приедет обвес (о загрузке он сообщает замером пола), и
+   * только потом подключаем салон — своим Suspense, без блокировки. В кадре
+   * это выглядит так: машина появилась и вращается, через секунду за стеклом
+   * проступил салон.
+   *
+   * В интерьерных ракурсах ждать нечего — там салон и есть содержимое кадра.
+   */
+  const exteriorLoaded = !files.kit || !config.kit || grounds[files.kit] !== undefined;
+  const showInterior = interiorVisible || exteriorLoaded;
+
   const groundOffset = useMemo(() => {
     const active = Object.entries(grounds).filter(([url]) => {
       /* Только файлы текущей машины: замеры предыдущей остаются в Record,
          и без этой проверки пол считался по объединению двух сборок. */
       if (url !== files.body && url !== files.kit && url !== files.interior && url !== files.steering) return false;
       if (url === files.kit && !config.kit) return false;
-      if ((url === files.interior || url === files.steering) && !interiorVisible) return false;
+      if ((url === files.interior || url === files.steering) && !showInterior) return false;
       return true;
     });
     return active.length ? -Math.min(...active.map(([, y]) => y)) : 0;
-  }, [grounds, config.kit, interiorVisible, files.body, files.kit, files.interior, files.steering]);
+  }, [grounds, config.kit, showInterior, files.body, files.kit, files.interior, files.steering]);
 
   // frameloop="demand": без явного запроса сдвиг пола не попал бы в кадр
   const invalidate = useThree((s) => s.invalidate);
@@ -382,7 +401,7 @@ export default function GClassGLTF({
         </OptionalBoundary>
       )}
 
-      {interiorVisible && files.interior && (
+      {showInterior && files.interior && (
         <OptionalBoundary label="интерьер">
           <Suspense fallback={null}>
             <Parts
@@ -396,7 +415,7 @@ export default function GClassGLTF({
         </OptionalBoundary>
       )}
 
-      {interiorVisible && files.steering && (
+      {showInterior && files.steering && (
         <OptionalBoundary label="руль">
           <Suspense fallback={null}>
             <Parts url={files.steering} fit={fit} kind="interior" materials={materials} />
