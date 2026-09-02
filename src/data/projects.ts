@@ -227,10 +227,10 @@ export const projects: Project[] = [
     duration: "12 weeks",
     package: "Ultra-Limited",
     category: "G-Class",
-    coverImage: g3GoldFront,
+    coverImage: g3GoldCover,
     images: [
-      { src: g3GoldFront, title: "Front view" },
       { src: g3GoldCover, title: "Gold grille three-quarter" },
+      { src: g3GoldFront, title: "Front view" },
       { src: g3GoldSide, title: "Side profile" },
       { src: g3GoldRear, title: "Rear view" },
       { src: g3GoldDetail, title: "Hood & wheel detail" },
