@@ -7,7 +7,7 @@ import g3BlackRear from "@/assets/g3-black-07.jpg";
 import g3BlackSide from "@/assets/g3-black-03.jpg";
 import g3GoldCover from "@/assets/g-3.jpg";
 import g3GoldFront from "@/assets/g3-iconic-gold-front.jpg";
-const greyCover = "/__l5e/assets-v1/7d412374-fc27-474b-abcc-0797824405eb/g3-silver-cover.jpg";
+import greyCover from "@/assets/g-1.jpg";
 import greyStudio from "@/assets/g3-grey-studio.jpg";
 import greyRear from "@/assets/g3-grey-rear.jpg";
 import greyDetail from "@/assets/g3-grey-detail.jpg";
