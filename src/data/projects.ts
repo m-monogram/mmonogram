@@ -167,9 +167,9 @@ export const projects: Project[] = [
     duration: "12 weeks",
     package: "Ultra-Limited",
     category: "G-Class",
-    coverImage: g3Black,
+    coverImage: g3GoldCover,
     isHub: true,
-    images: [{ src: g3Black, title: "Black edition" }],
+    images: [{ src: g3GoldCover, title: "Gold edition" }],
     description: "An ultra-limited G-Class transformation in three exclusive packages — Black, Gold and Silver.",
     modifications: [
       "M Monogram exterior identity package",
@@ -227,10 +227,10 @@ export const projects: Project[] = [
     duration: "12 weeks",
     package: "Ultra-Limited",
     category: "G-Class",
-    coverImage: g3GoldCover,
+    coverImage: g3GoldFront,
     images: [
-      { src: g3GoldCover, title: "Gold grille three-quarter" },
       { src: g3GoldFront, title: "Front view" },
+      { src: g3GoldCover, title: "Gold grille three-quarter" },
       { src: g3GoldSide, title: "Side profile" },
       { src: g3GoldRear, title: "Rear view" },
       { src: g3GoldDetail, title: "Hood & wheel detail" },
@@ -458,7 +458,7 @@ export const projects: Project[] = [
   {
     id: "fusion-arctic",
     editionOf: "rolls-royce-fusion",
-    title: "DIAMOND",
+    title: "Arctic",
     subtitle: "The Fusion",
     year: "2024",
     duration: "12 weeks",
