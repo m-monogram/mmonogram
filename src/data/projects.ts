@@ -322,7 +322,7 @@ export const projects: Project[] = [
   {
     id: "fusion-crimson",
     editionOf: "rolls-royce-fusion",
-    title: "Crimson",
+    title: "REDLİNE",
     subtitle: "The Fusion",
     year: "2024",
     duration: "12 weeks",
