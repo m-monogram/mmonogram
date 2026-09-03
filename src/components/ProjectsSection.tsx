@@ -44,7 +44,7 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
         </div>
 
         {/* Hero Section - Enhanced - starts from top with light gradient overlay */}
-        <section className="relative pb-2 sm:pb-3 px-4 sm:px-6 md:px-8" style={{ paddingTop: `calc(env(safe-area-inset-top, 0px) + 5.25rem)` }}>
+        <section className="relative pb-0 px-4 sm:px-6 md:px-8" style={{ paddingTop: `calc(env(safe-area-inset-top, 0px) + 4.75rem)` }}>
           {/* Light gradient overlay - photo visible, text readable */}
           <div
             className="absolute inset-0 pointer-events-none z-0"
@@ -76,7 +76,7 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
               initial={{ opacity: 0, scaleX: 0 }}
               animate={{ opacity: 1, scaleX: 1 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="w-24 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent mx-auto mb-5 sm:mb-6"
+              className="w-24 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent mx-auto mb-4 sm:mb-5"
             />
 
             {/* Main Title */}
@@ -87,7 +87,7 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
             >
               <BlurText
                 text="OUR PROJECTS"
-                className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-widest text-white uppercase mb-3 sm:mb-4"
+                className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-widest text-white uppercase mb-2 sm:mb-3"
                 delay={0.5}
                 staggerDelay={0.1}
               />
@@ -108,7 +108,7 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
               initial={{ opacity: 0, scaleX: 0 }}
               animate={{ opacity: 1, scaleX: 1 }}
               transition={{ duration: 0.8, delay: 0.8 }}
-              className="w-24 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent mx-auto mt-5 sm:mt-6"
+              className="w-24 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent mx-auto mt-4 sm:mt-5"
             />
           </div>
         </section>

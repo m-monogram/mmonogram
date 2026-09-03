@@ -70,7 +70,7 @@ const fallbackProjects: DBProject[] = staticProjects.map((p, idx) => ({
 }));
 
 export function useProjects(includeUnpublished = false) {
-  const [projects, setProjects] = useState<DBProject[]>([]);
+  const [projects, setProjects] = useState<DBProject[]>(fallbackProjects);
   const [loading, setLoading] = useState(true);
 
   const fetchProjects = useCallback(async () => {

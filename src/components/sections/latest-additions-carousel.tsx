@@ -37,13 +37,14 @@ const LatestAdditionsCarousel = memo(
           className={cn(
             "w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-10",
             priority
-              ? "pt-6 pb-14 sm:pt-8 sm:pb-16 md:pt-10 md:pb-20"
+              ? "pt-4 pb-12 sm:pt-5 sm:pb-14 md:pt-6 md:pb-16"
               : "pt-16 pb-16 sm:pt-20 sm:pb-20 md:pt-24 md:pb-24 lg:pt-28 lg:pb-28"
           )}
         >
           <motion.h2
             className={cn(
-              "font-display font-bold uppercase tracking-[0.18em] text-lg sm:text-2xl md:text-3xl text-center mb-8 sm:mb-10",
+              "font-display font-bold uppercase tracking-[0.18em] text-lg sm:text-2xl md:text-3xl text-center",
+              priority ? "mb-5 sm:mb-6" : "mb-8 sm:mb-10",
               isDark ? "text-white" : "text-black"
             )}
           >
