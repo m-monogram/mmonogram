@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { Plugin } from "vite";
 import { allPages, type PageSeo } from "./src/lib/seo/catalog.ts";
@@ -181,8 +181,12 @@ export default function seoPlugin(): Plugin {
       );
     },
 
-    closeBundle() {
+    writeBundle() {
       const indexPath = join(outDir, "index.html");
+      if (!existsSync(indexPath)) {
+        console.warn(`[seo] ${indexPath} не найден, статический SEO-пререндер пропущен`);
+        return;
+      }
       const template = stripDefaults(readFileSync(indexPath, "utf8"));
       const manifest: Array<{ path: string; file: string; title: string; description: string }> = [];
 
