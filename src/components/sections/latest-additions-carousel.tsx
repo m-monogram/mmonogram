@@ -11,6 +11,7 @@ export interface LatestAdditionsCarouselProps {
   className?: string;
   /** Карусель — главное содержимое первого экрана (страница /projects). */
   priority?: boolean;
+  variant?: "light" | "dark";
 }
 
 /**
@@ -18,9 +19,10 @@ export interface LatestAdditionsCarouselProps {
  * Opening a hub shows that model's colour/edition cards.
  */
 const LatestAdditionsCarousel = memo(
-  ({ onProjectClick, className, priority = false }: LatestAdditionsCarouselProps) => {
+  ({ onProjectClick, className, priority = false, variant = "light" }: LatestAdditionsCarouselProps) => {
     const { t } = useLanguage();
     const { projects: dbProjects } = useProjects();
+    const isDark = variant === "dark";
 
     const hubs = useMemo(() => getLatestAdditionHubs(dbProjects), [dbProjects]);
 
@@ -30,10 +32,20 @@ const LatestAdditionsCarousel = memo(
     );
 
     return (
-      <section className={cn("relative z-10 section-flow-light", className)}>
-        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-10 pt-16 pb-16 sm:pt-20 sm:pb-20 md:pt-24 md:pb-24 lg:pt-28 lg:pb-28">
+      <section className={cn("relative z-10", isDark ? "bg-premium-black" : "section-flow-light", className)}>
+        <div
+          className={cn(
+            "w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-10",
+            priority
+              ? "pt-6 pb-14 sm:pt-8 sm:pb-16 md:pt-10 md:pb-20"
+              : "pt-16 pb-16 sm:pt-20 sm:pb-20 md:pt-24 md:pb-24 lg:pt-28 lg:pb-28"
+          )}
+        >
           <motion.h2
-            className="font-display font-bold uppercase tracking-[0.18em] text-lg sm:text-2xl md:text-3xl text-black text-center mb-8 sm:mb-10"
+            className={cn(
+              "font-display font-bold uppercase tracking-[0.18em] text-lg sm:text-2xl md:text-3xl text-center mb-8 sm:mb-10",
+              isDark ? "text-white" : "text-black"
+            )}
           >
             {t("latestCreations.latestAdditions")}
           </motion.h2>
@@ -42,6 +54,7 @@ const LatestAdditionsCarousel = memo(
             columns={2}
             projects={hubs}
             priority={priority}
+            variant={variant}
             onProjectClick={handleProjectClick}
           />
         </div>

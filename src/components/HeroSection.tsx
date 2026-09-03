@@ -4,7 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useContent } from "@/hooks/useContent";
-import heroImage from "@/assets/g-3.jpg";
+import heroImage from "@/assets/hero-main-new.jpg";
 import heroImageMobile from "@/assets/hero-main-mobile.jpg";
 import MediaEdgeFade, { mediaFadeMask } from "@/components/MediaEdgeFade";
 

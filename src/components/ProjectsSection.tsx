@@ -1,6 +1,6 @@
 import { memo, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import LatestAdditionsCarousel from "@/components/sections/latest-additions-carousel";
 import { useNavigation } from "@/hooks/useNavigation";
 import { AuroraBackground } from "@/components/ui/aurora-background";
@@ -27,8 +27,8 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
   };
 
   return (
-    <AuroraBackground className="min-h-screen" intensity="subtle" showRadialGradient={true} transparent={true}>
-      <div className="relative z-10 w-full min-h-screen pb-12 sm:pb-16">
+    <AuroraBackground className="min-h-screen bg-premium-black" intensity="subtle" showRadialGradient={true} transparent={true}>
+      <div className="relative z-10 w-full min-h-screen bg-premium-black pb-12 sm:pb-16">
         {/* Back Button - positioned below logo */}
         <div className="absolute left-4 sm:left-6 md:left-12 z-20" style={{ top: `calc(env(safe-area-inset-top, 0px) + 6rem)` }}>
           <motion.button
@@ -44,7 +44,7 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
         </div>
 
         {/* Hero Section - Enhanced - starts from top with light gradient overlay */}
-        <section className="relative pb-6 sm:pb-8 px-4 sm:px-6 md:px-8" style={{ paddingTop: `calc(env(safe-area-inset-top, 0px) + 5.5rem)` }}>
+        <section className="relative pb-2 sm:pb-3 px-4 sm:px-6 md:px-8" style={{ paddingTop: `calc(env(safe-area-inset-top, 0px) + 5.25rem)` }}>
           {/* Light gradient overlay - photo visible, text readable */}
           <div
             className="absolute inset-0 pointer-events-none z-0"
@@ -87,7 +87,7 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
             >
               <BlurText
                 text="OUR PROJECTS"
-                className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl tracking-widest text-white uppercase mb-4 sm:mb-5"
+                className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-widest text-white uppercase mb-3 sm:mb-4"
                 delay={0.5}
                 staggerDelay={0.1}
               />
@@ -98,32 +98,17 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="font-body text-base sm:text-lg md:text-xl text-white/75 leading-relaxed max-w-3xl mx-auto tracking-wide mb-4"
+              className="font-body text-sm sm:text-base md:text-lg text-white/70 leading-relaxed max-w-3xl mx-auto tracking-wide"
             >
               A curated collection of bespoke automotive transformations
             </motion.p>
-
-            {/* Stats / Badge - enhanced */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
-              className="flex items-center justify-center mt-6"
-            >
-              <div className="flex items-center gap-3 px-6 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-none">
-                <Sparkles className="w-5 h-5 text-white/70" />
-                <span className="font-body text-sm sm:text-base text-white/70 uppercase tracking-widest">
-                  Premium Craftsmanship
-                </span>
-              </div>
-            </motion.div>
 
             {/* Decorative accent line - enhanced */}
             <motion.div
               initial={{ opacity: 0, scaleX: 0 }}
               animate={{ opacity: 1, scaleX: 1 }}
-              transition={{ duration: 0.8, delay: 1 }}
-              className="w-24 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent mx-auto mt-6 sm:mt-8"
+              transition={{ duration: 0.8, delay: 0.8 }}
+              className="w-24 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent mx-auto mt-5 sm:mt-6"
             />
           </div>
         </section>
@@ -133,6 +118,7 @@ const ProjectsSection = memo(({ setCurrentView, onProjectClick }: ProjectsSectio
             наперёд, она же и главная картинка страницы. */}
         <LatestAdditionsCarousel
           priority
+          variant="dark"
           onProjectClick={onProjectClick}
         />
 
