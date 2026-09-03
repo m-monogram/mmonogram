@@ -252,7 +252,7 @@ const ProjectTemplate = memo(function ProjectTemplate({
           margin: "-80px"
         }} transition={{
           duration: 0.7
-        }} className="font-body text-lg sm:text-xl md:text-2xl lg:text-3xl text-white/85 leading-relaxed tracking-wide">
+        }} className="font-body text-lg sm:text-xl md:text-2xl lg:text-[1.75rem] text-white/85 leading-[1.6] tracking-wide text-balance mx-auto">
             {statement}
           </motion.p>
         </div>
