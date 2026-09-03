@@ -235,11 +235,12 @@ const ProjectTemplate = memo(function ProjectTemplate({
       </header>
 
       {/* ——— B) STATEMENT ——— Enhanced with decorative elements ——— */}
-      <section className="relative z-10 bg-black pb-20 sm:pb-24 md:pb-32 pt-2">
+      <section className="relative z-10 bg-black pb-20 sm:pb-24 md:pb-32 pt-10 sm:pt-14 md:pt-16">
         {/* Decorative line above */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-        
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 text-center relative">
+
+        <div className="max-w-3xl mx-auto px-6 sm:px-8 md:px-10 text-center relative flex flex-col items-center">
+
           <motion.p initial={{
           opacity: 0,
           y: 20
