@@ -7,7 +7,7 @@ import g3BlackRear from "@/assets/g3-black-07.jpg";
 import g3BlackSide from "@/assets/g3-black-03.jpg";
 import g3GoldCover from "@/assets/g-3.jpg";
 import g3GoldFront from "@/assets/g3-iconic-gold-front.jpg";
-import greyCover from "@/assets/g-1.jpg";
+import greyCover from "@/assets/g3-grey-cover.jpg";
 import greyStudio from "@/assets/g3-grey-studio.jpg";
 import greyRear from "@/assets/g3-grey-rear.jpg";
 import greyDetail from "@/assets/g3-grey-detail.jpg";
@@ -33,7 +33,7 @@ import fusion07 from "@/assets/fusion/07-rear.jpg";
 import fusion08 from "@/assets/fusion/08-top.jpg";
 import fusion09 from "@/assets/fusion/09-interior-top.jpg";
 
-import fusionTurquoiseCoverUrl from "@/assets/fusion-editions/turquoise-cover.jpg";
+const fusionTurquoiseCoverUrl = "/__l5e/assets-v1/8970a228-257e-40e6-8477-ea6d545d805b/03-_1.jpg";
 
 import fusionCrimsonStudio from "@/assets/fusion-editions/crimson.jpg";
 import fusionTurquoiseStudio from "@/assets/fusion-editions/turquoise.jpg";
@@ -227,10 +227,10 @@ export const projects: Project[] = [
     duration: "12 weeks",
     package: "Ultra-Limited",
     category: "G-Class",
-    coverImage: g3GoldFront,
+    coverImage: g3GoldCover,
     images: [
-      { src: g3GoldFront, title: "Front view" },
       { src: g3GoldCover, title: "Gold grille three-quarter" },
+      { src: g3GoldFront, title: "Front view" },
       { src: g3GoldSide, title: "Side profile" },
       { src: g3GoldRear, title: "Rear view" },
       { src: g3GoldDetail, title: "Hood & wheel detail" },
@@ -322,7 +322,7 @@ export const projects: Project[] = [
   {
     id: "fusion-crimson",
     editionOf: "rolls-royce-fusion",
-    title: "REDLİNE",
+    title: "Crimson",
     subtitle: "The Fusion",
     year: "2024",
     duration: "12 weeks",
@@ -355,7 +355,7 @@ export const projects: Project[] = [
   {
     id: "fusion-turquoise",
     editionOf: "rolls-royce-fusion",
-    title: "SLATE BLUE",
+    title: "Turquoise",
     subtitle: "The Fusion",
     year: "2024",
     duration: "12 weeks",
@@ -490,7 +490,7 @@ export const projects: Project[] = [
   {
     id: "fusion-amethyst",
     editionOf: "rolls-royce-fusion",
-    title: "SAKURA",
+    title: "Amethyst",
     subtitle: "The Fusion",
     year: "2024",
     duration: "12 weeks",
