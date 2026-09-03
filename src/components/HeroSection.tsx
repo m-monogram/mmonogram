@@ -5,7 +5,7 @@ import { AuroraBackground } from "@/components/ui/aurora-background";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useContent } from "@/hooks/useContent";
 import heroImage from "@/assets/g-3.jpg";
-import heroImageMobile from "@/assets/g-3.jpg";
+import heroImageMobile from "@/assets/hero-main-mobile.jpg";
 import MediaEdgeFade, { mediaFadeMask } from "@/components/MediaEdgeFade";
 
 interface HeroSectionProps {
