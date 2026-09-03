@@ -191,8 +191,31 @@ const ProjectTemplate = memo(function ProjectTemplate({
       {/* ——— A) HERO ——— Premium cinematic hero with car positioned higher ——— */}
       <header className="relative h-[100dvh] min-h-[100dvh] w-full overflow-hidden bg-black">
         <div className="absolute inset-0 bg-black">
-          <img src={heroImage} alt={title} loading="eager" decoding="sync" fetchpriority="high" className="w-full h-full object-cover object-center" />
+          <img
+            src={heroImage}
+            alt={title}
+            loading="eager"
+            decoding="sync"
+            fetchpriority="high"
+            className="w-full h-full object-cover object-center"
+            style={{
+              WebkitMaskImage:
+                "linear-gradient(to bottom, #000 0%, #000 62%, rgba(0,0,0,0.72) 80%, rgba(0,0,0,0.28) 92%, transparent 100%)",
+              maskImage:
+                "linear-gradient(to bottom, #000 0%, #000 62%, rgba(0,0,0,0.72) 80%, rgba(0,0,0,0.28) 92%, transparent 100%)",
+            }}
+          />
+          {/* Плавный уход изображения в чёрный — без резкой границы */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-[38vh]"
+            style={{
+              background:
+                "linear-gradient(to top, #000 0%, rgba(0,0,0,0.92) 26%, rgba(0,0,0,0.6) 52%, rgba(0,0,0,0.25) 76%, transparent 100%)",
+            }}
+          />
         </div>
+
         {/* Subtle spotlight effect */}
         <div className="absolute inset-0 pointer-events-none opacity-30" aria-hidden>
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white/5 rounded-none blur-3xl" />
@@ -212,11 +235,12 @@ const ProjectTemplate = memo(function ProjectTemplate({
       </header>
 
       {/* ——— B) STATEMENT ——— Enhanced with decorative elements ——— */}
-      <section className="relative z-10 bg-black pb-20 sm:pb-24 md:pb-32 pt-2">
+      <section className="relative z-10 bg-black pb-20 sm:pb-24 md:pb-32 pt-10 sm:pt-14 md:pt-16">
         {/* Decorative line above */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-        
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 text-center relative">
+
+        <div className="max-w-3xl mx-auto px-6 sm:px-8 md:px-10 text-center relative flex flex-col items-center">
+
           <motion.p initial={{
           opacity: 0,
           y: 20
@@ -228,7 +252,7 @@ const ProjectTemplate = memo(function ProjectTemplate({
           margin: "-80px"
         }} transition={{
           duration: 0.7
-        }} className="font-body text-lg sm:text-xl md:text-2xl lg:text-3xl text-white/85 leading-relaxed tracking-wide">
+        }} className="font-body text-lg sm:text-xl md:text-2xl lg:text-[1.75rem] text-white/85 leading-[1.6] tracking-wide text-balance mx-auto">
             {statement}
           </motion.p>
         </div>
