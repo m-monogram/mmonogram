@@ -189,7 +189,7 @@ const ProjectTemplate = memo(function ProjectTemplate({
   }, [title]);
   return <div className="min-h-screen relative z-10 bg-black">
       {/* ——— A) HERO ——— Premium cinematic hero with car positioned higher ——— */}
-      <header className="relative h-[100dvh] min-h-[100dvh] w-full overflow-hidden bg-black">
+      <header className="relative h-[78dvh] min-h-[78dvh] md:h-[100dvh] md:min-h-[100dvh] w-full overflow-hidden bg-black">
         <div className="absolute inset-0 bg-black">
           <img
             src={heroImage}
@@ -197,7 +197,7 @@ const ProjectTemplate = memo(function ProjectTemplate({
             loading="eager"
             decoding="sync"
             fetchpriority="high"
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-contain object-center md:object-cover"
             style={{
               WebkitMaskImage:
                 "linear-gradient(to bottom, #000 0%, #000 62%, rgba(0,0,0,0.72) 80%, rgba(0,0,0,0.28) 92%, transparent 100%)",
